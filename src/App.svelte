@@ -44,7 +44,10 @@
 		}
 	} else {
 		switch ($location) {
-			case '/' || '/signup':
+			case '/':
+				links = ['로그인'];
+				break;
+			case '/signup':
 				links = ['로그인'];
 				break;
 			case '/login':
