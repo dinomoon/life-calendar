@@ -13,7 +13,7 @@
 </script>
 
 <div class="container">
-  <h2>회원가입</h2>
+  <h2 class="title">회원가입</h2>
   <form on:submit|preventDefault={submitHandler}>
     <label for="name">이름</label>
     <input id="name" type="text" placeholder="홍길동">
@@ -33,7 +33,7 @@
     margin: 0 auto;
   }
 
-  .container h2 {
+  .title {
     font-size: 32px;
     margin-bottom: 2rem;
     text-align: left;
@@ -44,18 +44,18 @@
   }
 
   label {
-    margin-bottom: 6px;
+    margin-bottom: 10px;
+  }
+
+  input {
+    padding-left: 1rem;
+    margin-bottom: 1.2rem;
   }
 
   input, button {
     width: 100%;
     height: 60px;
     border-radius: 3px;
-  }
-
-  input {
-    padding-left: 1rem;
-    margin-bottom: 1rem;
   }
 
   input::placeholder {

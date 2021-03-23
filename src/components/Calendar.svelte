@@ -88,7 +88,7 @@
   /* Annual */
   .annual .calendar--grid {
     display: grid;
-    grid-template-columns: repeat(10, 100px);
+    grid-template-columns: repeat(10, 1fr);
     gap: 10px;
   }
 
@@ -101,7 +101,7 @@
   /* Monthly */
   .monthly .calendar--grid {
     display: grid;
-    grid-template-columns: repeat(12, 80px);
+    grid-template-columns: repeat(12, 1fr);
     gap: 10px;
   }
 
@@ -114,7 +114,7 @@
   /* Weekly */
   .weekly .calendar--grid {
     display: grid;
-    grid-template-columns: repeat(52, 20px);
+    grid-template-columns: repeat(52, 1fr);
     gap: 5px;
   }
 
