@@ -51,7 +51,7 @@
         <ul class="calendar-tabs">
           {#each $calendarTabs as tab}
             <li>
-              <a href="/#/{obj[tab]}" class:activeTab={tab === $activeTab}>{tab}</a>
+              <a href="/#/{obj[tab]}" class:activeTab={tab === $activeTab} class:notActiveTab={tab !== $activeTab}>{tab}</a>
             </li>
           {/each}
         </ul>
@@ -79,6 +79,10 @@
   .activeTab {
     color: #fa5252;
     border-bottom: 2px solid #fa5252;
+  }
+
+  .notActiveTab:hover {
+    border-bottom: 2px solid #dee2e6;
   }
 
   header {
@@ -132,6 +136,6 @@
   ul li a, button {
     font-size: 18px;
     cursor: pointer;
-    padding: 0.4rem 0.8rem;
+    padding: 12px;
   }
 </style>
