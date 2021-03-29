@@ -10,7 +10,7 @@
   main {
     max-width: 1248px;
     margin: 0 auto;
-    padding-top: 8rem;
+    padding-top: 5rem;
     text-align: center;
   }
 

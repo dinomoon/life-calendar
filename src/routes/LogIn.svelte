@@ -1,6 +1,6 @@
 <script>
   import {push} from 'svelte-spa-router';
-	import {kakaoLoggedIn, naverLoggedIn} from '../store';
+	import {kakaoLoggedIn, naverLoggedIn, userId, userInfo} from '../store';
 
   const emailLoginHandler = (e) => {
     const email = e.target['email'].value;
@@ -25,14 +25,12 @@
         await Kakao.Auth.login({
           scope: 'profile, age_range',
           success: function(authObj) {
-            console.log(authObj);
             kakaoLoggedIn.set(true);
-            push('/')
             window.Kakao.API.request({
               url: '/v2/user/me',
               success: res => {
-                const kakao_account = res.kakao_account;
-                console.log(kakao_account);
+                userId.set(res.id);
+                push('/')
               }
             })
           }
@@ -62,7 +60,7 @@
     }
 
     if (provider) {
-      await firebase.auth().signInWithPopup(provider).then(result => console.log(result));
+      await firebase.auth().signInWithPopup(provider);
       push('/');
     }
   }
@@ -110,10 +108,11 @@
   .container {
     width: 500px;
     margin: 0 auto;
+    padding-top: 3rem;
   }
 
   .title {
-    font-size: 32px;
+    font-size: 1.6rem;
     text-align: left;
     margin-bottom: 2rem;
   }
@@ -141,7 +140,7 @@
 
   input, button {
     width: 100%;
-    height: 55px;
+    height: 50px;
   }
 
   input:last-of-type {
@@ -189,16 +188,15 @@
   */
 
   .social-login button {
-    background-color: transparent;
     color: #111;
-    padding-left: 0.4em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .social-login button i {
-    vertical-align: top;
     font-size: 1.6rem;
-    margin-right: 0.5rem;
-    padding-top: 1px;
+    margin-right: 10px;
   }
 
   .social-login .kakao {
@@ -249,8 +247,6 @@
 
   .google-icon, .naver-icon {
     width: 24px;
-    margin-right: 0.5rem;
-    vertical-align: top;
-    padding-top: 2px;
+    margin-right: 10px;
   }
 </style>

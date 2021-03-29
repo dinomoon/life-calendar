@@ -31,10 +31,11 @@
   .container {
     width: 520px;
     margin: 0 auto;
+    padding-top: 5rem;
   }
 
   .title {
-    font-size: 32px;
+    font-size: 1.6rem;
     margin-bottom: 2rem;
     text-align: left;
   }
@@ -54,7 +55,7 @@
 
   input, button {
     width: 100%;
-    height: 60px;
+    height: 55px;
     border-radius: 3px;
   }
 

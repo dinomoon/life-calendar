@@ -25,7 +25,7 @@
         pushHome();
         kakaoLoggedIn.set(false);
       } catch (error) {
-        console.log('error')
+        console.log('error');
       }
     }
   }
@@ -86,6 +86,7 @@
   }
 
   header {
+    max-width: 1920px;
     position: fixed;
     top: 0;
     left: 0;
@@ -94,6 +95,10 @@
     background-color: #fff;
     transition: all 0.3s ease;
     z-index: 1;
+  }
+
+  header.loggedIn {
+    padding: 0 24px;
   }
 
   header.borderBottom {
@@ -105,7 +110,7 @@
   }
 
   .container {
-    max-width: 1248px;
+    max-width: 1200px;
     height: 100%;
     margin: 0 auto;
     display: flex;
@@ -114,7 +119,7 @@
   }
 
   .loggedIn .container {
-    max-width: 1440px;
+    max-width: 100%;
   }
 
   .logo {

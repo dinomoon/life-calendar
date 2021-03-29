@@ -1,5 +1,22 @@
 @import url('https://cdn.rawgit.com/innks/NanumSquareRound/master/nanumsquareround.min.css');
 
+:root {
+  --border-color: #dee2e6;
+  --past-background-color: #ebecf0;
+  --current-item-color: #f5df4d;
+  --all-this-month-color: #939597;
+  --this-year-color: #74c0fc;
+  --this-year-past-color: #d0ebff;
+}
+
+.fold {
+  transform: rotate(-90deg);
+}
+
+i {
+  transition: all 0.3s;
+}
+
 * {
   padding: 0;
   margin: 0;
