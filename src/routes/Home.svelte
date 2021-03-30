@@ -2,6 +2,7 @@
 	import {loggedIn, userId, userInfo} from '../store';
 	import Annual from '../components/tabs/Annual.svelte';
 	import { onMount } from 'svelte';
+import Calendar from '../components/Calendar.svelte';
 
 	onMount(() => {
 		db.collection('users').onSnapshot((snapshot => {
@@ -18,18 +19,18 @@
 	<Annual />
 {:else}
 	<section class="welcome">
-		<img src="/img/welcome-img.svg" alt="">
-		<h2>Welcome to Life Calendar!</h2>
+		<h2>당신은 어떤 삶을 살고 계신가요?</h2>
 	</section>
+	<!-- <Calendar monthly /> -->
 {/if}
-
 
 <style>
 	section {
+		height: 100vh;
 		padding-top: 5rem;
 	}
 
-	.welcome img {
-		margin-bottom: 1rem;
+	section h2 {
+		font-size: 2rem;
 	}
 </style>

@@ -1,4 +1,4 @@
-@import url('https://cdn.rawgit.com/innks/NanumSquareRound/master/nanumsquareround.min.css');
+@import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css);
 
 :root {
   --border-color: #dee2e6;
@@ -7,6 +7,8 @@
   --all-this-month-color: #939597;
   --this-year-color: #74c0fc;
   --this-year-past-color: #d0ebff;
+  --active-color: #fa5252;
+  --background-color: #fdf9f1;
 }
 
 .fold {
@@ -32,8 +34,10 @@ body {
 
 body {
   color: #111;
-  font-family: 'NanumSquareRound', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-family: 'Spoqa Han Sans Neo', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue',
+    sans-serif;
+  background-color: var(--background-color);
 }
 
 a {
@@ -58,29 +62,6 @@ textarea {
   -webkit-padding: 0.4em 0;
   padding: 0.4em;
   margin: 0 0 0.5em 0;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   border-radius: 2px;
-}
-
-input:disabled {
-  color: #ccc;
-}
-
-button {
-  color: #333;
-  background-color: #f4f4f4;
-  outline: none;
-}
-
-button:disabled {
-  color: #999;
-}
-
-button:not(:disabled):active {
-  background-color: #ddd;
-}
-
-button:focus {
-  border-color: #666;
 }

@@ -1,7 +1,8 @@
 <script>
-  import { fade } from 'svelte/transition';
+  import { onMount } from 'svelte';
+  import { userId, userInfo, week, colors, squareList, beforeBtnClasses, beforeBtnObj, monthlyFoldObj, weeklyFoldObj } from "../store";
   import { push } from "svelte-spa-router";
-  import { userId, userInfo, week, colors } from "../store";
+  import { fade } from 'svelte/transition';
 
   export let annual = false;
   export let monthly = false;
@@ -10,14 +11,33 @@
   const thisYear = date.getFullYear();
   const thisMonth = date.getMonth();
   let weekNum = null;
-  let squareList = [];
 
   if (annual) {
-    squareList = Array.from(Array(100).keys());
+    squareList.set(Array.from(Array(100).keys()));
   } else if (monthly) {
-    squareList = Array.from(Array(1200).keys());
+    squareList.set(Array.from(Array(1200).keys()));
   } else if (weekly) {
-    squareList = Array.from(Array(5200).keys());
+    squareList.set(Array.from(Array(5200).keys()));
+  }
+
+  if (monthly || weekly) {
+    onMount(() => {
+      $beforeBtnClasses.forEach(btnClass => {
+        if (JSON.parse(localStorage.getItem('monthly-fold-obj'))[btnClass] === true && monthly) {
+          const btn = document.querySelector(`.${btnClass}`);
+          const icon = btn.querySelector('i');
+          icon.classList.add('fold');
+          const items = document.querySelectorAll($beforeBtnObj[btnClass]);
+          items.forEach(item => item.classList.add('hidden'));
+        } else if (JSON.parse(localStorage.getItem('weekly-fold-obj'))[btnClass] === true && weekly) {
+          const btn = document.querySelector(`.${btnClass}`);
+          const icon = btn.querySelector('i');
+          icon.classList.add('fold');
+          const items = document.querySelectorAll($beforeBtnObj[btnClass]);
+          items.forEach(item => item.classList.add('hidden'));
+        }
+      });
+    })
   }
 
   const submitHandler = async (e) => {
@@ -93,47 +113,47 @@
     let classList = null;
     if (e.target.tagName === 'BUTTON') {
       button = e.target;
-      icon = e.target.children[0];
+      icon = button.children[0];
       classList = button.classList;
     } else {
-      button = e.target.parentNode;
       icon = e.target;
+      button = icon.parentNode;
       classList = button.classList;
     }
 
     icon.classList.toggle('fold');
 
-    if (classList.contains('b10')) {
-      const items = document.querySelectorAll('.before10');
-      items.forEach(item => item.classList.toggle('hidden'));
-    } else if (classList.contains('b20')) {
-      const items = document.querySelectorAll('.before20');
-      items.forEach(item => item.classList.toggle('hidden'));
-    } else if (classList.contains('b30')) {
-      const items = document.querySelectorAll('.before30');
-      items.forEach(item => item.classList.toggle('hidden'));
-    } else if (classList.contains('b40')) {
-      const items = document.querySelectorAll('.before40');
-      items.forEach(item => item.classList.toggle('hidden'));
-    } else if (classList.contains('b50')) {
-      const items = document.querySelectorAll('.before50');
-      items.forEach(item => item.classList.toggle('hidden'));
-    } else if (classList.contains('b60')) {
-      const items = document.querySelectorAll('.before60');
-      items.forEach(item => item.classList.toggle('hidden'));
-    } else if (classList.contains('b70')) {
-      const items = document.querySelectorAll('.before70');
-      items.forEach(item => item.classList.toggle('hidden'));
-    } else if (classList.contains('b80')) {
-      const items = document.querySelectorAll('.before80');
-      items.forEach(item => item.classList.toggle('hidden'));
-    } else if (classList.contains('b90')) {
-      const items = document.querySelectorAll('.before90');
-      items.forEach(item => item.classList.toggle('hidden'));
-    } else if (classList.contains('b100')) {
-      const items = document.querySelectorAll('.before100');
-      items.forEach(item => item.classList.toggle('hidden'));
+    if (JSON.parse(localStorage.getItem('monthly-fold-obj')) === null) {
+      localStorage.setItem('monthly-fold-obj', JSON.stringify($monthlyFoldObj));
     }
+
+    if (JSON.parse(localStorage.getItem('weekly-fold-obj')) === null) {
+      localStorage.setItem('weekly-fold-obj', JSON.stringify($weeklyFoldObj));
+    }
+
+    $beforeBtnClasses.forEach(btnClass => {
+      if (classList.contains(btnClass)) {
+        if (monthly) {
+          if (JSON.parse(localStorage.getItem('monthly-fold-obj'))[btnClass] === true) {
+            $monthlyFoldObj[btnClass] = false;
+            localStorage.setItem('monthly-fold-obj', JSON.stringify($monthlyFoldObj));
+          } else {
+            $monthlyFoldObj[btnClass] = true;
+            localStorage.setItem('monthly-fold-obj', JSON.stringify($monthlyFoldObj));
+          }
+        } else if (weekly) {
+          if (JSON.parse(localStorage.getItem('weekly-fold-obj'))[btnClass] === true) {
+            $weeklyFoldObj[btnClass] = false;
+            localStorage.setItem('weekly-fold-obj', JSON.stringify($weeklyFoldObj));
+          } else {
+            $weeklyFoldObj[btnClass] = true;
+            localStorage.setItem('weekly-fold-obj', JSON.stringify($weeklyFoldObj));
+          }
+        }
+        const items = document.querySelectorAll($beforeBtnObj[btnClass]);
+        items.forEach(item => item.classList.toggle('hidden'));
+      }
+    });
   }
 
   function mouseoverHandler(e) {
@@ -206,8 +226,8 @@
   {#if $userInfo}
   <div class="container" class:annual class:monthly class:weekly>
     <div class="calendar--grid" on:mouseover={mouseoverHandler} on:mouseout={mouseoutHandler} in:fade>
-      <div class="time">{thisYear}년 {thisMonth + 1}월 {date.getDate()}일 {$week[date.getDay()]}요일</div>
-      {#each squareList as item}
+      <!-- <div class="time">오늘은 {thisYear}년 {thisMonth + 1}월 {date.getDate()}일 {$week[date.getDay()]}요일입니다.</div> -->
+      {#each $squareList as item}
         <!-- Annual -->
         {#if annual}
           <div class="item"
@@ -220,9 +240,9 @@
         {:else if monthly}
           <div class="item"
             class:past={$userInfo.birthday.year + Math.floor(item / 12) < thisYear || ((Math.floor(item / 12) === (thisYear - $userInfo.birthday.year)) && (item % 12 < thisMonth))}
+            class:current={(Math.floor(item / 12) === (thisYear - $userInfo.birthday.year)) && (item % 12 === thisMonth)}
             class:allThisMonth={item % 12 === thisMonth}
             class:thisYear={Math.floor(item / 12) === (thisYear - $userInfo.birthday.year)}
-            class:current={(Math.floor(item / 12) === (thisYear - $userInfo.birthday.year)) && (item % 12 === thisMonth)}
             class:before10={12 * 1 - 1 < item && item < 12 * 9}
             class:before20={12 * 10 - 1 < item && item < 12 * 19}
             class:before30={12 * 20 - 1 < item && item < 12 * 29}
@@ -237,33 +257,41 @@
             data-age={Math.floor(item / 12)}
           >
             {#if item === 0}
-              <span class="month-name">JAN</span>
+              <span class="month-name" class:currentText={thisMonth === 0}>JAN</span>
             {:else if item === 1}
-              <span class="month-name">FEB</span>
+              <span class="month-name" class:currentText={thisMonth === 1}>FEB</span>
             {:else if item === 2}
-              <span class="month-name">MAR</span>
+              <span class="month-name" class:currentText={thisMonth === 2}>MAR</span>
             {:else if item === 3}
-              <span class="month-name">APR</span>
+              <span class="month-name" class:currentText={thisMonth === 3}>APR</span>
             {:else if item === 4}
-              <span class="month-name">MAY</span>
+              <span class="month-name" class:currentText={thisMonth === 4}>MAY</span>
             {:else if item === 5}
-              <span class="month-name">JUN</span>
+              <span class="month-name" class:currentText={thisMonth === 5}>JUN</span>
             {:else if item === 6}
-              <span class="month-name">JUL</span>
+              <span class="month-name" class:currentText={thisMonth === 6}>JUL</span>
             {:else if item === 7}
-              <span class="month-name">AUG</span>
+              <span class="month-name" class:currentText={thisMonth === 7}>AUG</span>
             {:else if item === 8}
-              <span class="month-name">SEP</span>
+              <span class="month-name" class:currentText={thisMonth === 8}>SEP</span>
             {:else if item === 9}
-              <span class="month-name">OCT</span>
+              <span class="month-name" class:currentText={thisMonth === 9}>OCT</span>
             {:else if item === 10}
-              <span class="month-name">NOV</span>
+              <span class="month-name" class:currentText={thisMonth === 10}>NOV</span>
             {:else if item === 11}
-              <span class="month-name">DEC</span>
+              <span class="month-name" class:currentText={thisMonth === 11}>DEC</span>
             {/if}
+            <!-- age -->
             {#if item % 12 === 0}
-              <span class="cursor-default age" class:textBold={(Math.floor(item / 12) + 1) % 10 === 0 || item === 0}>{Math.floor(item / 12) + 1}</span>
+              <span 
+                class="cursor-default age"
+                class:textBold={(Math.floor(item / 12) + 1) % 10 === 0 || item === 0}
+                class:currentText={Math.floor(item / 12) === thisYear - $userInfo.birthday.year}
+              >
+                {Math.floor(item / 12) + 1}
+              </span>
             {/if}
+            <!-- // age -->
             {#if item != 1199 && item % 12 === 11 && (Math.floor(item / 12) + 1) % 10 === 0 || item === 11}
               <button
                 on:click={hideHandler}
@@ -283,12 +311,15 @@
               </button>
             {/if}
           </div>
+        <!-- // Monthly  -->
         <!-- Weekly -->
         {:else if weekly}
           <div
             class="item"
             class:past={($userInfo.birthday.year + Math.floor(item / 52) < thisYear) || (($userInfo.birthday.year + Math.floor(item / 52) == thisYear) && (item % 52 < weekNum - 1))}
             class:current={(Math.floor(item / 52) === (thisYear - $userInfo.birthday.year)) && (item % 52 === weekNum - 1)}
+            class:allThisMonth={item % 52 === weekNum - 1}
+            class:thisYear={Math.floor(item / 52) === (thisYear - $userInfo.birthday.year)}
             class:before10={52 * 1 - 1 < item && item < 52 * 9}
             class:before20={52 * 10 - 1 < item && item < 52 * 19}
             class:before30={52 * 20 - 1 < item && item < 52 * 29}
@@ -303,10 +334,14 @@
             data-age={Math.floor(item / 52)}
           >
             {#if item < 52}
-              <span class="top-item cursor-default">{item + 1}</span>
+              <span class="top-item cursor-default" class:currentText={item === weekNum - 1}>{item + 1}</span>
             {/if}
             {#if item % 52 === 0}
-              <span class="left-item cursor-default" class:textBold={(Math.floor(item / 52) + 1) % 10 === 0 || item === 0}>
+              <span
+                class="left-item cursor-default"
+                class:textBold={(Math.floor(item / 52) + 1) % 10 === 0 || item === 0}
+                class:currentText={Math.floor(item / 52) === thisYear - $userInfo.birthday.year}
+              >
                 {Math.floor(item / 52) + 1}
               </span>
             {/if}
@@ -334,12 +369,14 @@
     </div>
   </div>
   {:else}
-    <h2>태어난 날을 선택해주세요.</h2>
-    <form on:submit|preventDefault={submitHandler}>
-      <label for="birthday">태어난 날</label>
-      <input type="date" id="birthday" name="birthday">
-      <button type="submit">시작하기</button>
-    </form>
+    <div class="birth-form-container">
+      <h2>생일을 입력해주세요.😊👀</h2>
+      <form on:submit|preventDefault={submitHandler}>
+        <!-- <label for="birthday">당신의 생일은?</label> -->
+        <input type="date" id="birthday" name="birthday">
+        <button type="submit">시작하기</button>
+      </form>
+    </div>
   {/if}
   <div class="hidden"></div>
 </section>
@@ -355,9 +392,30 @@
     text-align: center;
   }
 
+  /* 
   .time {
     position: absolute;
     top: -3rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  */
+  .birth-form-container {
+		margin-bottom: 14rem;
+	}
+
+  .birth-form-container h2 {
+    margin-bottom: 2rem;
+  }
+
+  .birth-form-container form {
+    display: flex;
+		justify-content: center;
+  }
+
+  .currentText {
+    color: var(--active-color);
+    font-weight: 800;
   }
 
   /* Grid Common Style */
@@ -414,13 +472,13 @@
     background-color: var(--current-item-color) !important;
     color: #fff;
     border: none;
-    font-weight: 800;
+    font-weight: bold;
   }
 
   /* Annual */
   .annual .calendar--grid {
-    grid-template-columns: repeat(10, 80px);
-    grid-template-rows: repeat(10, 40px);
+    grid-template-columns: repeat(10, 90px);
+    grid-template-rows: repeat(10, 45px);
     gap: 6px;
   }
 
@@ -432,23 +490,23 @@
   .monthly .calendar--grid {
     grid-template-columns: repeat(12, 60px);
     grid-template-rows: repeat(100, 30px);
-    gap: 4px;
+    gap: 5px;
   }
 
   .monthly .calendar--grid .item {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .monthly .calendar--grid .item .age {
     position: absolute;
-    right: 120%;
+    right: 130%;
   }
 
   .month-name {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    top: -20px;
+    top: -30px;
     cursor: default;
   }
 
@@ -466,25 +524,26 @@
 
   /* Weekly */
   .weekly .calendar--grid {
-    grid-template-columns: repeat(52, 20px);
-    grid-template-rows: repeat(100, 20px);
-    gap: 2px;
+    grid-template-columns: repeat(52, 21px);
+    grid-template-rows: repeat(100, 21px);
+    gap: 3px;
   }
 
   .weekly .calendar--grid .item {
     border-radius: 1px;
   }
 
-  .weekly .top-item {
+  .weekly .top-item, .weekly .left-item {
     position: absolute;
-    top: -16px;
-    font-size: 10px;
+    font-size: 12px;
+  }
+
+  .weekly .top-item {
+    top: -25px;
   }
 
   .weekly .left-item {
-    position: absolute;
-    right: 140%;
-    font-size: 10px;
+    right: 165%;
   }
 
   .weekly .fold-button {

@@ -77,12 +77,12 @@
 
 <style>
   .activeTab {
-    color: #fa5252;
-    border-bottom: 2px solid #fa5252;
+    color: var(--active-color);
+    border-bottom: 2px solid var(--active-color);
   }
 
   .notActiveTab:hover {
-    border-bottom: 2px solid #dee2e6;
+    border-bottom: 2px solid var(--border-color);
   }
 
   header {
@@ -92,7 +92,7 @@
     left: 0;
     right: 0;
     height: 80px;
-    background-color: #fff;
+    background-color: var(--background-color);
     transition: all 0.3s ease;
     z-index: 1;
   }
