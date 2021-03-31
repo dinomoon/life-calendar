@@ -1,6 +1,6 @@
 <script>
   import {push} from 'svelte-spa-router';
-	import {kakaoLoggedIn, naverLoggedIn, userId, userInfo} from '../store';
+	import {kakaoLoggedIn, userId} from '../store';
 
   const emailLoginHandler = (e) => {
     const email = e.target['email'].value;
@@ -35,16 +35,6 @@
             })
           }
         })
-        break;
-      case 'naver':
-        // ClientId, Callback URL
-        let naver_id_login = await new window.naver_id_login("CmNDUb_mqPdzPuWXSgVL", "http://localhost:5000");
-        naver_id_login.init_naver_id_login();
-        naver_id_login.setPopup();
-        // let state = naver_id_login.getUniqState();
-        // naver_id_login.setDomain(".service.com");
-        // naver_id_login.setState(state);
-        naverLoggedIn.set(true);
         break;
       case 'facebook':
         provider = new firebase.auth.FacebookAuthProvider();
@@ -85,10 +75,7 @@
       <i class="fas fa-comment"></i>
       <span>카카오로 시작하기</span>
     </button>
-    <button type="button" class="naver" id="naver_id_login">
-      <img class="naver-icon" src="/img/naver.png" alt="">
-      <span>네이버로 시작하기</span>
-    </button>
+    
     <button type="button" class="facebook">
       <i class="fab fa-facebook-square"></i>
       <span>페이스북으로 시작하기</span>
@@ -96,10 +83,6 @@
     <button type="button" class="google">
       <img class="google-icon" src="/img/google-icon.svg" alt="">
       <span>구글로 시작하기</span>
-    </button>
-    <button type="button" class="apple">
-      <i class="fab fa-apple"></i>
-      <span>애플로 시작하기</span>
     </button>
   </div>
 </div>
@@ -175,7 +158,7 @@
   .or .line {
     flex: 3;
     height: 1px;
-    background-color: #ddd;
+    background-color: var(--border-color);
   }
 
   .or .text {
@@ -207,45 +190,26 @@
     background-color: #f5e20f;
   }
 
-  .social-login .naver {
-    background-color: #1EC800;
-    color: #fff;
-  }
-
-  .social-login .naver:hover {
-    background-color: #40c057;
-  }
-
   .social-login .facebook {
-    background-color: #228be6;
+    background-color: #1877f2;
     color: #fff;
   }
 
   .social-login .facebook:hover {
-    background-color: #1c7ed6;
+    background-color: #106ae0;
     color: #fff;
   }
 
   .social-login .google {
-    background-color: #f1f3f5;
-    color: #000;
+    background-color: #4b525a;
+    color: #fff;
   }
 
   .social-login .google:hover {
-    background-color: #e9ecef;
+    background-color: #30383f;
   }
 
-  .social-login .apple {
-    background-color: #000;
-    color: #fff;
-  }
-
-  .social-login .apple:hover {
-    background-color: #343a40;
-    color: #fff;
-  }
-
-  .google-icon, .naver-icon {
+  .google-icon {
     width: 24px;
     margin-right: 10px;
   }

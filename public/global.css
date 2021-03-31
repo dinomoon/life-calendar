@@ -2,11 +2,12 @@
 
 :root {
   --border-color: #dee2e6;
-  --past-background-color: #ebecf0;
+  --past-background-color: rgba(0, 0, 0, 0.1);
   --current-item-color: #f5df4d;
-  --all-this-month-color: #939597;
-  --this-year-color: #74c0fc;
-  --this-year-past-color: #d0ebff;
+  --all-this-month-past-color: rgba(0, 0, 0, 0.4);
+  --all-this-month-future-color: lightpink;
+  --this-year-color: lightpink;
+  --this-year-past-color: rgba(0, 0, 0, 0.4);
   --active-color: #fa5252;
   --background-color: #fdf9f1;
 }
@@ -64,4 +65,8 @@ textarea {
   margin: 0 0 0.5em 0;
   border: 1px solid var(--border-color);
   border-radius: 2px;
+}
+
+button {
+  outline: none;
 }

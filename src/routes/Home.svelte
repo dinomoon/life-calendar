@@ -19,18 +19,41 @@ import Calendar from '../components/Calendar.svelte';
 	<Annual />
 {:else}
 	<section class="welcome">
-		<h2>당신은 어떤 삶을 살고 계신가요?</h2>
+		<div class="left-text">
+			<h2>당신은 어떤 삶을 살고 계신가요?</h2>
+			<p>당신의 삶을 기록해보세요.</p>
+		</div>
+		<div class="right-img">
+			<img src="/img/main.svg" alt="">
+		</div>
 	</section>
 	<!-- <Calendar monthly /> -->
 {/if}
 
 <style>
-	section {
-		height: 100vh;
-		padding-top: 5rem;
+	.welcome {
+		padding-top: 10rem;
+		text-align: left;
 	}
 
-	section h2 {
-		font-size: 2rem;
+	.left-text {
+		margin-bottom: 2rem;
+	}
+
+	.left-text h2 {
+		font-size: 2.2rem;
+		margin-bottom: 10px;
+	}
+
+	.left-text p {
+		font-size: 20px;
+	}
+
+	.right-img {
+		text-align: right;
+	}
+
+	.right-img img {
+		width: 900px;
 	}
 </style>

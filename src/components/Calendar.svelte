@@ -1,7 +1,6 @@
 <script>
   import { onMount } from 'svelte';
   import { userId, userInfo, week, colors, squareList, beforeBtnClasses, beforeBtnObj, monthlyFoldObj, weeklyFoldObj } from "../store";
-  import { push } from "svelte-spa-router";
   import { fade } from 'svelte/transition';
 
   export let annual = false;
@@ -163,7 +162,7 @@
 
     if (target.classList.contains('item')) {
       if (annual) {
-        target.style.backgroundColor = $colors['current-item-color'];
+        target.style.backgroundColor = $colors['current-hover-item-color'];
         target.style.color = '#fff';
       } else {
         const hoverId = target.dataset.id;
@@ -178,7 +177,7 @@
         ages.forEach(age => {
           age.style.backgroundColor = $colors['hover-item-color'];
         })
-        target.style.backgroundColor = $colors['current-item-color'];
+        target.style.backgroundColor = $colors['current-hover-item-color'];
       }
     }
   }
@@ -194,7 +193,7 @@
         if (target.classList.contains('past')) {
           target.style.backgroundColor = $colors['past-background-color'];
         } else {
-          target.style.backgroundColor = '#fff';
+          target.style.backgroundColor = '#fff'
         }
       } else {
         const hoverId = target.dataset.id;
@@ -241,7 +240,8 @@
           <div class="item"
             class:past={$userInfo.birthday.year + Math.floor(item / 12) < thisYear || ((Math.floor(item / 12) === (thisYear - $userInfo.birthday.year)) && (item % 12 < thisMonth))}
             class:current={(Math.floor(item / 12) === (thisYear - $userInfo.birthday.year)) && (item % 12 === thisMonth)}
-            class:allThisMonth={item % 12 === thisMonth}
+            class:allThisMonthPast={item % 12 === thisMonth && (Math.floor(item / 12) < (thisYear - $userInfo.birthday.year))}
+            class:allThisMonthFuture={item % 12 === thisMonth && (Math.floor(item / 12) > (thisYear - $userInfo.birthday.year))}
             class:thisYear={Math.floor(item / 12) === (thisYear - $userInfo.birthday.year)}
             class:before10={12 * 1 - 1 < item && item < 12 * 9}
             class:before20={12 * 10 - 1 < item && item < 12 * 19}
@@ -318,7 +318,8 @@
             class="item"
             class:past={($userInfo.birthday.year + Math.floor(item / 52) < thisYear) || (($userInfo.birthday.year + Math.floor(item / 52) == thisYear) && (item % 52 < weekNum - 1))}
             class:current={(Math.floor(item / 52) === (thisYear - $userInfo.birthday.year)) && (item % 52 === weekNum - 1)}
-            class:allThisMonth={item % 52 === weekNum - 1}
+            class:allThisMonthPast={item % 52 === weekNum - 1 && (Math.floor(item / 52) < (thisYear - $userInfo.birthday.year))}
+            class:allThisMonthFuture={item % 52 === weekNum - 1 && (Math.floor(item / 52) > (thisYear - $userInfo.birthday.year))}
             class:thisYear={Math.floor(item / 52) === (thisYear - $userInfo.birthday.year)}
             class:before10={52 * 1 - 1 < item && item < 52 * 9}
             class:before20={52 * 10 - 1 < item && item < 52 * 19}
@@ -378,7 +379,7 @@
       </form>
     </div>
   {/if}
-  <div class="hidden"></div>
+  <div class="hidden current-hover-item"></div>
 </section>
 
 <style>
@@ -434,6 +435,12 @@
     border-radius: 4px;
     position: relative;
     transition: all 0.3s;
+    background-color: #fff;
+  }
+
+  .item.current {
+    background-color: var(--current-item-color) !important;
+    border: none;
   }
 
   .textBold {
@@ -465,14 +472,8 @@
     color: #555;
     background-color: transparent;
     border: none;
+    outline: none;
     cursor: pointer;
-  }
-
-  .item.current {
-    background-color: var(--current-item-color) !important;
-    color: #fff;
-    border: none;
-    font-weight: bold;
   }
 
   /* Annual */
@@ -490,7 +491,7 @@
   .monthly .calendar--grid {
     grid-template-columns: repeat(12, 60px);
     grid-template-rows: repeat(100, 30px);
-    gap: 5px;
+    gap: 4.5px;
   }
 
   .monthly .calendar--grid .item {
@@ -510,8 +511,12 @@
     cursor: default;
   }
 
-  .allThisMonth {
-    background-color: var(--all-this-month-color) !important;
+  .allThisMonthPast {
+    background-color: var(--all-this-month-past-color) !important;
+  }
+
+  .allThisMonthFuture {
+    background-color: var(--all-this-month-future-color) !important;
   }
 
   .thisYear {
@@ -520,6 +525,10 @@
 
   .thisYear.past {
     background-color: var(--this-year-past-color) !important;
+  }
+
+  .allThisMonthPast:hover, .allThisMonthFuture:hover, .thisYear:hover, .thisYear.past:hover {
+    opacity: 0.7;
   }
 
   /* Weekly */

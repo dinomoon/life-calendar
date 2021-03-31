@@ -1,21 +1,22 @@
 import { writable } from 'svelte/store';
 
 export const colors = writable({
-  'past-background-color': '#ebecf0',
-  'current-item-color': '#adb5bd',
-  'hover-item-color': '#dee2e6',
+  'past-background-color': 'rgba(0, 0, 0, 0.1)',
+  'current-hover-item-color': 'rgba(0,0,0,0.4)',
+  'hover-item-color': 'rgba(0,0,0,0.2)',
+  'background-color': '#fdf9f1',
 });
 export const loggedIn = writable(false);
 export const firebaseLoggedIn = writable(false);
 export const kakaoLoggedIn = writable(false);
-export const naverLoggedIn = writable(false);
 export const calendarTabs = writable(['연간', '월간', '주간']);
 export const activeTab = writable('연간');
 export const submitBirth = writable(false);
 export const userId = writable(null);
-export const userInfo = writable({
-  birthday: { year: 1994 },
-});
+// export const userInfo = writable({
+//   birthday: { year: 1994 },
+// });
+export const userInfo = writable(null);
 export const squareList = writable(null);
 export const week = writable({
   0: '일',

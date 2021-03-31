@@ -7,7 +7,7 @@
 	import Footer from './components/Footer.svelte'
 	import Main from './components/Main.svelte'
 
-	import {loggedIn, firebaseLoggedIn, kakaoLoggedIn, naverLoggedIn, activeTab, userId} from './store';
+	import {loggedIn, firebaseLoggedIn, kakaoLoggedIn, activeTab, userId} from './store';
 
 	let links = [];
 
@@ -21,8 +21,7 @@
 			}
 		});
 	})
-
-	$: if ($firebaseLoggedIn || $kakaoLoggedIn || $naverLoggedIn) {
+	$: if ($firebaseLoggedIn || $kakaoLoggedIn) {
 		loggedIn.set(true);
 	} else {
 		loggedIn.set(false);

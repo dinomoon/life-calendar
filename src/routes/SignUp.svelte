@@ -15,8 +15,8 @@
 <div class="container">
   <h2 class="title">회원가입</h2>
   <form on:submit|preventDefault={submitHandler}>
-    <label for="name">이름</label>
-    <input id="name" type="text" placeholder="홍길동">
+    <!-- <label for="name">이름</label> -->
+    <!-- <input id="name" type="text" placeholder="홍길동"> -->
     <label for="email">이메일</label>
     <input type="email" placeholder="example@example.com" id="email">
     <label for="password">비밀번호</label>
