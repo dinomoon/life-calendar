@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 
 export const colors = writable({
-  'past-background-color': 'rgba(0, 0, 0, 0.1)',
+  'past-background-color': 'rgba(0,0,0,0.1)',
   'current-hover-item-color': 'rgba(0,0,0,0.4)',
   'hover-item-color': 'rgba(0,0,0,0.2)',
   'background-color': '#fdf9f1',

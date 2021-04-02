@@ -63,10 +63,19 @@ textarea {
   -webkit-padding: 0.4em 0;
   padding: 0.4em;
   margin: 0 0 0.5em 0;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--past-background-color);
+  background-color: #fffefc;
   border-radius: 2px;
 }
 
 button {
   outline: none;
+}
+
+input::placeholder {
+  color: #adb5bd;
+}
+
+label {
+  margin-bottom: 8px;
 }

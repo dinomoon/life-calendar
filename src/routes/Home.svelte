@@ -37,16 +37,16 @@ import Calendar from '../components/Calendar.svelte';
 	}
 
 	.left-text {
-		margin-bottom: 2rem;
+		margin-bottom: 4rem;
 	}
 
 	.left-text h2 {
-		font-size: 2.2rem;
+		font-size: 50px;
 		margin-bottom: 10px;
 	}
 
 	.left-text p {
-		font-size: 20px;
+		font-size: 24px;
 	}
 
 	.right-img {

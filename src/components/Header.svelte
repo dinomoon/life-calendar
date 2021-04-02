@@ -1,7 +1,7 @@
 <script>
   import { push } from 'svelte-spa-router';
 
-	import {loggedIn, calendarTabs, firebaseLoggedIn, kakaoLoggedIn, activeTab} from '../store';
+	import {loggedIn, calendarTabs, firebaseLoggedIn, kakaoLoggedIn, activeTab, userInfo} from '../store';
 
   export let links;
   let borderBottom = false;
@@ -9,6 +9,7 @@
 
   const pushHome = () => {
     push('/');
+    activeTab.set('연간');
   }
 
   const logoutHandler = async () => {
@@ -46,7 +47,7 @@
         Life Calendar
       </a>
     </h1>
-    {#if $loggedIn}
+    {#if $loggedIn && $userInfo}
       <nav>
         <ul class="calendar-tabs">
           {#each $calendarTabs as tab}
@@ -91,7 +92,7 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 120px;
+    height: 100px;
     background-color: inherit;
     transition: all 0.3s ease;
     z-index: 1;
@@ -99,7 +100,7 @@
 
   header.loggedIn {
     padding: 0 40px;
-    height: 100px;
+    height: 80px;
   }
 
   header h1 {
@@ -158,7 +159,7 @@
 
   .logout-btn {
     transition: 0.3s;
-    border: 1px solid #151515;
+    border: 1px solid rgba(0,0,0,0.8);
   }
 
   .logout-btn:hover {

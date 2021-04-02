@@ -3,6 +3,7 @@
   import { userId, userInfo, week, colors, squareList, beforeBtnClasses, beforeBtnObj, monthlyFoldObj, weeklyFoldObj } from "../store";
   import { fade } from 'svelte/transition';
 
+  let birthdayValid = false;
   export let annual = false;
   export let monthly = false;
   export let weekly = false;
@@ -21,34 +22,46 @@
 
   if (monthly || weekly) {
     onMount(() => {
-      $beforeBtnClasses.forEach(btnClass => {
-        if (JSON.parse(localStorage.getItem('monthly-fold-obj'))[btnClass] === true && monthly) {
-          const btn = document.querySelector(`.${btnClass}`);
-          const icon = btn.querySelector('i');
-          icon.classList.add('fold');
-          const items = document.querySelectorAll($beforeBtnObj[btnClass]);
-          items.forEach(item => item.classList.add('hidden'));
-        } else if (JSON.parse(localStorage.getItem('weekly-fold-obj'))[btnClass] === true && weekly) {
-          const btn = document.querySelector(`.${btnClass}`);
-          const icon = btn.querySelector('i');
-          icon.classList.add('fold');
-          const items = document.querySelectorAll($beforeBtnObj[btnClass]);
-          items.forEach(item => item.classList.add('hidden'));
-        }
-      });
+      if (monthly) {
+        $beforeBtnClasses.forEach(btnClass => {
+          if (JSON.parse(localStorage.getItem('monthly-fold-obj'))[btnClass] === true) {
+            const btn = document.querySelector(`.${btnClass}`);
+            const icon = btn.querySelector('i');
+            icon.classList.add('fold');
+            const items = document.querySelectorAll($beforeBtnObj[btnClass]);
+            items.forEach(item => item.classList.add('hidden'));
+          }
+        });
+      } else if (weekly) {
+        $beforeBtnClasses.forEach(btnClass => {
+          if (JSON.parse(localStorage.getItem('weekly-fold-obj'))[btnClass] === true) {
+            const btn = document.querySelector(`.${btnClass}`);
+            const icon = btn.querySelector('i');
+            icon.classList.add('fold');
+            const items = document.querySelectorAll($beforeBtnObj[btnClass]);
+            items.forEach(item => item.classList.add('hidden'));
+          }
+        })
+      }
     })
   }
 
   const submitHandler = async (e) => {
+    birthdayValid = false;
     const birthday = e.target['birthday'].value;
     const birthArray = birthday.split('-');
     const year = +birthArray[0];
     const month = +birthArray[1];
     const day = +birthArray[2];
-    await db.collection('users').add({
-      userId: $userId,
-      birthday: {year, month, day},
-    })
+
+    console.log(birthArray)
+
+    if (birthdayValid) {
+      await db.collection('users').add({
+        userId: $userId,
+        birthday: {year, month, day},
+      })
+    }
   }
 
   // const clickHandler = (e) => {
@@ -82,20 +95,20 @@
   }
 
   function ordinalDay(date) {
-    var ordinal_table = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    let ordinal_table = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
 
     if (isLeap(date.getFullYear()))
-      for (var i = 2; i < ordinal_table.length; i++)
+      for (let i = 2; i < ordinal_table.length; i++)
         ordinal_table[i] += 1;
 
     return ordinal_table[date.getMonth()] + date.getDate();
   }
 
   function weekNumber(date) {
-    var ordinal_day = ordinalDay(date);
-    var current_year = date.getFullYear();
-    var weekday = date.getDay();
-    var week = Math.floor((ordinal_day - weekday + 10) / 7);
+    let ordinal_day = ordinalDay(date);
+    let current_year = date.getFullYear();
+    let weekday = date.getDay();
+    let week = Math.floor((ordinal_day - weekday + 10) / 7);
 
     if (week < 1) return lastWeek(current_year- 1);
     if (week > lastWeek(current_year)) return 1;
@@ -373,10 +386,13 @@
     <div class="birth-form-container">
       <h2>생일을 입력해주세요.😊👀</h2>
       <form on:submit|preventDefault={submitHandler}>
-        <!-- <label for="birthday">당신의 생일은?</label> -->
         <input type="date" id="birthday" name="birthday">
         <button type="submit">시작하기</button>
       </form>
+      <div class="birth-img-wrap">
+        <img class="party-img" src="/img/party.svg" alt="">
+        <img class="birthday-img" src="/img/birthday.svg" alt="">
+      </div>
     </div>
   {/if}
   <div class="hidden current-hover-item"></div>
@@ -393,25 +409,38 @@
     text-align: center;
   }
 
-  /* 
-  .time {
-    position: absolute;
-    top: -3rem;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  */
   .birth-form-container {
-		margin-bottom: 14rem;
+    width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
 	}
 
   .birth-form-container h2 {
+    font-size: 30px;
     margin-bottom: 2rem;
   }
 
   .birth-form-container form {
     display: flex;
 		justify-content: center;
+  }
+
+  .birth-form-container input {
+    padding: 10px;
+  }
+
+  .birth-img-wrap {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .birth-img-wrap img {
+    width: 300px;
+  }
+
+  .birth-img-wrap .birthday-img {
+    margin-top: 10rem;
   }
 
   .currentText {
