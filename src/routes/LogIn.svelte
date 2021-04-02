@@ -25,15 +25,14 @@
       valid = false;
       errors.email = '올바른 이메일이 아닙니다.'
     }
-
+    
+    // valid password
     if (fields.password === '') {
       valid = false;
       errors.password = '비밀번호를 입력해주세요.'
     } else {
       errors.password = '';
     }
-
-    // valid password
 
     if (valid) {
       auth.signInWithEmailAndPassword(fields.email, fields.password).then(() => {
@@ -75,7 +74,7 @@
     switch(clickedSocial) {
       case 'kakao':
         await Kakao.Auth.login({
-          scope: 'profile, age_range',
+          scope: 'profile',
           success: function(authObj) {
             kakaoLoggedIn.set(true);
             window.Kakao.API.request({
@@ -251,12 +250,12 @@
   }
 
   .social-login .google {
-    background-color: #4b525a;
+    background-color: #343a40;
     color: #fff;
   }
-
+  
   .social-login .google:hover {
-    background-color: #30383f;
+    background-color: #212529;
   }
 
   .google-icon {

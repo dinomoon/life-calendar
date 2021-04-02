@@ -10,6 +10,7 @@
   const pushHome = () => {
     push('/');
     activeTab.set('연간');
+    userInfo.set(null);
   }
 
   const logoutHandler = async () => {
@@ -26,7 +27,7 @@
         kakaoLoggedIn.set(false);
         pushHome();
       } catch (error) {
-        console.log('error');
+        console.log(error);
       }
     }
   }
@@ -59,7 +60,7 @@
       </nav>
     {/if}
     <nav>
-      <ul>
+      <ul class="sign-tabs">
         {#each links as link}
           {#if link === '로그아웃'}
             <li on:click={logoutHandler}>
@@ -111,6 +112,15 @@
 
   header.loggedIn h1 {
     font-size: 1.5rem;
+    flex: 1;
+  }
+
+  header.loggedIn nav {
+    flex: 1;
+  }
+
+  header.loggedIn .sign-tabs {
+    justify-content: flex-end;
   }
 
   header.borderBottom {
@@ -136,6 +146,7 @@
 
   ul {
     display: flex;
+    justify-content: center;
     align-items: center;
     list-style-type: none;
   }
@@ -159,7 +170,7 @@
 
   .logout-btn {
     transition: 0.3s;
-    border: 1px solid rgba(0,0,0,0.8);
+    border: 1px solid rgba(0,0,0,0.2);
   }
 
   .logout-btn:hover {

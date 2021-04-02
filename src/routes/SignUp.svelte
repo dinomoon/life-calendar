@@ -1,5 +1,5 @@
 <script>
-import { onMount } from "svelte";
+  import { onMount } from "svelte";
 
   import { push } from "svelte-spa-router";
 
@@ -11,6 +11,15 @@ import { onMount } from "svelte";
     let re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
     return re.test(email);
   }
+
+  onMount(() => {
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(input => {
+      input.addEventListener('focusout', () => {
+        validateCheck(input.id);
+      })
+    })
+  })
 
   function validateCheck(type) {
     // valid email
@@ -26,7 +35,6 @@ import { onMount } from "svelte";
       }
     }
     
-
     // valid password
     if (type === 'password' || type === 'all') {
       if (fields.password === '') {
@@ -60,6 +68,18 @@ import { onMount } from "svelte";
     }
   }
 
+  $: if (fields.password.length < 6 && fields.password !== '') {
+    errors.password = '6자 이상 입력해주세요.'
+  } else {
+    errors.password = ''
+  }
+
+  $: if (fields.password !== '' && fields.passwordConfirm !== '' && fields.password !== fields.passwordConfirm) {
+    errors.passwordConfirm = '비밀번호가 일치하지 않습니다.';
+  } else {
+    errors.passwordConfirm = '';
+  }
+
   const submitHandler = (e) => {
     e.preventDefault();
     valid = true;
@@ -85,27 +105,6 @@ import { onMount } from "svelte";
       })
     }
   }
-
-  $: if (fields.password.length < 6) {
-    errors.password = '6자 이상 입력해주세요.'
-  } else {
-    errors.password = ''
-  }
-
-  $: if (fields.password !== '' && fields.passwordConfirm !== '' && fields.password !== fields.passwordConfirm) {
-    errors.passwordConfirm = '비밀번호가 일치하지 않습니다.';
-  } else {
-    errors.passwordConfirm = '';
-  }
-
-  onMount(() => {
-    const inputs = document.querySelectorAll('input');
-    inputs.forEach(input => {
-      input.addEventListener('focusout', () => {
-        validateCheck(input.id);
-      })
-    })
-  })
 </script>
 
 <div class="container">
@@ -127,7 +126,7 @@ import { onMount } from "svelte";
     </p>
 
     <label for="password">비밀번호</label>
-    <input type="password" placeholder="*******" id="password" bind:value={fields.password} class:invalidate={errors.password && errors.password !== '6자 이상 입력해주세요.'}>
+    <input type="password" placeholder="*******" id="password" bind:value={fields.password} class:invalidate={errors.password}>
     <p class="error">
       {#if errors.password}
         <i class="fas fa-exclamation-triangle"></i>

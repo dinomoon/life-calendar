@@ -19,6 +19,6 @@
     display: inline-block;
     padding: 20px;
     font-size: 12px;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid var(--border-color);
   }
 </style>

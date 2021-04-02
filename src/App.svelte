@@ -4,8 +4,8 @@
 	import routes from './routes';
 
 	import Header from './components/Header.svelte'
-	import Footer from './components/Footer.svelte'
 	import Main from './components/Main.svelte'
+	import Footer from './components/Footer.svelte'
 
 	import {loggedIn, firebaseLoggedIn, kakaoLoggedIn, activeTab, userId} from './store';
 
@@ -21,6 +21,7 @@
 			}
 		});
 	})
+
 	$: if ($firebaseLoggedIn || $kakaoLoggedIn) {
 		loggedIn.set(true);
 	} else {
@@ -61,6 +62,7 @@
 
 <Header {links}/>
 <Main>
+	<div class="result"></div>
 	<Router {routes} />
 </Main>
 <Footer />
