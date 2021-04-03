@@ -2,10 +2,12 @@
   import { onMount } from 'svelte';
   import { userId, userInfo, week, colors, squareList, beforeBtnClasses, beforeBtnObj, monthlyFoldObj, weeklyFoldObj, birthdayValid, date, thisYear, thisMonth, weekNum } from "../store";
   import { fade } from 'svelte/transition';
+  import { weekNumber } from '../../public/weekNum.js'
 
   export let annual = false;
   export let monthly = false;
   export let weekly = false;
+  let calendarGrid = null;
   
   if (annual) {
     squareList.set(Array.from(Array(100).keys()));
@@ -14,8 +16,9 @@
   } else if (weekly) {
     squareList.set(Array.from(Array(5200).keys()));
   }
-
+  
   onMount(() => {
+    calendarGrid = document.querySelector('.calendar--grid');
     if (JSON.parse(localStorage.getItem('monthly-fold-obj')) === null) {
       localStorage.setItem('monthly-fold-obj', JSON.stringify($monthlyFoldObj));
     }
@@ -27,23 +30,24 @@
     if (monthly) {
       $beforeBtnClasses.forEach(btnClass => {
         if (JSON.parse(localStorage.getItem('monthly-fold-obj'))[btnClass] === true) {
-          const btn = document.querySelector(`.${btnClass}`);
+          const btn = calendarGrid.querySelector(`.${btnClass}`);
           const icon = btn.querySelector('i');
           icon.classList.add('fold');
-          const items = document.querySelectorAll($beforeBtnObj[btnClass]);
+          const items = calendarGrid.querySelectorAll($beforeBtnObj[btnClass]);
           items.forEach(item => item.classList.add('hidden'));
         }
       });
     } else if (weekly) {
       $beforeBtnClasses.forEach(btnClass => {
         if (JSON.parse(localStorage.getItem('weekly-fold-obj'))[btnClass] === true) {
-          const btn = document.querySelector(`.${btnClass}`);
+          const btn = calendarGrid.querySelector(`.${btnClass}`);
           const icon = btn.querySelector('i');
           icon.classList.add('fold');
-          const items = document.querySelectorAll($beforeBtnObj[btnClass]);
+          const items = calendarGrid.querySelectorAll($beforeBtnObj[btnClass]);
           items.forEach(item => item.classList.add('hidden'));
         }
       })
+      weekNum.set(weekNumber($date));
     }
   })
 
@@ -74,57 +78,13 @@
   //   }
   // }
 
-  // ====== weekNum 구하기 ======
-
-  function isLeap(year) {
-    if (year % 400 == 0) return true;
-    if (year % 100 == 0) return false;
-    if (year % 4 == 0) return true;
-    return false;
-  }
-
-  function pYear(year) {
-    return (year + Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400)) % 7;
-  }
-
-  function lastWeek(year) {
-    if (pYear(year) == 4 || pYear(year - 1) == 3) {
-      return 53;
-    } else {
-      return 52;
-    }
-  }
-
-  function ordinalDay(date) {
-    let ordinal_table = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-
-    if (isLeap($thisYear))
-      for (let i = 2; i < ordinal_table.length; i++)
-        ordinal_table[i] += 1;
-
-    return ordinal_table[$thisMonth] + date.getDate();
-  }
-
-  function weekNumber(date) {
-    let ordinal_day = ordinalDay(date);
-    let current_year = $thisYear;
-    let weekday = date.getDay();
-    let week = Math.floor((ordinal_day - weekday + 10) / 7);
-
-    if (week < 1) return lastWeek(current_year- 1);
-    if (week > lastWeek(current_year)) return 1;
-    return week;
-  }
-
-  if (weekly) {
-    weekNum.set(weekNumber($date));
-  }
-
   // hideHandler
   function hideHandler(e) {
     let button = null;
     let icon = null;
     let classList = null;
+    let items = null;
+
     if (e.target.tagName === 'BUTTON') {
       button = e.target;
       icon = button.children[0];
@@ -136,15 +96,6 @@
     }
 
     icon.classList.toggle('fold');
-    // const myWorker = new Worker("worker.js");
-
-    // myWorker.postMessage([1, 2]);
-    // console.log('Message posted to worker');
-
-    // myWorker.onmessage = function(e) {
-    //   result.textContent = e.data;
-    //   console.log('Message received from worker');
-    // }
 
     $beforeBtnClasses.forEach(btnClass => {
       if (classList.contains(btnClass)) {
@@ -157,36 +108,44 @@
           $weeklyFoldObj[btnClass] = $weeklyFoldObj[btnClass] ? false : true;
           localStorage.setItem('weekly-fold-obj', JSON.stringify($weeklyFoldObj));
         }
-        const items = document.querySelectorAll($beforeBtnObj[btnClass]);
-        // myWorker.postMessage(JSON.stringify(items));
-        items.forEach(item => item.classList.toggle('hidden'));
+        items = calendarGrid.querySelectorAll($beforeBtnObj[btnClass]);
       }
+    });
+    items.forEach((item, idx) => {
+      if (idx % 52 === 51) {
+        setTimeout(() => {}, 3000)
+      }
+      item.classList.toggle('hidden');
     });
   }
 
   function mouseoverHandler(e) {
     let items = null;
     let ages = null;
+    const hoverColor = $colors['hover-item-color'];
+    const currentHoverColor = $colors['current-hover-item-color'];
     const target = e.target;
 
     if (target.classList.contains('item')) {
       if (annual) {
-        target.style.backgroundColor = $colors['current-hover-item-color'];
+        target.style.backgroundColor = currentHoverColor;
         target.style.color = $colors['item-background-color'];
+        let age = target.textContent - $userInfo.birthday.year + 1;
+        target.textContent = age;
       } else {
         const hoverId = target.dataset.id;
         const hoverAge = target.dataset.age;
 
-        items = document.querySelectorAll(`[data-id="${hoverId}"]`);
-        ages = document.querySelectorAll(`[data-age="${hoverAge}"]`);
+        items = calendarGrid.querySelectorAll(`[data-id="${hoverId}"]`);
+        ages = calendarGrid.querySelectorAll(`[data-age="${hoverAge}"]`);
 
         items.forEach(item => {
-          item.style.backgroundColor = $colors['hover-item-color'];
+          item.style.backgroundColor = hoverColor;
         })
         ages.forEach(age => {
-          age.style.backgroundColor = $colors['hover-item-color'];
+          age.style.backgroundColor = hoverColor;
         })
-        target.style.backgroundColor = $colors['current-hover-item-color'];
+        target.style.backgroundColor = currentHoverColor;
       }
     }
   }
@@ -194,36 +153,28 @@
   function mouseoutHandler(e) {
     let items = null;
     let ages = null;
+    const pastColor = $colors['past-background-color'];
+    const itemColor = $colors['item-background-color'];
     let target = e.target;
 
     if (target.classList.contains('item')) {
       if (annual) {
         target.style.color = '#000';
-        if (target.classList.contains('past')) {
-          target.style.backgroundColor = $colors['past-background-color'];
-        } else {
-          target.style.backgroundColor = $colors['item-background-color']
-        }
+        target.style.backgroundColor = target.classList.contains('past') ? pastColor : itemColor;
+        let year = +target.textContent + $userInfo.birthday.year - 1;
+        target.textContent = year;
       } else {
         const hoverId = target.dataset.id;
         const hoverAge = target.dataset.age;
 
-        items = document.querySelectorAll(`[data-id="${hoverId}"]`);
-        ages = document.querySelectorAll(`[data-age="${hoverAge}"]`);
+        items = calendarGrid.querySelectorAll(`[data-id="${hoverId}"]`);
+        ages = calendarGrid.querySelectorAll(`[data-age="${hoverAge}"]`);
         
         items.forEach(item => {
-          if (item.classList.contains('past')) {
-            item.style.backgroundColor = $colors['past-background-color'];
-          } else {
-            item.style.backgroundColor = $colors['item-background-color'];
-          }
+          item.style.backgroundColor = item.classList.contains('past') ? pastColor : itemColor;
         })
         ages.forEach(age => {
-          if (age.classList.contains('past')) {
-            age.style.backgroundColor = $colors['past-background-color'];
-          } else {
-            age.style.backgroundColor = $colors['item-background-color'];
-          }
+          age.style.backgroundColor = age.classList.contains('past') ? pastColor : itemColor;
         })
       }
     }
