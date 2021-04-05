@@ -2,7 +2,7 @@
 	import {loggedIn, userId, userInfo} from '../store';
 	import Annual from '../components/tabs/Annual.svelte';
 	import { onMount } from 'svelte';
-import Calendar from '../components/Calendar.svelte';
+	import Calendar from '../components/Calendar.svelte';
 
 	onMount(() => {
 		db.collection('users').onSnapshot((snapshot => {
@@ -27,7 +27,7 @@ import Calendar from '../components/Calendar.svelte';
 			<img src="/img/main.svg" alt="">
 		</div>
 	</section>
-	<!-- <Calendar monthly /> -->
+	<!-- <Calendar annual /> -->
 {/if}
 
 <style>
@@ -41,7 +41,7 @@ import Calendar from '../components/Calendar.svelte';
 	}
 
 	.left-text h2 {
-		font-size: 50px;
+		font-size: 46px;
 		margin-bottom: 10px;
 	}
 

@@ -1,13 +1,17 @@
 <script>
   import { onMount } from 'svelte';
-  import { userId, userInfo, week, colors, squareList, beforeBtnClasses, beforeBtnObj, monthlyFoldObj, weeklyFoldObj, birthdayValid, date, thisYear, thisMonth, weekNum } from "../store";
+  import { userId, userInfo, week, colors, squareList, beforeBtnClasses, 
+    beforeBtnObj, monthlyFoldObj, weeklyFoldObj, birthdayValid,
+    date, thisYear, thisMonth, weekNum, clickedDay } from "../store";
   import { fade } from 'svelte/transition';
   import { weekNumber } from '../../public/weekNum.js'
+  import Modal from './Modal.svelte';
 
   export let annual = false;
   export let monthly = false;
   export let weekly = false;
   let calendarGrid = null;
+  let showModal = false;
   
   if (annual) {
     squareList.set(Array.from(Array(100).keys()));
@@ -69,14 +73,22 @@
     }
   }
 
-  // const clickHandler = (e) => {
-  //   if (annual && e.target.classList.contains('item')) {
-  //     push('/monthly')
-  //   } else if (monthly && e.target.classList.contains('item')) {
-  //     push('/weekly');
-  //     console.log(e.target)
-  //   }
-  // }
+  // clickHandler
+  const clickHandler = (e) => {
+    if (e.target.classList.contains('item')) {
+      if (annual) {
+        clickedDay.set({year: +e.target.dataset.year});
+      } else if (monthly) {
+        console.log(e.target)
+        clickedDay.set({month: +e.target.dataset.id + 1});
+      } else if (weekly) {
+        clickedDay.set({week: +e.target.dataset.id + 1});
+      }
+      showModal = true;
+    } else {
+      showModal = false;
+    }
+  }
 
   // hideHandler
   function hideHandler(e) {
@@ -112,9 +124,6 @@
       }
     });
     items.forEach((item, idx) => {
-      if (idx % 52 === 51) {
-        setTimeout(() => {}, 3000)
-      }
       item.classList.toggle('hidden');
     });
   }
@@ -183,8 +192,9 @@
 
 <section>
   {#if $userInfo}
+  <Modal on:click={clickHandler} {showModal} {annual} {monthly} {weekly} />
   <div class="container" class:annual class:monthly class:weekly>
-    <div class="calendar--grid" on:mouseover={mouseoverHandler} on:mouseout={mouseoutHandler} in:fade>
+    <div class="calendar--grid" on:click={clickHandler} on:mouseover={mouseoverHandler} on:mouseout={mouseoutHandler} in:fade>
       <!-- <div class="time">오늘은 {thisYear}년 {$thisMonth + 1}월 {date.getDate()}일 {$week[date.getDay()]}요일입니다.</div> -->
       {#each $squareList as item}
         <!-- Annual -->
@@ -192,6 +202,7 @@
           <div class="item"
             class:past={$userInfo.birthday.year + item < $thisYear}
             class:current={$userInfo.birthday.year + item === $thisYear}
+            data-year={$userInfo.birthday.year + item}
           >
             {$userInfo.birthday.year + item}
           </div>
@@ -297,7 +308,7 @@
             data-age={Math.floor(item / 52)}
           >
             {#if item < 52}
-              <span class="top-item cursor-default" class:currentText={item === weekNum - 1}>{item + 1}</span>
+              <span class="top-item cursor-default" class:currentText={item === $weekNum - 1}>{item + 1}</span>
             {/if}
             {#if item % 52 === 0}
               <span

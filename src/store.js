@@ -15,10 +15,11 @@ export const calendarTabs = writable(['연간', '월간', '주간']);
 export const activeTab = writable('연간');
 export const submitBirth = writable(false);
 export const userId = writable(null);
-export const userInfo = writable({
-  birthday: { year: 1994 },
-});
-// export const userInfo = writable(null);
+// export const userInfo = writable({
+//   birthday: { year: 1994 },
+// });
+export const userInfo = writable(null);
+export const clickedDay = writable({ year: null, month: null, week: null });
 export const squareList = writable(null);
 export const birthdayValid = writable(false);
 export const date = writable(time);
