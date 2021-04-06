@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { userId, userInfo, week, colors, squareList, beforeBtnClasses, 
     beforeBtnObj, monthlyFoldObj, weeklyFoldObj, birthdayValid,
-    date, thisYear, thisMonth, weekNum, clickedDay } from "../store";
+    date, thisYear, thisMonth, weekNum, clickedDay, userDocId } from "../store";
   import { fade } from 'svelte/transition';
   import { weekNumber } from '../../public/weekNum.js'
   import Modal from './Modal.svelte';
@@ -69,23 +69,45 @@
       await db.collection('users').add({
         userId: $userId,
         birthday: {year, month, day},
+        annual: {},
+        monthly: {},
+        weekly: {},
       })
     }
   }
 
   // clickHandler
-  const clickHandler = (e) => {
+  const clickHandler = async (e) => {
     if (e.target.classList.contains('item')) {
       if (annual) {
-        clickedDay.set({year: +e.target.dataset.year});
+        clickedDay.set({year: e.target.dataset.year});
       } else if (monthly) {
-        console.log(e.target)
-        clickedDay.set({month: +e.target.dataset.id + 1});
+        clickedDay.set({month: +e.target.dataset.id + 1, age: +e.target.dataset.age + 1});
       } else if (weekly) {
-        clickedDay.set({week: +e.target.dataset.id + 1});
+        clickedDay.set({week: +e.target.dataset.id + 1, age: +e.target.dataset.age + 1});
       }
       showModal = true;
-    } else {
+    } else if (e.target.classList.contains('backdrop')) {
+      const textarea = document.querySelector('textarea');
+      if (annual) {
+        db.collection('users').doc($userDocId).set({
+          annual: {
+            [$clickedDay.year]: textarea.value
+          },
+        }, {merge: true});
+      } else if (monthly) {
+        db.collection('users').doc($userDocId).set({
+          monthly: {
+            [`${$clickedDay.age} ${$clickedDay.month}`]: textarea.value
+          },
+        }, {merge: true})
+      } else if (weekly) {
+        db.collection('users').doc($userDocId).set({
+          weekly: {
+            [`${$clickedDay.age} ${$clickedDay.week}`]: textarea.value
+          },
+        }, {merge: true})
+      }
       showModal = false;
     }
   }

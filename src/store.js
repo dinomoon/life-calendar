@@ -19,7 +19,13 @@ export const userId = writable(null);
 //   birthday: { year: 1994 },
 // });
 export const userInfo = writable(null);
-export const clickedDay = writable({ year: null, month: null, week: null });
+export const userDocId = writable(null);
+export const clickedDay = writable({
+  year: null,
+  month: null,
+  week: null,
+  age: null,
+});
 export const squareList = writable(null);
 export const birthdayValid = writable(false);
 export const date = writable(time);

@@ -1,5 +1,5 @@
 <script>
-	import {loggedIn, userId, userInfo} from '../store';
+	import {loggedIn, userId, userInfo, userDocId} from '../store';
 	import Annual from '../components/tabs/Annual.svelte';
 	import { onMount } from 'svelte';
 	import Calendar from '../components/Calendar.svelte';
@@ -9,6 +9,7 @@
 			snapshot.docs.forEach(doc => {
 				if (doc.data().userId === $userId) {
 					userInfo.set(doc.data());
+					userDocId.set(doc.id);
 				}
 			})
 		}))
@@ -21,7 +22,7 @@
 	<section class="welcome">
 		<div class="left-text">
 			<h2>당신은 어떤 삶을 살고 계신가요?</h2>
-			<p>당신의 삶을 기록해보세요.</p>
+			<p>당신의 삶을 위해 기록해보세요.</p>
 		</div>
 		<div class="right-img">
 			<img src="/img/main.svg" alt="">
