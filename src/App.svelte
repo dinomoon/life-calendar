@@ -62,7 +62,6 @@
 
 <Header {links}/>
 <Main>
-	<div class="result"></div>
 	<Router {routes} />
 </Main>
 <Footer />

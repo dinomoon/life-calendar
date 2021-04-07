@@ -26,6 +26,7 @@ export const clickedDay = writable({
   week: null,
   age: null,
 });
+export const showModal = writable(false);
 export const squareList = writable(null);
 export const birthdayValid = writable(false);
 export const date = writable(time);

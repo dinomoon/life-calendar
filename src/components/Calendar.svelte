@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { userId, userInfo, week, colors, squareList, beforeBtnClasses, 
     beforeBtnObj, monthlyFoldObj, weeklyFoldObj, birthdayValid,
-    date, thisYear, thisMonth, weekNum, clickedDay, userDocId } from "../store";
+    date, thisYear, thisMonth, weekNum, clickedDay, userDocId, showModal } from "../store";
   import { fade } from 'svelte/transition';
   import { weekNumber } from '../../public/weekNum.js'
   import Modal from './Modal.svelte';
@@ -11,7 +11,6 @@
   export let monthly = false;
   export let weekly = false;
   let calendarGrid = null;
-  let showModal = false;
   
   if (annual) {
     squareList.set(Array.from(Array(100).keys()));
@@ -80,35 +79,35 @@
   const clickHandler = async (e) => {
     if (e.target.classList.contains('item')) {
       if (annual) {
-        clickedDay.set({year: e.target.dataset.year});
+        clickedDay.set({year: +e.target.dataset.year});
       } else if (monthly) {
         clickedDay.set({month: +e.target.dataset.id + 1, age: +e.target.dataset.age + 1});
       } else if (weekly) {
         clickedDay.set({week: +e.target.dataset.id + 1, age: +e.target.dataset.age + 1});
       }
-      showModal = true;
+      showModal.set(true);
     } else if (e.target.classList.contains('backdrop')) {
-      const textarea = document.querySelector('textarea');
+      const textarea = document.querySelector('.textarea');
       if (annual) {
         db.collection('users').doc($userDocId).set({
           annual: {
-            [$clickedDay.year]: textarea.value
+            [$clickedDay.year]: textarea.innerHTML
           },
         }, {merge: true});
       } else if (monthly) {
         db.collection('users').doc($userDocId).set({
           monthly: {
-            [`${$clickedDay.age} ${$clickedDay.month}`]: textarea.value
+            [`${$clickedDay.age} ${$clickedDay.month}`]: textarea.textContent
           },
         }, {merge: true})
       } else if (weekly) {
         db.collection('users').doc($userDocId).set({
           weekly: {
-            [`${$clickedDay.age} ${$clickedDay.week}`]: textarea.value
+            [`${$clickedDay.age} ${$clickedDay.week}`]: textarea.textContent
           },
         }, {merge: true})
       }
-      showModal = false;
+      showModal.set(false);
     }
   }
 
@@ -214,7 +213,7 @@
 
 <section>
   {#if $userInfo}
-  <Modal on:click={clickHandler} {showModal} {annual} {monthly} {weekly} />
+  <Modal on:click={clickHandler} {annual} {monthly} {weekly} />
   <div class="container" class:annual class:monthly class:weekly>
     <div class="calendar--grid" on:click={clickHandler} on:mouseover={mouseoverHandler} on:mouseout={mouseoutHandler} in:fade>
       <!-- <div class="time">오늘은 {thisYear}년 {$thisMonth + 1}월 {date.getDate()}일 {$week[date.getDay()]}요일입니다.</div> -->
