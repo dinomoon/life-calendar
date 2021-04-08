@@ -1,49 +1,12 @@
 <script>
   import { onMount } from 'svelte';
-  import { clickedDay, userDocId, userInfo, showModal } from '../store.js';
+  import { clickedDay, showModal } from '../store.js';
 
   export let annual;
   export let monthly;
   export let weekly;
 
-  let k = false;
-  let value = "";
-
-  $: if ($showModal) {
-    k = true;
-  }
-
-  if (k) {
-    if (annual) {
-      value = $userInfo.annual[$clickedDay.year] || "";
-    } else if (monthly) {
-      value = $userInfo.monthly[`${$clickedDay.age} ${$clickedDay.month}`] || "";
-    } else if (weekly) {
-      value = $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`] || "";
-    }
-    console.log(value)
-  }
-
-  // 이전의 내용과 다르면 저장, 다르지 않으면 저장하지 않기
-  function annualClickSave(year) {
-    db.collection('users').doc($userDocId).set({
-      annual: {
-        [year]: value
-      },
-    }, {merge: true});
-  }
-
-  function annualClickHandler(dir) {
-    if (dir === 'prev') {
-      annualClickSave($clickedDay.year);
-      clickedDay.set({year: $clickedDay.year - 1});
-      value = $userInfo.annual[$clickedDay.year] || "";
-    } else if (dir === 'next') {
-      annualClickSave($clickedDay.year);
-      clickedDay.set({year: $clickedDay.year + 1});
-      value = $userInfo.annual[$clickedDay.year] || "";
-    }
-  }
+  export let value = "";
 </script>
 
 {#if $showModal}
@@ -51,9 +14,9 @@
     <div class="backdrop" on:click|self>
       <div class="modal">
         <header>
-          <span on:click={() => annualClickHandler('prev')}>{$clickedDay.year - 1}년</span>
+          <span class="prev" on:click>{$clickedDay.year - 1}년</span>
           <h2>{$clickedDay.year}년</h2>
-          <span on:click={() => annualClickHandler('next')}>{$clickedDay.year + 1}년</span>
+          <span class="next" on:click>{$clickedDay.year + 1}년</span>
         </header>
         <div
           class="textarea"
@@ -119,8 +82,8 @@
     flex-direction: column;
     align-items: center;
     font-size: 20px;
-    width: 1000px;
-    height: 800px;
+    width: 60vw;
+    height: 80vh;
     padding: 40px;
     background-color: #fff;
     border-radius: 4px;
@@ -151,15 +114,14 @@
     width: 100%;
     height: 100%;
     overflow-y: auto;
-    /* white-space: pre; */
   }
 
   .textarea::placeholder {
-    font-size: inherit;
+    font-size: 1rem;
   }
 
   .textarea[placeholder]:empty:before {
     content: attr(placeholder);
-    color: #555; 
-}
+    color: #777; 
+  }
 </style>
