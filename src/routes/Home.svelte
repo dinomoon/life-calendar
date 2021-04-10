@@ -4,7 +4,6 @@
 	import { onMount } from 'svelte';
 	import Calendar from '../components/Calendar.svelte';
 
-	onMount(() => {
 		db.collection('users').onSnapshot((snapshot => {
 			snapshot.docs.forEach(doc => {
 				if (doc.data().userId === $userId) {
@@ -13,7 +12,6 @@
 				}
 			})
 		}))
-	})
 </script>
 
 {#if $loggedIn}

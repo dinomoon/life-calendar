@@ -1,69 +1,129 @@
 <script>
-  import { onMount } from 'svelte';
-  import { clickedDay, showModal } from '../store.js';
+  import { onDestroy, onMount } from 'svelte';
+  import { clickedDay, userDocId, userInfo } from '../store.js';
 
   export let annual;
   export let monthly;
   export let weekly;
 
-  export let value = "";
+  let value = "";
+
+  onMount(() => {
+    if (annual) {
+      value = $userInfo.annual[$clickedDay.year] || "";
+    } else if (monthly) {
+      value = $userInfo.monthly[`${$clickedDay.age} ${$clickedDay.month}`] || "";
+    } else if (weekly) {
+      value = $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`] || "";
+    }
+  })
+
+  onDestroy(() => {
+    if (annual) {
+      db.collection('users').doc($userDocId).set({
+        annual: {
+          [$clickedDay.year]: value
+        },
+      }, {merge: true});
+    } else if (monthly) {
+      db.collection('users').doc($userDocId).set({
+        monthly: {
+          [`${$clickedDay.age} ${$clickedDay.month}`]: textarea.innerHTML
+        },
+      }, {merge: true})
+    } else if (weekly) {
+      db.collection('users').doc($userDocId).set({
+        weekly: {
+          [`${$clickedDay.age} ${$clickedDay.week}`]: textarea.innerHTML
+        },
+      }, {merge: true})
+    }
+  })
+
+  const clickHandler = (dir) => {
+    db.collection('users').doc($userDocId).set({
+      annual: {
+        [$clickedDay.year]: value
+      },
+    }, {merge: true});
+    if (dir === 'prev') {
+      clickedDay.set({year: $clickedDay.year - 1});
+    } else if (dir === 'next') {
+      clickedDay.set({year: $clickedDay.year + 1});
+    }
+    value = $userInfo.annual[$clickedDay.year] || "";
+  }
 </script>
 
-{#if $showModal}
-  {#if annual}
-    <div class="backdrop" on:click|self>
-      <div class="modal">
-        <header>
-          <span class="prev" on:click>{$clickedDay.year - 1}년</span>
-          <h2>{$clickedDay.year}년</h2>
-          <span class="next" on:click>{$clickedDay.year + 1}년</span>
-        </header>
-        <div
-          class="textarea"
-          contenteditable
-          spellcheck="false"
-          placeholder="여기에 기록을 할 수 있어요."
-          bind:innerHTML={value}
+{#if annual}
+  <div class="backdrop" on:click|self>
+    <div class="modal">
+      <header>
+        <span
+          class="prev"
+          class:hidden={$clickedDay.year === $userInfo.birthday.year}
+          on:click={() => clickHandler('prev')}
         >
-        </div>
+          {$clickedDay.year - 1}년
+        </span>
+        <h2>{$clickedDay.year}년</h2>
+        <span
+          class="next"
+          class:hidden={$clickedDay.year === $userInfo.birthday.year + 99}
+          on:click={() => clickHandler('next')}
+        >
+          {$clickedDay.year + 1}년
+        </span>
+      </header>
+      <div
+        class="textarea"
+        contenteditable
+        spellcheck="false"
+        placeholder="여기에 기록을 할 수 있어요."
+        bind:innerHTML={value}
+      >
       </div>
     </div>
-  {:else if monthly}
-    <div class="backdrop" on:click|self>
-      <div class="modal">
-        <header>
-          <h2>{$clickedDay.month}월</h2>
-        </header>
-        <div
-          class="textarea"
-          contenteditable
-          spellcheck="false"
-          placeholder="여기에 기록을 할 수 있어요."
-          bind:innerHTML={value}
-        >
-        </div>
+  </div>
+{:else if monthly}
+  <div class="backdrop" on:click|self>
+    <div class="modal">
+      <header>
+        <h2>{$clickedDay.month}월</h2>
+      </header>
+      <div
+        class="textarea"
+        contenteditable
+        spellcheck="false"
+        placeholder="여기에 기록을 할 수 있어요."
+        bind:innerHTML={value}
+      >
       </div>
     </div>
-  {:else if weekly}
-    <div class="backdrop" on:click|self>
-      <div class="modal">
-        <header>
-          <h2>{$clickedDay.age} - {$clickedDay.week}주</h2>
-        </header>
-        <div
-          class="textarea"
-          contenteditable
-          spellcheck="false"
-          placeholder="여기에 기록을 할 수 있어요."
-          bind:innerHTML={value}
-        >
-        </div>
+  </div>
+{:else if weekly}
+  <div class="backdrop" on:click|self>
+    <div class="modal">
+      <header>
+        <h2>{$clickedDay.age} - {$clickedDay.week}주</h2>
+      </header>
+      <div
+        class="textarea"
+        contenteditable
+        spellcheck="false"
+        placeholder="여기에 기록을 할 수 있어요."
+        bind:innerHTML={value}
+      >
       </div>
     </div>
-  {/if}
+  </div>
 {/if}
 
 <style>
+  .modal .hidden {
+    visibility: hidden;
+  }
+
   .backdrop {
     left: 0;
     right: 0;
@@ -84,7 +144,7 @@
     font-size: 20px;
     width: 60vw;
     height: 80vh;
-    padding: 40px;
+    padding: 40px 100px 60px;
     background-color: #fff;
     border-radius: 4px;
   }
@@ -95,7 +155,7 @@
     align-items: baseline;
     justify-content: space-evenly;
     padding-bottom: 20px;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     border-bottom: 1px solid var(--border-color);
     user-select: none;
   }

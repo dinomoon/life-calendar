@@ -75,62 +75,20 @@
     }
   }
 
-  let value = "";
-
   // clickHandler
   const clickHandler = async (e) => {
-    if (e.target.classList.contains('item')) {
+    const classList = e.target.classList;
+    if (classList.contains('item')) {
       if (annual) {
-        clickedDay.set({year: +e.target.dataset.year});
-        value = $userInfo.annual[$clickedDay.year] || "";
+        await clickedDay.set({year: +e.target.dataset.year});
       } else if (monthly) {
         clickedDay.set({month: +e.target.dataset.id + 1, age: +e.target.dataset.age + 1});
-        value = $userInfo.monthly[`${$clickedDay.age} ${$clickedDay.month}`] || "";
       } else if (weekly) {
         clickedDay.set({week: +e.target.dataset.id + 1, age: +e.target.dataset.age + 1});
-        value = $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`] || "";
       }
       showModal.set(true);
-    } else if (e.target.classList.contains('backdrop')) {
-      const textarea = document.querySelector('.textarea');
-      if (annual) {
-        db.collection('users').doc($userDocId).set({
-          annual: {
-            [$clickedDay.year]: textarea.innerHTML
-          },
-        }, {merge: true});
-      } else if (monthly) {
-          db.collection('users').doc($userDocId).set({
-            monthly: {
-              [`${$clickedDay.age} ${$clickedDay.month}`]: textarea.innerHTML
-            },
-          }, {merge: true})
-      } else if (weekly) {
-          db.collection('users').doc($userDocId).set({
-            weekly: {
-              [`${$clickedDay.age} ${$clickedDay.week}`]: textarea.innerHTML
-            },
-          }, {merge: true})
-      }
+    } else if (classList.contains('backdrop')) {
       showModal.set(false);
-    } else if (e.target.classList.contains('prev')) {
-        const textarea = document.querySelector('.textarea');
-        await db.collection('users').doc($userDocId).set({
-          annual: {
-            [$clickedDay.year]: textarea.innerHTML
-          },
-        }, {merge: true});
-        clickedDay.set({year: $clickedDay.year - 1});
-        value = $userInfo.annual[$clickedDay.year] || "";
-    } else if (e.target.classList.contains('next')) {
-        const textarea = document.querySelector('.textarea');
-        await db.collection('users').doc($userDocId).set({
-          annual: {
-            [$clickedDay.year]: textarea.innerHTML
-          },
-        }, {merge: true});
-        clickedDay.set({year: $clickedDay.year + 1});
-        value = $userInfo.annual[$clickedDay.year] || "";
     }
   }
 
@@ -236,7 +194,9 @@
 
 <section>
   {#if $userInfo}
-  <Modal on:click={clickHandler} {annual} {monthly} {weekly} {value} />
+  {#if $showModal}
+    <Modal on:click={clickHandler} {annual} {monthly} {weekly} />
+  {/if}
   <div class="container" class:annual class:monthly class:weekly>
     <div class="calendar--grid" on:click={clickHandler} on:mouseover={mouseoverHandler} on:mouseout={mouseoutHandler} in:fade>
       <!-- <div class="time">오늘은 {thisYear}년 {$thisMonth + 1}월 {date.getDate()}일 {$week[date.getDay()]}요일입니다.</div> -->
