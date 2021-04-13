@@ -2,13 +2,15 @@
 
 :root {
   --border-color: #dee2e6;
-  --past-background-color: #ebecf0;
+  --past-background-color: rgba(0, 0, 0, 0.1);
   --current-item-color: #f5df4d;
-  --all-this-month-color: #939597;
-  --this-year-color: #74c0fc;
-  --this-year-past-color: #d0ebff;
+  --all-this-month-past-color: rgba(0, 0, 0, 0.4);
+  --all-this-month-future-color: lightpink;
+  --this-year-color: lightpink;
+  --this-year-past-color: rgba(0, 0, 0, 0.4);
   --active-color: #fa5252;
   --background-color: #fdf9f1;
+  --item-background-color: #fffefc;
 }
 
 .fold {
@@ -62,6 +64,53 @@ textarea {
   -webkit-padding: 0.4em 0;
   padding: 0.4em;
   margin: 0 0 0.5em 0;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--past-background-color);
+  background-color: #fffefc;
   border-radius: 2px;
+}
+
+button {
+  outline: none;
+}
+
+input::placeholder {
+  color: #adb5bd;
+}
+
+label {
+  margin-bottom: 8px;
+}
+
+h1.ce-header {
+  font-size: 34px;
+}
+
+h2.ce-header {
+  font-size: 30px;
+}
+
+h3.ce-header {
+  font-size: 26px;
+}
+
+h4.ce-header {
+  font-size: 22px;
+}
+
+h5.ce-header {
+  font-size: 20px;
+}
+
+h6.ce-header {
+  font-size: 18px;
+}
+
+h1.ce-header,
+h2.ce-header,
+h3.ce-header,
+h4.ce-header,
+h5.ce-header,
+h6.ce-header {
+  margin: 0.5rem 0;
+  padding: 0;
 }

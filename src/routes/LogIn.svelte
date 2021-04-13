@@ -1,14 +1,65 @@
 <script>
   import {push} from 'svelte-spa-router';
-	import {kakaoLoggedIn, naverLoggedIn, userId, userInfo} from '../store';
+	import {kakaoLoggedIn, userId} from '../store';
+
+  let valid = false;
+
+  let fields = {email: '', password: ''};
+  let errors = {email: '', password: ''};
+
+  function validateEmail(email) {
+    let re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+    return re.test(email);
+  }
 
   const emailLoginHandler = (e) => {
-    const email = e.target['email'].value;
-    const password = e.target['password'].value;
+    valid = true;
 
-    auth.signInWithEmailAndPassword(email, password).then(() => {
-      push('/');
-    })
+    // valid email
+    if (validateEmail(fields.email)) {
+        errors.email = '';
+    } else if (fields.email === '') {
+      valid = false;
+      errors.email = '이메일을 입력해주세요.'
+    } else {
+      valid = false;
+      errors.email = '올바른 이메일이 아닙니다.'
+    }
+    
+    // valid password
+    if (fields.password === '') {
+      valid = false;
+      errors.password = '비밀번호를 입력해주세요.'
+    } else {
+      errors.password = '';
+    }
+
+    if (valid) {
+      auth.signInWithEmailAndPassword(fields.email, fields.password).then(() => {
+        push('/')
+      }).catch(error => {
+        let errorCode = error.code;
+        let errorMessage = error.message;
+
+        switch (errorCode) {
+          case 'auth/invalid-email':
+            alert('아이디 또는 비밀번호를 확인해주세요.')
+            break;
+          case 'auth/user-disabled':
+            alert('아이디 또는 비밀번호를 확인해주세요.')
+            break;
+          case 'auth/user-not-found':
+            alert('이메일을 확인해주세요.')
+            break;
+          case 'auth/wrong-password':
+            alert('비밀번호를 확인해주세요.')
+            break;
+          default:
+            return;
+        }
+        console.log(errorMessage);
+      })
+    }
   }
 
   const socialLoginHandler = async (e) => {
@@ -23,7 +74,7 @@
     switch(clickedSocial) {
       case 'kakao':
         await Kakao.Auth.login({
-          scope: 'profile, age_range',
+          scope: 'profile',
           success: function(authObj) {
             kakaoLoggedIn.set(true);
             window.Kakao.API.request({
@@ -36,24 +87,11 @@
           }
         })
         break;
-      case 'naver':
-        // ClientId, Callback URL
-        let naver_id_login = await new window.naver_id_login("CmNDUb_mqPdzPuWXSgVL", "http://localhost:5000");
-        naver_id_login.init_naver_id_login();
-        naver_id_login.setPopup();
-        // let state = naver_id_login.getUniqState();
-        // naver_id_login.setDomain(".service.com");
-        // naver_id_login.setState(state);
-        naverLoggedIn.set(true);
-        break;
       case 'facebook':
         provider = new firebase.auth.FacebookAuthProvider();
         break;
       case 'google':
         provider = new firebase.auth.GoogleAuthProvider()
-        break;
-      case 'apple':
-        provider = new firebase.auth.OAuthProvider('apple.com');
         break;
       default:
         return;
@@ -70,9 +108,21 @@
   <h2 class="title">로그인</h2>
   <form on:submit|preventDefault={emailLoginHandler}>
     <label for="email">이메일</label>
-    <input type="email" placeholder="example@naver.com" id="email">
+    <input type="text" placeholder="example@naver.com" id="email" bind:value={fields.email}>
+    <p class="error">
+      {#if errors.email}
+        <i class="fas fa-exclamation-triangle"></i>
+        {errors.email}
+      {/if}
+    </p>
     <label for="password">비밀번호</label>
-    <input type="password" placeholder="*******" id="password">
+    <input type="password" placeholder="*******" id="password" bind:value={fields.password}>
+    <p class="error">
+      {#if errors.password}
+        <i class="fas fa-exclamation-triangle"></i>
+        {errors.password}
+      {/if}
+    </p>
     <button type="submit" class="email">로그인</button>
   </form>
   <div class="or">
@@ -85,10 +135,6 @@
       <i class="fas fa-comment"></i>
       <span>카카오로 시작하기</span>
     </button>
-    <button type="button" class="naver" id="naver_id_login">
-      <img class="naver-icon" src="/img/naver.png" alt="">
-      <span>네이버로 시작하기</span>
-    </button>
     <button type="button" class="facebook">
       <i class="fab fa-facebook-square"></i>
       <span>페이스북으로 시작하기</span>
@@ -96,10 +142,6 @@
     <button type="button" class="google">
       <img class="google-icon" src="/img/google-icon.svg" alt="">
       <span>구글로 시작하기</span>
-    </button>
-    <button type="button" class="apple">
-      <i class="fab fa-apple"></i>
-      <span>애플로 시작하기</span>
     </button>
   </div>
 </div>
@@ -112,7 +154,7 @@
   }
 
   .title {
-    font-size: 1.6rem;
+    font-size: 2rem;
     text-align: left;
     margin-bottom: 2rem;
   }
@@ -122,20 +164,8 @@
     text-align: left;
   }
 
-  label {
-    margin-bottom: 10px;
-  }
-
   input {
     padding-left: 1rem;
-  }
-
-  input[type="email"] {
-    margin-bottom: 1rem;
-  }
-
-  input::placeholder {
-    color: #adb5bd;
   }
 
   input, button {
@@ -143,8 +173,10 @@
     height: 50px;
   }
 
-  input:last-of-type {
-    margin-bottom: 2rem;
+  .error {
+    color: var(--active-color);
+    margin-bottom: 1.2rem;
+    font-size: 14px;
   }
 
   button {
@@ -175,7 +207,7 @@
   .or .line {
     flex: 3;
     height: 1px;
-    background-color: #ddd;
+    background-color: var(--border-color);
   }
 
   .or .text {
@@ -207,45 +239,26 @@
     background-color: #f5e20f;
   }
 
-  .social-login .naver {
-    background-color: #1EC800;
-    color: #fff;
-  }
-
-  .social-login .naver:hover {
-    background-color: #40c057;
-  }
-
   .social-login .facebook {
-    background-color: #228be6;
+    background-color: #1877f2;
     color: #fff;
   }
 
   .social-login .facebook:hover {
-    background-color: #1c7ed6;
+    background-color: #106ae0;
     color: #fff;
   }
 
   .social-login .google {
-    background-color: #f1f3f5;
-    color: #000;
-  }
-
-  .social-login .google:hover {
-    background-color: #e9ecef;
-  }
-
-  .social-login .apple {
-    background-color: #000;
-    color: #fff;
-  }
-
-  .social-login .apple:hover {
     background-color: #343a40;
     color: #fff;
   }
+  
+  .social-login .google:hover {
+    background-color: #212529;
+  }
 
-  .google-icon, .naver-icon {
+  .google-icon {
     width: 24px;
     margin-right: 10px;
   }

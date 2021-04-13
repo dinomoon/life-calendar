@@ -1,5 +1,5 @@
 <script>
   import Calendar from "../Calendar.svelte";
-  </script>
+</script>
   
-  <Calendar monthly />
+<Calendar monthly />

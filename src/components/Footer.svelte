@@ -1,8 +1,10 @@
 <script>
+  import {loggedIn} from '../store';
+
   let year = new Date().getFullYear();
 </script>
 
-<footer>
+<footer class:loggedIn={$loggedIn}>
   <div class="copyright">Copyright {year}. MoonK. All rights reserved.</div>
 </footer>
 
@@ -11,11 +13,12 @@
     padding: 100px 0 20px;
     text-align: center;
   }
+
   .copyright {
     color: #aaa;
     display: inline-block;
     padding: 20px;
     font-size: 12px;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid var(--border-color);
   }
 </style>

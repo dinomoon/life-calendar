@@ -1,7 +1,7 @@
 <script>
   import { push } from 'svelte-spa-router';
 
-	import {loggedIn, calendarTabs, firebaseLoggedIn, kakaoLoggedIn, naverLoggedIn, activeTab} from '../store';
+	import {loggedIn, calendarTabs, firebaseLoggedIn, kakaoLoggedIn, activeTab, userInfo} from '../store';
 
   export let links;
   let borderBottom = false;
@@ -9,6 +9,8 @@
 
   const pushHome = () => {
     push('/');
+    activeTab.set('연간');
+    userInfo.set(null);
   }
 
   const logoutHandler = async () => {
@@ -22,10 +24,10 @@
     } else if ($kakaoLoggedIn) {
       try {
         await window.Kakao.Auth.logout();
-        pushHome();
         kakaoLoggedIn.set(false);
+        pushHome();
       } catch (error) {
-        console.log('error');
+        console.log(error);
       }
     }
   }
@@ -43,10 +45,10 @@
 	<div class="container">
     <h1>
       <a href="/#/">
-        <img class="logo" src="./img/h1.svg" alt="">
+        Life Calendar
       </a>
     </h1>
-    {#if $loggedIn}
+    {#if $loggedIn && $userInfo}
       <nav>
         <ul class="calendar-tabs">
           {#each $calendarTabs as tab}
@@ -58,15 +60,15 @@
       </nav>
     {/if}
     <nav>
-      <ul>
+      <ul class="sign-tabs">
         {#each links as link}
           {#if link === '로그아웃'}
             <li on:click={logoutHandler}>
-              <button type="button">{link}</button>
+              <button class="logout-btn" type="button">{link}</button>
             </li>
           {:else}
             <li>
-              <a href="/#/{obj[link]}">{link}</a>
+              <a href="/#/{obj[link]}" class:signButton={link === '로그인' || link === '회원가입'}>{link}</a>
             </li>
           {/if}
         {/each}
@@ -91,14 +93,34 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 80px;
-    background-color: var(--background-color);
+    height: 100px;
+    background-color: inherit;
     transition: all 0.3s ease;
     z-index: 1;
   }
 
   header.loggedIn {
-    padding: 0 24px;
+    padding: 0 40px;
+    height: 80px;
+  }
+
+  header h1 {
+    font-size: 1.8rem;
+    font-weight: 500;
+    letter-spacing: -0.4px;
+  }
+
+  header.loggedIn h1 {
+    font-size: 1.5rem;
+    flex: 1;
+  }
+
+  header.loggedIn nav {
+    flex: 1;
+  }
+
+  header.loggedIn .sign-tabs {
+    justify-content: flex-end;
   }
 
   header.borderBottom {
@@ -122,12 +144,9 @@
     max-width: 100%;
   }
 
-  .logo {
-    cursor: pointer;
-  }
-
   ul {
     display: flex;
+    justify-content: center;
     align-items: center;
     list-style-type: none;
   }
@@ -138,9 +157,30 @@
     margin: 0;
   }
 
+  .signButton {
+    background-color: #151515;
+    color: #fff;
+    transition: 0.3s;
+    border-radius: 4px;
+  }
+
+  .signButton:hover {
+    background-color: rgba(0,0,0,0.8);
+  }
+
+  .logout-btn {
+    transition: 0.3s;
+    border: 1px solid rgba(0,0,0,0.2);
+  }
+
+  .logout-btn:hover {
+    background-color: rgba(0,0,0,0.8);
+    color: #fff;
+  }
+
   ul li a, button {
     font-size: 18px;
     cursor: pointer;
-    padding: 12px;
+    padding: 6px 20px;
   }
 </style>

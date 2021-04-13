@@ -1,17 +1,17 @@
 <script>
   import { onMount } from 'svelte';
-  import { userId, userInfo, week, colors, squareList, beforeBtnClasses, beforeBtnObj, monthlyFoldObj, weeklyFoldObj } from "../store";
-  import { push } from "svelte-spa-router";
+  import { userId, userInfo, colors, squareList, beforeBtnClasses, 
+    beforeBtnObj, monthlyFoldObj, weeklyFoldObj, birthdayValid,
+    date, thisYear, thisMonth, weekNum, clickedDay, showModal } from "../store";
   import { fade } from 'svelte/transition';
+  import { weekNumber } from '../../public/weekNum.js'
+  import Modal from './Modal.svelte';
 
   export let annual = false;
   export let monthly = false;
   export let weekly = false;
-  const date = new Date();
-  const thisYear = date.getFullYear();
-  const thisMonth = date.getMonth();
-  let weekNum = null;
-
+  let calendarGrid = null;
+  
   if (annual) {
     squareList.set(Array.from(Array(100).keys()));
   } else if (monthly) {
@@ -19,98 +19,86 @@
   } else if (weekly) {
     squareList.set(Array.from(Array(5200).keys()));
   }
+  
+  onMount(() => {
+    calendarGrid = document.querySelector('.calendar--grid');
+    if (JSON.parse(localStorage.getItem('monthly-fold-obj')) === null) {
+      localStorage.setItem('monthly-fold-obj', JSON.stringify($monthlyFoldObj));
+    }
 
-  if (monthly || weekly) {
-    onMount(() => {
+    if (JSON.parse(localStorage.getItem('weekly-fold-obj')) === null) {
+      localStorage.setItem('weekly-fold-obj', JSON.stringify($weeklyFoldObj));
+    }
+
+    if (monthly) {
       $beforeBtnClasses.forEach(btnClass => {
-        if (JSON.parse(localStorage.getItem('monthly-fold-obj'))[btnClass] === true && monthly) {
-          const btn = document.querySelector(`.${btnClass}`);
+        if (JSON.parse(localStorage.getItem('monthly-fold-obj'))[btnClass] === true) {
+          const btn = calendarGrid.querySelector(`.${btnClass}`);
           const icon = btn.querySelector('i');
           icon.classList.add('fold');
-          const items = document.querySelectorAll($beforeBtnObj[btnClass]);
-          items.forEach(item => item.classList.add('hidden'));
-        } else if (JSON.parse(localStorage.getItem('weekly-fold-obj'))[btnClass] === true && weekly) {
-          const btn = document.querySelector(`.${btnClass}`);
-          const icon = btn.querySelector('i');
-          icon.classList.add('fold');
-          const items = document.querySelectorAll($beforeBtnObj[btnClass]);
+          const items = calendarGrid.querySelectorAll($beforeBtnObj[btnClass]);
           items.forEach(item => item.classList.add('hidden'));
         }
       });
-    })
-  }
+    } else if (weekly) {
+      $beforeBtnClasses.forEach(btnClass => {
+        if (JSON.parse(localStorage.getItem('weekly-fold-obj'))[btnClass] === true) {
+          const btn = calendarGrid.querySelector(`.${btnClass}`);
+          const icon = btn.querySelector('i');
+          icon.classList.add('fold');
+          const items = calendarGrid.querySelectorAll($beforeBtnObj[btnClass]);
+          items.forEach(item => item.classList.add('hidden'));
+        }
+      })
+      weekNum.set(weekNumber($date));
+    }
+  })
 
   const submitHandler = async (e) => {
+    birthdayValid.set(true);
     const birthday = e.target['birthday'].value;
     const birthArray = birthday.split('-');
     const year = +birthArray[0];
     const month = +birthArray[1];
     const day = +birthArray[2];
-    await db.collection('users').add({
-      userId: $userId,
-      birthday: {year, month, day},
-    })
-  }
 
-  // const clickHandler = (e) => {
-  //   if (annual && e.target.classList.contains('item')) {
-  //     push('/monthly')
-  //   } else if (monthly && e.target.classList.contains('item')) {
-  //     push('/weekly');
-  //     console.log(e.target)
-  //   }
-  // }
+    birthdayValid.set(birthday ? true : false);
 
-  // ====== weekNum 구하기 ======
-
-  function isLeap(year) {
-    if (year % 400 == 0) return true;
-    if (year % 100 == 0) return false;
-    if (year % 4 == 0) return true;
-    return false;
-  }
-
-  function pYear(year) {
-    return (year + Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400)) % 7;
-  }
-
-  function lastWeek(year) {
-    if (pYear(year) == 4 || pYear(year - 1) == 3) {
-      return 53;
-    } else {
-      return 52;
+    if (birthdayValid) {
+      await db.collection('users').add({
+        userId: $userId,
+        birthday: {year, month, day},
+        annual: {},
+        monthly: {},
+        weekly: {},
+      })
     }
   }
 
-  function ordinalDay(date) {
-    var ordinal_table = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-
-    if (isLeap(date.getFullYear()))
-      for (var i = 2; i < ordinal_table.length; i++)
-        ordinal_table[i] += 1;
-
-    return ordinal_table[date.getMonth()] + date.getDate();
+  // clickHandler
+  const clickHandler = async (e) => {
+    const classList = e.target.classList;
+    if (classList.contains('item')) {
+      if (annual) {
+        await clickedDay.set({year: +e.target.dataset.year});
+      } else if (monthly) {
+        clickedDay.set({month: +e.target.dataset.id + 1, age: +e.target.dataset.age + 1});
+      } else if (weekly) {
+        clickedDay.set({week: +e.target.dataset.id + 1, age: +e.target.dataset.age + 1});
+      }
+      showModal.set(true);
+    } else if (classList.contains('backdrop')) {
+      showModal.set(false);
+    }
   }
 
-  function weekNumber(date) {
-    var ordinal_day = ordinalDay(date);
-    var current_year = date.getFullYear();
-    var weekday = date.getDay();
-    var week = Math.floor((ordinal_day - weekday + 10) / 7);
-
-    if (week < 1) return lastWeek(current_year- 1);
-    if (week > lastWeek(current_year)) return 1;
-    return week;
-  }
-
-  if (weekly) {
-    weekNum = weekNumber(date);
-  }
-
+  // hideHandler
   function hideHandler(e) {
     let button = null;
     let icon = null;
     let classList = null;
+    let items = null;
+
     if (e.target.tagName === 'BUTTON') {
       button = e.target;
       icon = button.children[0];
@@ -123,62 +111,52 @@
 
     icon.classList.toggle('fold');
 
-    if (JSON.parse(localStorage.getItem('monthly-fold-obj')) === null) {
-      localStorage.setItem('monthly-fold-obj', JSON.stringify($monthlyFoldObj));
-    }
-
-    if (JSON.parse(localStorage.getItem('weekly-fold-obj')) === null) {
-      localStorage.setItem('weekly-fold-obj', JSON.stringify($weeklyFoldObj));
-    }
-
     $beforeBtnClasses.forEach(btnClass => {
       if (classList.contains(btnClass)) {
         if (monthly) {
-          if (JSON.parse(localStorage.getItem('monthly-fold-obj'))[btnClass] === true) {
-            $monthlyFoldObj[btnClass] = false;
-            localStorage.setItem('monthly-fold-obj', JSON.stringify($monthlyFoldObj));
-          } else {
-            $monthlyFoldObj[btnClass] = true;
-            localStorage.setItem('monthly-fold-obj', JSON.stringify($monthlyFoldObj));
-          }
+          monthlyFoldObj.set(JSON.parse(localStorage.getItem('monthly-fold-obj')));
+          $monthlyFoldObj[btnClass] = $monthlyFoldObj[btnClass] ? false : true;
+          localStorage.setItem('monthly-fold-obj', JSON.stringify($monthlyFoldObj));
         } else if (weekly) {
-          if (JSON.parse(localStorage.getItem('weekly-fold-obj'))[btnClass] === true) {
-            $weeklyFoldObj[btnClass] = false;
-            localStorage.setItem('weekly-fold-obj', JSON.stringify($weeklyFoldObj));
-          } else {
-            $weeklyFoldObj[btnClass] = true;
-            localStorage.setItem('weekly-fold-obj', JSON.stringify($weeklyFoldObj));
-          }
+          monthlyFoldObj.set(JSON.parse(localStorage.getItem('weekly-fold-obj')));
+          $weeklyFoldObj[btnClass] = $weeklyFoldObj[btnClass] ? false : true;
+          localStorage.setItem('weekly-fold-obj', JSON.stringify($weeklyFoldObj));
         }
-        const items = document.querySelectorAll($beforeBtnObj[btnClass]);
-        items.forEach(item => item.classList.toggle('hidden'));
+        items = calendarGrid.querySelectorAll($beforeBtnObj[btnClass]);
       }
+    });
+    items.forEach((item, idx) => {
+      item.classList.toggle('hidden');
     });
   }
 
   function mouseoverHandler(e) {
     let items = null;
     let ages = null;
+    const hoverColor = $colors['hover-item-color'];
+    const currentHoverColor = $colors['current-hover-item-color'];
     const target = e.target;
 
     if (target.classList.contains('item')) {
       if (annual) {
-        target.style.backgroundColor = $colors['current-item-color'];
-        target.style.color = '#fff';
+        target.style.backgroundColor = currentHoverColor;
+        target.style.color = $colors['item-background-color'];
+        let age = target.textContent - $userInfo.birthday.year + 1;
+        target.textContent = age;
       } else {
         const hoverId = target.dataset.id;
         const hoverAge = target.dataset.age;
 
-        items = document.querySelectorAll(`[data-id="${hoverId}"]`);
-        ages = document.querySelectorAll(`[data-age="${hoverAge}"]`);
+        items = calendarGrid.querySelectorAll(`[data-id="${hoverId}"]`);
+        ages = calendarGrid.querySelectorAll(`[data-age="${hoverAge}"]`);
 
         items.forEach(item => {
-          item.style.backgroundColor = $colors['hover-item-color'];
+          item.style.backgroundColor = hoverColor;
         })
         ages.forEach(age => {
-          age.style.backgroundColor = $colors['hover-item-color'];
+          age.style.backgroundColor = hoverColor;
         })
-        target.style.backgroundColor = $colors['current-item-color'];
+        target.style.backgroundColor = currentHoverColor;
       }
     }
   }
@@ -186,36 +164,28 @@
   function mouseoutHandler(e) {
     let items = null;
     let ages = null;
+    const pastColor = $colors['past-background-color'];
+    const itemColor = $colors['item-background-color'];
     let target = e.target;
 
     if (target.classList.contains('item')) {
       if (annual) {
         target.style.color = '#000';
-        if (target.classList.contains('past')) {
-          target.style.backgroundColor = $colors['past-background-color'];
-        } else {
-          target.style.backgroundColor = '#fff';
-        }
+        target.style.backgroundColor = target.classList.contains('past') ? pastColor : itemColor;
+        let year = +target.textContent + $userInfo.birthday.year - 1;
+        target.textContent = year;
       } else {
         const hoverId = target.dataset.id;
         const hoverAge = target.dataset.age;
 
-        items = document.querySelectorAll(`[data-id="${hoverId}"]`);
-        ages = document.querySelectorAll(`[data-age="${hoverAge}"]`);
+        items = calendarGrid.querySelectorAll(`[data-id="${hoverId}"]`);
+        ages = calendarGrid.querySelectorAll(`[data-age="${hoverAge}"]`);
         
         items.forEach(item => {
-          if (item.classList.contains('past')) {
-            item.style.backgroundColor = $colors['past-background-color'];
-          } else {
-            item.style.backgroundColor = '#fff';
-          }
+          item.style.backgroundColor = item.classList.contains('past') ? pastColor : itemColor;
         })
         ages.forEach(age => {
-          if (age.classList.contains('past')) {
-            age.style.backgroundColor = $colors['past-background-color'];
-          } else {
-            age.style.backgroundColor = '#fff';
-          }
+          age.style.backgroundColor = age.classList.contains('past') ? pastColor : itemColor;
         })
       }
     }
@@ -224,25 +194,31 @@
 
 <section>
   {#if $userInfo}
+  {#if $showModal}
+    <Modal on:click={clickHandler} {annual} {monthly} {weekly} />
+  {/if}
   <div class="container" class:annual class:monthly class:weekly>
-    <div class="calendar--grid" on:mouseover={mouseoverHandler} on:mouseout={mouseoutHandler} in:fade>
-      <!-- <div class="time">오늘은 {thisYear}년 {thisMonth + 1}월 {date.getDate()}일 {$week[date.getDay()]}요일입니다.</div> -->
+    <div class="calendar--grid" on:click={clickHandler} on:mouseover={mouseoverHandler} on:mouseout={mouseoutHandler} in:fade>
+      <!-- <div class="time">오늘은 {thisYear}년 {$thisMonth + 1}월 {date.getDate()}일 {$week[date.getDay()]}요일입니다.</div> -->
       {#each $squareList as item}
         <!-- Annual -->
         {#if annual}
           <div class="item"
-            class:past={$userInfo.birthday.year + item < thisYear}
-            class:current={$userInfo.birthday.year + item === thisYear}
+            class:past={$userInfo.birthday.year + item < $thisYear}
+            class:current={$userInfo.birthday.year + item === $thisYear}
+            class:circle={$userInfo.annual[$userInfo.birthday.year + item] !== undefined && $userInfo.annual[$userInfo.birthday.year + item].length > 0}
+            data-year={$userInfo.birthday.year + item}
           >
             {$userInfo.birthday.year + item}
           </div>
         <!-- Monthly -->
         {:else if monthly}
           <div class="item"
-            class:past={$userInfo.birthday.year + Math.floor(item / 12) < thisYear || ((Math.floor(item / 12) === (thisYear - $userInfo.birthday.year)) && (item % 12 < thisMonth))}
-            class:current={(Math.floor(item / 12) === (thisYear - $userInfo.birthday.year)) && (item % 12 === thisMonth)}
-            class:allThisMonth={item % 12 === thisMonth}
-            class:thisYear={Math.floor(item / 12) === (thisYear - $userInfo.birthday.year)}
+            class:past={$userInfo.birthday.year + Math.floor(item / 12) < $thisYear || ((Math.floor(item / 12) === ($thisYear - $userInfo.birthday.year)) && (item % 12 < $thisMonth))}
+            class:current={(Math.floor(item / 12) === ($thisYear - $userInfo.birthday.year)) && (item % 12 === $thisMonth)}
+            class:allThisMonthPast={item % 12 === $thisMonth && (Math.floor(item / 12) < ($thisYear - $userInfo.birthday.year))}
+            class:allThisMonthFuture={item % 12 === $thisMonth && (Math.floor(item / 12) > ($thisYear - $userInfo.birthday.year))}
+            class:thisYear={Math.floor(item / 12) === ($thisYear - $userInfo.birthday.year)}
             class:before10={12 * 1 - 1 < item && item < 12 * 9}
             class:before20={12 * 10 - 1 < item && item < 12 * 19}
             class:before30={12 * 20 - 1 < item && item < 12 * 29}
@@ -253,45 +229,47 @@
             class:before80={12 * 70 - 1 < item && item < 12 * 79}
             class:before90={12 * 80 - 1 < item && item < 12 * 89}
             class:before100={12 * 90 - 1 < item && item < 12 * 99}
+            class:circle={$userInfo.monthly[`${Math.floor(item / 12) + 1} ${item % 12 + 1}`] !== undefined && $userInfo.monthly[`${Math.floor(item / 12) + 1} ${item % 12 + 1}`].length > 0}
             data-id={item % 12}
             data-age={Math.floor(item / 12)}
           >
             {#if item === 0}
-              <span class="month-name" class:currentText={thisMonth === 0}>JAN</span>
+              <span class="month-name" class:currentText={$thisMonth === 0}>JAN</span>
             {:else if item === 1}
-              <span class="month-name" class:currentText={thisMonth === 1}>FEB</span>
+              <span class="month-name" class:currentText={$thisMonth === 1}>FEB</span>
             {:else if item === 2}
-              <span class="month-name" class:currentText={thisMonth === 2}>MAR</span>
+              <span class="month-name" class:currentText={$thisMonth === 2}>MAR</span>
             {:else if item === 3}
-              <span class="month-name" class:currentText={thisMonth === 3}>APR</span>
+              <span class="month-name" class:currentText={$thisMonth === 3}>APR</span>
             {:else if item === 4}
-              <span class="month-name" class:currentText={thisMonth === 4}>MAY</span>
+              <span class="month-name" class:currentText={$thisMonth === 4}>MAY</span>
             {:else if item === 5}
-              <span class="month-name" class:currentText={thisMonth === 5}>JUN</span>
+              <span class="month-name" class:currentText={$thisMonth === 5}>JUN</span>
             {:else if item === 6}
-              <span class="month-name" class:currentText={thisMonth === 6}>JUL</span>
+              <span class="month-name" class:currentText={$thisMonth === 6}>JUL</span>
             {:else if item === 7}
-              <span class="month-name" class:currentText={thisMonth === 7}>AUG</span>
+              <span class="month-name" class:currentText={$thisMonth === 7}>AUG</span>
             {:else if item === 8}
-              <span class="month-name" class:currentText={thisMonth === 8}>SEP</span>
+              <span class="month-name" class:currentText={$thisMonth === 8}>SEP</span>
             {:else if item === 9}
-              <span class="month-name" class:currentText={thisMonth === 9}>OCT</span>
+              <span class="month-name" class:currentText={$thisMonth === 9}>OCT</span>
             {:else if item === 10}
-              <span class="month-name" class:currentText={thisMonth === 10}>NOV</span>
+              <span class="month-name" class:currentText={$thisMonth === 10}>NOV</span>
             {:else if item === 11}
-              <span class="month-name" class:currentText={thisMonth === 11}>DEC</span>
+              <span class="month-name" class:currentText={$thisMonth === 11}>DEC</span>
             {/if}
             <!-- age -->
             {#if item % 12 === 0}
               <span 
                 class="cursor-default age"
                 class:textBold={(Math.floor(item / 12) + 1) % 10 === 0 || item === 0}
-                class:currentText={Math.floor(item / 12) === thisYear - $userInfo.birthday.year}
+                class:currentText={Math.floor(item / 12) === $thisYear - $userInfo.birthday.year}
               >
                 {Math.floor(item / 12) + 1}
               </span>
             {/if}
             <!-- // age -->
+            <!-- fold button -->
             {#if item != 1199 && item % 12 === 11 && (Math.floor(item / 12) + 1) % 10 === 0 || item === 11}
               <button
                 on:click={hideHandler}
@@ -309,6 +287,7 @@
               >
                 <i class="fas fa-chevron-down"></i>
               </button>
+              <!-- // fold button -->
             {/if}
           </div>
         <!-- // Monthly  -->
@@ -316,10 +295,11 @@
         {:else if weekly}
           <div
             class="item"
-            class:past={($userInfo.birthday.year + Math.floor(item / 52) < thisYear) || (($userInfo.birthday.year + Math.floor(item / 52) == thisYear) && (item % 52 < weekNum - 1))}
-            class:current={(Math.floor(item / 52) === (thisYear - $userInfo.birthday.year)) && (item % 52 === weekNum - 1)}
-            class:allThisMonth={item % 52 === weekNum - 1}
-            class:thisYear={Math.floor(item / 52) === (thisYear - $userInfo.birthday.year)}
+            class:past={($userInfo.birthday.year + Math.floor(item / 52) < $thisYear) || (($userInfo.birthday.year + Math.floor(item / 52) == $thisYear) && (item % 52 < $weekNum - 1))}
+            class:current={(Math.floor(item / 52) === ($thisYear - $userInfo.birthday.year)) && (item % 52 === $weekNum - 1)}
+            class:allThisMonthPast={item % 52 === $weekNum - 1 && (Math.floor(item / 52) < ($thisYear - $userInfo.birthday.year))}
+            class:allThisMonthFuture={item % 52 === $weekNum - 1 && (Math.floor(item / 52) > ($thisYear - $userInfo.birthday.year))}
+            class:thisYear={Math.floor(item / 52) === ($thisYear - $userInfo.birthday.year)}
             class:before10={52 * 1 - 1 < item && item < 52 * 9}
             class:before20={52 * 10 - 1 < item && item < 52 * 19}
             class:before30={52 * 20 - 1 < item && item < 52 * 29}
@@ -330,22 +310,24 @@
             class:before80={52 * 70 - 1 < item && item < 52 * 79}
             class:before90={52 * 80 - 1 < item && item < 52 * 89}
             class:before100={52 * 90 - 1 < item && item < 52 * 99}
+            class:circle={$userInfo.weekly[`${Math.floor(item / 52) + 1} ${item % 52 + 1}`] !== undefined && $userInfo.weekly[`${Math.floor(item / 52) + 1} ${item % 52 + 1}`].length > 0}
             data-id={item % 52}
             data-age={Math.floor(item / 52)}
           >
             {#if item < 52}
-              <span class="top-item cursor-default" class:currentText={item === weekNum - 1}>{item + 1}</span>
+              <span class="top-item cursor-default" class:currentText={item === $weekNum - 1}>{item + 1}</span>
             {/if}
             {#if item % 52 === 0}
               <span
                 class="left-item cursor-default"
                 class:textBold={(Math.floor(item / 52) + 1) % 10 === 0 || item === 0}
-                class:currentText={Math.floor(item / 52) === thisYear - $userInfo.birthday.year}
+                class:currentText={Math.floor(item / 52) === $thisYear - $userInfo.birthday.year}
               >
                 {Math.floor(item / 52) + 1}
               </span>
             {/if}
-            {#if item != 1199 && item % 52 === 51 && (Math.floor(item / 52) + 1) % 10 === 0 || item === 51}
+            <!-- fold button -->
+            {#if item != 5199 && item % 52 === 51 && (Math.floor(item / 52) + 1) % 10 === 0 || item === 51}
               <button
                 on:click={hideHandler}
                 class="fold-button"
@@ -363,6 +345,7 @@
                 <i class="fas fa-chevron-down"></i>
               </button>
             {/if}
+            <!-- // fold button -->
           </div>
         {/if}
       {/each}
@@ -372,13 +355,15 @@
     <div class="birth-form-container">
       <h2>생일을 입력해주세요.😊👀</h2>
       <form on:submit|preventDefault={submitHandler}>
-        <!-- <label for="birthday">당신의 생일은?</label> -->
         <input type="date" id="birthday" name="birthday">
         <button type="submit">시작하기</button>
       </form>
+      <div class="birth-img-wrap">
+        <img class="party-img" src="/img/party.svg" alt="">
+        <img class="birthday-img" src="/img/birthday.svg" alt="">
+      </div>
     </div>
   {/if}
-  <div class="hidden"></div>
 </section>
 
 <style>
@@ -392,25 +377,38 @@
     text-align: center;
   }
 
-  /* 
-  .time {
-    position: absolute;
-    top: -3rem;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  */
   .birth-form-container {
-		margin-bottom: 14rem;
+    width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
 	}
 
   .birth-form-container h2 {
+    font-size: 30px;
     margin-bottom: 2rem;
   }
 
   .birth-form-container form {
     display: flex;
 		justify-content: center;
+  }
+
+  .birth-form-container input {
+    padding: 10px;
+  }
+
+  .birth-img-wrap {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .birth-img-wrap img {
+    width: 300px;
+  }
+
+  .birth-img-wrap .birthday-img {
+    margin-top: 10rem;
   }
 
   .currentText {
@@ -434,6 +432,11 @@
     border-radius: 4px;
     position: relative;
     transition: all 0.3s;
+    background-color: var(--item-background-color);
+  }
+
+  .item.current {
+    background-color: var(--current-item-color) !important;
   }
 
   .textBold {
@@ -446,10 +449,6 @@
 
   .cursor-default {
     cursor: default;
-  }
-
-  .hidden {
-    display: none;
   }
 
   .fold-button {
@@ -465,14 +464,31 @@
     color: #555;
     background-color: transparent;
     border: none;
+    outline: none;
     cursor: pointer;
   }
 
-  .item.current {
-    background-color: var(--current-item-color) !important;
-    color: #fff;
-    border: none;
-    font-weight: bold;
+  .circle::before {
+    content: '';
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--active-color);
+  }
+
+  .monthly .circle::before {
+    width: 6px;
+    height: 6px;
+  }
+
+  .weekly .circle::before {
+    right: 3px;
+    top: 3px;
+    width: 5px;
+    height: 5px;
   }
 
   /* Annual */
@@ -490,7 +506,7 @@
   .monthly .calendar--grid {
     grid-template-columns: repeat(12, 60px);
     grid-template-rows: repeat(100, 30px);
-    gap: 5px;
+    gap: 4px;
   }
 
   .monthly .calendar--grid .item {
@@ -510,8 +526,12 @@
     cursor: default;
   }
 
-  .allThisMonth {
-    background-color: var(--all-this-month-color) !important;
+  .allThisMonthPast {
+    background-color: var(--all-this-month-past-color) !important;
+  }
+
+  .allThisMonthFuture {
+    background-color: var(--all-this-month-future-color) !important;
   }
 
   .thisYear {
@@ -520,6 +540,10 @@
 
   .thisYear.past {
     background-color: var(--this-year-past-color) !important;
+  }
+
+  .allThisMonthPast:hover, .allThisMonthFuture:hover, .thisYear:hover, .thisYear.past:hover {
+    opacity: 0.7;
   }
 
   /* Weekly */
