@@ -169,12 +169,9 @@
     </div>
   </div>
 {/if}
-<!-- <div class="ce-block__content hidden"></div>
-<div class="ce-toolbar__content hidden"></div>
-<div class="cdx-block hidden"></div> -->
 
 <style>
-  .hidden {
+  .modal .hidden {
     visibility: hidden;
   }
 
@@ -228,11 +225,10 @@
     width: 100%;
     height: 100%;
     overflow-y: auto;
+    padding: 0 10px;
   }
 
   #textarea::-webkit-scrollbar {
-    position: relative;
-    left: 20px;
     width: 10px;
   }
 

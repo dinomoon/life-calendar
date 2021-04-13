@@ -437,6 +437,7 @@
 
   .item.current {
     background-color: var(--current-item-color) !important;
+    border: none;
   }
 
   .textBold {

@@ -2,14 +2,14 @@
 	import {loggedIn, userId, userInfo, userDocId} from '../store';
 	import Annual from '../components/tabs/Annual.svelte';
 
-		db.collection('users').onSnapshot((snapshot => {
-			snapshot.docs.forEach(doc => {
-				if (doc.data().userId === $userId) {
-					userInfo.set(doc.data());
-					userDocId.set(doc.id);
-				}
-			})
-		}))
+	db.collection('users').onSnapshot((snapshot => {
+		snapshot.docs.forEach(doc => {
+			if (doc.data().userId === $userId) {
+				userInfo.set(doc.data());
+				userDocId.set(doc.id);
+			}
+		})
+	}))
 </script>
 
 {#if $loggedIn}
