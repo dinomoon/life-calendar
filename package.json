@@ -20,7 +20,7 @@
     "svelte-spa-router": "^3.1.0"
   },
   "dependencies": {
-    "html-to-text": "^7.0.0",
+    "editorjs-drag-drop": "^0.1.1",
     "sirv-cli": "^1.0.0"
   }
 }

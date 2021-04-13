@@ -1,12 +1,14 @@
 <script>
   import { onDestroy, onMount } from 'svelte';
   import { clickedDay, userDocId, userInfo } from '../store.js';
+  import DragDrop from 'editorjs-drag-drop';
 
   export let annual;
   export let monthly;
   export let weekly;
 
   let value = "";
+  let editor = null;
 
   onMount(() => {
     if (annual) {
@@ -16,42 +18,112 @@
     } else if (weekly) {
       value = $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`] || "";
     }
+
+    editor = new EditorJS({
+      onReady: () => {
+        new DragDrop(editor);
+      },
+      holder: 'textarea',
+      placeholder: '여기에 기록을 할 수 있어요.',
+      data: {
+        blocks: [...value],
+      },
+      tools: {
+        heading: {
+          class: Header,
+        },
+        list: {
+          class: List,
+        },
+        checklist: {
+          class: Checklist,
+        },
+        // image: {
+        //   class: ImageTool,
+        //   config: {
+        //     endpoints: {
+        //       byFile: 'http://localhost:5000/#/', // Your backend file uploader endpoint
+        //       byUrl: 'http://localhost:5000/#/', // Your endpoint that provides uploading by Url
+        //     }
+        //   }
+        // },
+        embed: {
+          class: Embed,
+          config: {
+            services: {
+              youtube: true,
+            }
+          }
+        },
+        quote: Quote,
+        // inlineCode: {
+        //   class: InlineCode,
+        //   shortcut: 'CMD+SHIFT+M',
+        // },
+      },
+    });
   })
 
   onDestroy(() => {
-    if (annual) {
-      db.collection('users').doc($userDocId).set({
-        annual: {
-          [$clickedDay.year]: value
-        },
-      }, {merge: true});
-    } else if (monthly) {
-      db.collection('users').doc($userDocId).set({
-        monthly: {
-          [`${$clickedDay.age} ${$clickedDay.month}`]: textarea.innerHTML
-        },
-      }, {merge: true})
-    } else if (weekly) {
-      db.collection('users').doc($userDocId).set({
-        weekly: {
-          [`${$clickedDay.age} ${$clickedDay.week}`]: textarea.innerHTML
-        },
-      }, {merge: true})
-    }
+    editor.save().then((outputData) => {
+      if (annual) {
+        db.collection('users').doc($userDocId).set({
+          annual: {
+            [$clickedDay.year]: outputData.blocks
+          },
+        }, {merge: true});
+      } else if (monthly) {
+        db.collection('users').doc($userDocId).set({
+          monthly: {
+            [`${$clickedDay.age} ${$clickedDay.month}`]: outputData.blocks
+          },
+        }, {merge: true})
+      } else if (weekly) {
+        db.collection('users').doc($userDocId).set({
+          weekly: {
+            [`${$clickedDay.age} ${$clickedDay.week}`]: outputData.blocks
+          },
+        }, {merge: true})
+      }
+    }).catch((error) => {
+      console.log('Saving failed: ', error)
+    });
   })
 
-  const clickHandler = (dir) => {
-    db.collection('users').doc($userDocId).set({
-      annual: {
-        [$clickedDay.year]: value
-      },
-    }, {merge: true});
+  const clickHandler = async (dir) => {
+    await editor.save().then((outputData) => {
+      db.collection('users').doc($userDocId).set({
+        annual: {
+          [$clickedDay.year]: outputData.blocks
+        },
+      }, {merge: true});
+    })
+    editor.destroy();
     if (dir === 'prev') {
       clickedDay.set({year: $clickedDay.year - 1});
     } else if (dir === 'next') {
       clickedDay.set({year: $clickedDay.year + 1});
     }
     value = $userInfo.annual[$clickedDay.year] || "";
+    editor = new EditorJS({
+      holder: 'textarea',
+      placeholder: '여기에 기록을 할 수 있어요.',
+      data: {
+        blocks: [...value],
+      },
+      tools: {
+        heading: {
+          class: Header,
+        },
+        list: {
+          class: List,
+        },
+        checklist: {
+          class: Checklist,
+        },
+        image: SimpleImage,
+      },
+    });
   }
 </script>
 
@@ -75,14 +147,7 @@
           {$clickedDay.year + 1}년
         </span>
       </header>
-      <div
-        class="textarea"
-        contenteditable
-        spellcheck="false"
-        placeholder="여기에 기록을 할 수 있어요."
-        bind:innerHTML={value}
-      >
-      </div>
+      <div id="textarea" spellcheck="false"></div>
     </div>
   </div>
 {:else if monthly}
@@ -91,14 +156,7 @@
       <header>
         <h2>{$clickedDay.month}월</h2>
       </header>
-      <div
-        class="textarea"
-        contenteditable
-        spellcheck="false"
-        placeholder="여기에 기록을 할 수 있어요."
-        bind:innerHTML={value}
-      >
-      </div>
+      <div id="textarea"></div>
     </div>
   </div>
 {:else if weekly}
@@ -107,14 +165,7 @@
       <header>
         <h2>{$clickedDay.age} - {$clickedDay.week}주</h2>
       </header>
-      <div
-        class="textarea"
-        contenteditable
-        spellcheck="false"
-        placeholder="여기에 기록을 할 수 있어요."
-        bind:innerHTML={value}
-      >
-      </div>
+      <div id="textarea"></div>
     </div>
   </div>
 {/if}
@@ -167,21 +218,30 @@
     cursor: pointer;
   }
 
-  .textarea {
+  #textarea {
     text-align: left;
     border: none;
     outline: none;
     width: 100%;
     height: 100%;
     overflow-y: auto;
+    padding: 0 10px;
   }
 
-  .textarea::placeholder {
-    font-size: 1rem;
+  #textarea::-webkit-scrollbar {
+    width: 10px;
   }
 
-  .textarea[placeholder]:empty:before {
-    content: attr(placeholder);
-    color: #777; 
+  #textarea::-webkit-scrollbar-track {
+    background-color: #f8f9fa;
+  }
+  
+  #textarea::-webkit-scrollbar-thumb {
+    background-color: #e9ecef;
+  }
+
+  #textarea::-webkit-scrollbar-button {
+    width: 0;
+    height: 0;
   }
 </style>

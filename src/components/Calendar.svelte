@@ -1,8 +1,8 @@
 <script>
   import { onMount } from 'svelte';
-  import { userId, userInfo, week, colors, squareList, beforeBtnClasses, 
+  import { userId, userInfo, colors, squareList, beforeBtnClasses, 
     beforeBtnObj, monthlyFoldObj, weeklyFoldObj, birthdayValid,
-    date, thisYear, thisMonth, weekNum, clickedDay, userDocId, showModal } from "../store";
+    date, thisYear, thisMonth, weekNum, clickedDay, showModal } from "../store";
   import { fade } from 'svelte/transition';
   import { weekNumber } from '../../public/weekNum.js'
   import Modal from './Modal.svelte';
@@ -206,6 +206,7 @@
           <div class="item"
             class:past={$userInfo.birthday.year + item < $thisYear}
             class:current={$userInfo.birthday.year + item === $thisYear}
+            class:circle={$userInfo.annual[$userInfo.birthday.year + item] !== undefined && $userInfo.annual[$userInfo.birthday.year + item].length > 0}
             data-year={$userInfo.birthday.year + item}
           >
             {$userInfo.birthday.year + item}
@@ -469,6 +470,17 @@
     border: none;
     outline: none;
     cursor: pointer;
+  }
+
+  .circle::before {
+    content: '';
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--active-color);
   }
 
   /* Annual */
