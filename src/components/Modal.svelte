@@ -7,16 +7,17 @@
   export let monthly;
   export let weekly;
 
-  let value = "";
+  let value = '';
   let editor = null;
 
   onMount(() => {
     if (annual) {
-      value = $userInfo.annual[$clickedDay.year] || "";
+      value = $userInfo.annual[$clickedDay.year] || '';
     } else if (monthly) {
-      value = $userInfo.monthly[`${$clickedDay.age} ${$clickedDay.month}`] || "";
+      value =
+        $userInfo.monthly[`${$clickedDay.age} ${$clickedDay.month}`] || '';
     } else if (weekly) {
-      value = $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`] || "";
+      value = $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`] || '';
     }
 
     editor = new EditorJS({
@@ -31,12 +32,144 @@
       tools: {
         heading: {
           class: Header,
+          inlineToolbar: true,
         },
         list: {
           class: List,
+          inlineToolbar: true,
         },
         checklist: {
           class: Checklist,
+          inlineToolbar: true,
+        },
+        image: {
+          class: ImageTool,
+          config: {
+            endpoints: {
+              byFile: 'gs://life-calendar-ce63c.appspot.com', // Your backend file uploader endpoint
+              byUrl: 'gs://life-calendar-ce63c.appspot.com', // Your endpoint that provides uploading by Url
+            },
+            captionPlaceholder: '설명',
+          },
+        },
+        embed: {
+          class: Embed,
+          config: {
+            services: {
+              youtube: true,
+            },
+          },
+        },
+        quote: {
+          class: Quote,
+          inlineToolbar: true,
+          config: {
+            quotePlaceholder: '인용 내용',
+            captionPlaceholder: '저자',
+          },
+        },
+        inlineCode: {
+          class: InlineCode,
+        },
+        Marker: {
+          class: Marker,
+        },
+        linkTool: {
+          class: LinkTool,
+          config: {
+            endpoint: 'http://localhost:8008/fetchUrl', // Your backend endpoint for url data fetching
+          },
+        },
+        delimiter: Delimiter,
+      },
+    });
+  });
+
+  onDestroy(() => {
+    editor
+      .save()
+      .then((outputData) => {
+        if (annual) {
+          db.collection('users')
+            .doc($userDocId)
+            .set(
+              {
+                annual: {
+                  [$clickedDay.year]: outputData.blocks,
+                },
+              },
+              { merge: true },
+            );
+        } else if (monthly) {
+          db.collection('users')
+            .doc($userDocId)
+            .set(
+              {
+                monthly: {
+                  [`${$clickedDay.age} ${$clickedDay.month}`]: outputData.blocks,
+                },
+              },
+              { merge: true },
+            );
+        } else if (weekly) {
+          db.collection('users')
+            .doc($userDocId)
+            .set(
+              {
+                weekly: {
+                  [`${$clickedDay.age} ${$clickedDay.week}`]: outputData.blocks,
+                },
+              },
+              { merge: true },
+            );
+        }
+      })
+      .catch((error) => {
+        console.log('Saving failed: ', error);
+      });
+  });
+
+  const clickHandler = async (dir) => {
+    await editor.save().then((outputData) => {
+      db.collection('users')
+        .doc($userDocId)
+        .set(
+          {
+            annual: {
+              [$clickedDay.year]: outputData.blocks,
+            },
+          },
+          { merge: true },
+        );
+    });
+    editor.destroy();
+    if (dir === 'prev') {
+      clickedDay.set({ year: $clickedDay.year - 1 });
+    } else if (dir === 'next') {
+      clickedDay.set({ year: $clickedDay.year + 1 });
+    }
+    value = $userInfo.annual[$clickedDay.year] || '';
+    editor = new EditorJS({
+      onReady: () => {
+        new DragDrop(editor);
+      },
+      holder: 'textarea',
+      placeholder: '여기에 기록을 할 수 있어요.',
+      data: {
+        blocks: [...value],
+      },
+      tools: {
+        heading: {
+          class: Header,
+          inlineToolbar: true,
+        },
+        list: {
+          class: List,
+          inlineToolbar: true,
+        },
+        checklist: {
+          class: Checklist,
+          inlineToolbar: true,
         },
         // image: {
         //   class: ImageTool,
@@ -52,79 +185,25 @@
           config: {
             services: {
               youtube: true,
-            }
-          }
+            },
+          },
         },
-        quote: Quote,
+        quote: {
+          class: Quote,
+          inlineToolbar: true,
+          shortcut: 'CMD+SHIFT+O',
+          config: {
+            quotePlaceholder: 'Enter a quote',
+            captionPlaceholder: "Quote's author",
+          },
+        },
         // inlineCode: {
         //   class: InlineCode,
         //   shortcut: 'CMD+SHIFT+M',
         // },
       },
     });
-  })
-
-  onDestroy(() => {
-    editor.save().then((outputData) => {
-      if (annual) {
-        db.collection('users').doc($userDocId).set({
-          annual: {
-            [$clickedDay.year]: outputData.blocks
-          },
-        }, {merge: true});
-      } else if (monthly) {
-        db.collection('users').doc($userDocId).set({
-          monthly: {
-            [`${$clickedDay.age} ${$clickedDay.month}`]: outputData.blocks
-          },
-        }, {merge: true})
-      } else if (weekly) {
-        db.collection('users').doc($userDocId).set({
-          weekly: {
-            [`${$clickedDay.age} ${$clickedDay.week}`]: outputData.blocks
-          },
-        }, {merge: true})
-      }
-    }).catch((error) => {
-      console.log('Saving failed: ', error)
-    });
-  })
-
-  const clickHandler = async (dir) => {
-    await editor.save().then((outputData) => {
-      db.collection('users').doc($userDocId).set({
-        annual: {
-          [$clickedDay.year]: outputData.blocks
-        },
-      }, {merge: true});
-    })
-    editor.destroy();
-    if (dir === 'prev') {
-      clickedDay.set({year: $clickedDay.year - 1});
-    } else if (dir === 'next') {
-      clickedDay.set({year: $clickedDay.year + 1});
-    }
-    value = $userInfo.annual[$clickedDay.year] || "";
-    editor = new EditorJS({
-      holder: 'textarea',
-      placeholder: '여기에 기록을 할 수 있어요.',
-      data: {
-        blocks: [...value],
-      },
-      tools: {
-        heading: {
-          class: Header,
-        },
-        list: {
-          class: List,
-        },
-        checklist: {
-          class: Checklist,
-        },
-        image: SimpleImage,
-      },
-    });
-  }
+  };
 </script>
 
 {#if annual}
@@ -147,7 +226,7 @@
           {$clickedDay.year + 1}년
         </span>
       </header>
-      <div id="textarea" spellcheck="false"></div>
+      <div id="textarea" spellcheck="false" />
     </div>
   </div>
 {:else if monthly}
@@ -156,7 +235,7 @@
       <header>
         <h2>{$clickedDay.month}월</h2>
       </header>
-      <div id="textarea"></div>
+      <div id="textarea" />
     </div>
   </div>
 {:else if weekly}
@@ -165,16 +244,12 @@
       <header>
         <h2>{$clickedDay.age} - {$clickedDay.week}주</h2>
       </header>
-      <div id="textarea"></div>
+      <div id="textarea" />
     </div>
   </div>
 {/if}
 
 <style>
-  .modal .hidden {
-    visibility: hidden;
-  }
-
   .backdrop {
     left: 0;
     right: 0;
@@ -192,7 +267,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-size: 20px;
+    font-size: 1rem;
     width: 60vw;
     height: 80vh;
     padding: 40px 100px 60px;
@@ -235,7 +310,7 @@
   #textarea::-webkit-scrollbar-track {
     background-color: #f8f9fa;
   }
-  
+
   #textarea::-webkit-scrollbar-thumb {
     background-color: #e9ecef;
   }
@@ -245,11 +320,11 @@
     height: 0;
   }
 
-  :global(.ce-block__content, .ce-toolbar__content) { 
+  :global(.ce-block__content, .ce-toolbar__content) {
     max-width: calc(100% - 60px);
   }
-  
-  :global(.cdx-block) { 
+
+  :global(.cdx-block) {
     max-width: 100%;
   }
 

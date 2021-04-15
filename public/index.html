@@ -23,6 +23,7 @@
         projectId: 'life-calendar-ce63c',
         appId: '1:834192164508:web:2800899972df5e47e88f59',
         measurementId: 'G-8C9K27WN3T',
+        // storageBucket: 'life-calendar-ce63c.appspot.com',
       };
       // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
@@ -30,6 +31,7 @@
       // make auth and firestore references
       const auth = firebase.auth();
       const db = firebase.firestore();
+      // const storage = firebase.storage();
 
       // update firestore settings
       db.settings({ timestampsInSnapshots: true });
@@ -43,9 +45,13 @@
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/image@2.3.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/image@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/marker@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/link@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest"></script>
     <script defer src="./build/bundle.js"></script>
   </head>
   <body></body>

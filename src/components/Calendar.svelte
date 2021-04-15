@@ -1,17 +1,31 @@
 <script>
   import { onMount } from 'svelte';
-  import { userId, userInfo, colors, squareList, beforeBtnClasses, 
-    beforeBtnObj, monthlyFoldObj, weeklyFoldObj, birthdayValid,
-    date, thisYear, thisMonth, weekNum, clickedDay, showModal } from "../store";
+  import {
+    userId,
+    userInfo,
+    colors,
+    squareList,
+    beforeBtnClasses,
+    beforeBtnObj,
+    monthlyFoldObj,
+    weeklyFoldObj,
+    birthdayValid,
+    date,
+    thisYear,
+    thisMonth,
+    weekNum,
+    clickedDay,
+    showModal,
+  } from '../store';
   import { fade } from 'svelte/transition';
-  import { weekNumber } from '../../public/weekNum.js'
+  import { weekNumber } from '../../public/weekNum.js';
   import Modal from './Modal.svelte';
 
   export let annual = false;
   export let monthly = false;
   export let weekly = false;
   let calendarGrid = null;
-  
+
   if (annual) {
     squareList.set(Array.from(Array(100).keys()));
   } else if (monthly) {
@@ -19,7 +33,7 @@
   } else if (weekly) {
     squareList.set(Array.from(Array(5200).keys()));
   }
-  
+
   onMount(() => {
     calendarGrid = document.querySelector('.calendar--grid');
     if (JSON.parse(localStorage.getItem('monthly-fold-obj')) === null) {
@@ -31,28 +45,33 @@
     }
 
     if (monthly) {
-      $beforeBtnClasses.forEach(btnClass => {
-        if (JSON.parse(localStorage.getItem('monthly-fold-obj'))[btnClass] === true) {
+      $beforeBtnClasses.forEach((btnClass) => {
+        if (
+          JSON.parse(localStorage.getItem('monthly-fold-obj'))[btnClass] ===
+          true
+        ) {
           const btn = calendarGrid.querySelector(`.${btnClass}`);
           const icon = btn.querySelector('i');
           icon.classList.add('fold');
           const items = calendarGrid.querySelectorAll($beforeBtnObj[btnClass]);
-          items.forEach(item => item.classList.add('hidden'));
+          items.forEach((item) => item.classList.add('hidden'));
         }
       });
     } else if (weekly) {
-      $beforeBtnClasses.forEach(btnClass => {
-        if (JSON.parse(localStorage.getItem('weekly-fold-obj'))[btnClass] === true) {
+      $beforeBtnClasses.forEach((btnClass) => {
+        if (
+          JSON.parse(localStorage.getItem('weekly-fold-obj'))[btnClass] === true
+        ) {
           const btn = calendarGrid.querySelector(`.${btnClass}`);
           const icon = btn.querySelector('i');
           icon.classList.add('fold');
           const items = calendarGrid.querySelectorAll($beforeBtnObj[btnClass]);
-          items.forEach(item => item.classList.add('hidden'));
+          items.forEach((item) => item.classList.add('hidden'));
         }
-      })
+      });
       weekNum.set(weekNumber($date));
     }
-  })
+  });
 
   const submitHandler = async (e) => {
     birthdayValid.set(true);
@@ -67,33 +86,40 @@
     if (birthdayValid) {
       await db.collection('users').add({
         userId: $userId,
-        birthday: {year, month, day},
+        birthday: { year, month, day },
         annual: {},
         monthly: {},
         weekly: {},
-      })
+      });
     }
-  }
+  };
 
   // clickHandler
   const clickHandler = async (e) => {
     const classList = e.target.classList;
     if (classList.contains('item')) {
       if (annual) {
-        await clickedDay.set({year: +e.target.dataset.year});
+        await clickedDay.set({ year: +e.target.dataset.year });
       } else if (monthly) {
-        clickedDay.set({month: +e.target.dataset.id + 1, age: +e.target.dataset.age + 1});
+        clickedDay.set({
+          month: +e.target.dataset.id + 1,
+          age: +e.target.dataset.age + 1,
+        });
       } else if (weekly) {
-        clickedDay.set({week: +e.target.dataset.id + 1, age: +e.target.dataset.age + 1});
+        clickedDay.set({
+          week: +e.target.dataset.id + 1,
+          age: +e.target.dataset.age + 1,
+        });
       }
       showModal.set(true);
     } else if (classList.contains('backdrop')) {
       showModal.set(false);
     }
-  }
+  };
 
   // hideHandler
   function hideHandler(e) {
+    console.log(e.target);
     let button = null;
     let icon = null;
     let classList = null;
@@ -111,16 +137,26 @@
 
     icon.classList.toggle('fold');
 
-    $beforeBtnClasses.forEach(btnClass => {
+    $beforeBtnClasses.forEach((btnClass) => {
       if (classList.contains(btnClass)) {
         if (monthly) {
-          monthlyFoldObj.set(JSON.parse(localStorage.getItem('monthly-fold-obj')));
+          monthlyFoldObj.set(
+            JSON.parse(localStorage.getItem('monthly-fold-obj')),
+          );
           $monthlyFoldObj[btnClass] = $monthlyFoldObj[btnClass] ? false : true;
-          localStorage.setItem('monthly-fold-obj', JSON.stringify($monthlyFoldObj));
+          localStorage.setItem(
+            'monthly-fold-obj',
+            JSON.stringify($monthlyFoldObj),
+          );
         } else if (weekly) {
-          monthlyFoldObj.set(JSON.parse(localStorage.getItem('weekly-fold-obj')));
+          monthlyFoldObj.set(
+            JSON.parse(localStorage.getItem('weekly-fold-obj')),
+          );
           $weeklyFoldObj[btnClass] = $weeklyFoldObj[btnClass] ? false : true;
-          localStorage.setItem('weekly-fold-obj', JSON.stringify($weeklyFoldObj));
+          localStorage.setItem(
+            'weekly-fold-obj',
+            JSON.stringify($weeklyFoldObj),
+          );
         }
         items = calendarGrid.querySelectorAll($beforeBtnObj[btnClass]);
       }
@@ -150,12 +186,12 @@
         items = calendarGrid.querySelectorAll(`[data-id="${hoverId}"]`);
         ages = calendarGrid.querySelectorAll(`[data-age="${hoverAge}"]`);
 
-        items.forEach(item => {
+        items.forEach((item) => {
           item.style.backgroundColor = hoverColor;
-        })
-        ages.forEach(age => {
+        });
+        ages.forEach((age) => {
           age.style.backgroundColor = hoverColor;
-        })
+        });
         target.style.backgroundColor = currentHoverColor;
       }
     }
@@ -171,7 +207,9 @@
     if (target.classList.contains('item')) {
       if (annual) {
         target.style.color = '#000';
-        target.style.backgroundColor = target.classList.contains('past') ? pastColor : itemColor;
+        target.style.backgroundColor = target.classList.contains('past')
+          ? pastColor
+          : itemColor;
         let year = +target.textContent + $userInfo.birthday.year - 1;
         target.textContent = year;
       } else {
@@ -180,13 +218,17 @@
 
         items = calendarGrid.querySelectorAll(`[data-id="${hoverId}"]`);
         ages = calendarGrid.querySelectorAll(`[data-age="${hoverAge}"]`);
-        
-        items.forEach(item => {
-          item.style.backgroundColor = item.classList.contains('past') ? pastColor : itemColor;
-        })
-        ages.forEach(age => {
-          age.style.backgroundColor = age.classList.contains('past') ? pastColor : itemColor;
-        })
+
+        items.forEach((item) => {
+          item.style.backgroundColor = item.classList.contains('past')
+            ? pastColor
+            : itemColor;
+        });
+        ages.forEach((age) => {
+          age.style.backgroundColor = age.classList.contains('past')
+            ? pastColor
+            : itemColor;
+        });
       }
     }
   }
@@ -194,173 +236,240 @@
 
 <section>
   {#if $userInfo}
-  {#if $showModal}
-    <Modal on:click={clickHandler} {annual} {monthly} {weekly} />
-  {/if}
-  <div class="container" class:annual class:monthly class:weekly>
-    <div class="calendar--grid" on:click={clickHandler} on:mouseover={mouseoverHandler} on:mouseout={mouseoutHandler} in:fade>
-      <!-- <div class="time">오늘은 {thisYear}년 {$thisMonth + 1}월 {date.getDate()}일 {$week[date.getDay()]}요일입니다.</div> -->
-      {#each $squareList as item}
-        <!-- Annual -->
-        {#if annual}
-          <div class="item"
-            class:past={$userInfo.birthday.year + item < $thisYear}
-            class:current={$userInfo.birthday.year + item === $thisYear}
-            class:circle={$userInfo.annual[$userInfo.birthday.year + item] !== undefined && $userInfo.annual[$userInfo.birthday.year + item].length > 0}
-            data-year={$userInfo.birthday.year + item}
-          >
-            {$userInfo.birthday.year + item}
-          </div>
-        <!-- Monthly -->
-        {:else if monthly}
-          <div class="item"
-            class:past={$userInfo.birthday.year + Math.floor(item / 12) < $thisYear || ((Math.floor(item / 12) === ($thisYear - $userInfo.birthday.year)) && (item % 12 < $thisMonth))}
-            class:current={(Math.floor(item / 12) === ($thisYear - $userInfo.birthday.year)) && (item % 12 === $thisMonth)}
-            class:allThisMonthPast={item % 12 === $thisMonth && (Math.floor(item / 12) < ($thisYear - $userInfo.birthday.year))}
-            class:allThisMonthFuture={item % 12 === $thisMonth && (Math.floor(item / 12) > ($thisYear - $userInfo.birthday.year))}
-            class:thisYear={Math.floor(item / 12) === ($thisYear - $userInfo.birthday.year)}
-            class:before10={12 * 1 - 1 < item && item < 12 * 9}
-            class:before20={12 * 10 - 1 < item && item < 12 * 19}
-            class:before30={12 * 20 - 1 < item && item < 12 * 29}
-            class:before40={12 * 30 - 1 < item && item < 12 * 39}
-            class:before50={12 * 40 - 1 < item && item < 12 * 49}
-            class:before60={12 * 50 - 1 < item && item < 12 * 59}
-            class:before70={12 * 60 - 1 < item && item < 12 * 69}
-            class:before80={12 * 70 - 1 < item && item < 12 * 79}
-            class:before90={12 * 80 - 1 < item && item < 12 * 89}
-            class:before100={12 * 90 - 1 < item && item < 12 * 99}
-            class:circle={$userInfo.monthly[`${Math.floor(item / 12) + 1} ${item % 12 + 1}`] !== undefined && $userInfo.monthly[`${Math.floor(item / 12) + 1} ${item % 12 + 1}`].length > 0}
-            data-id={item % 12}
-            data-age={Math.floor(item / 12)}
-          >
-            {#if item === 0}
-              <span class="month-name" class:currentText={$thisMonth === 0}>JAN</span>
-            {:else if item === 1}
-              <span class="month-name" class:currentText={$thisMonth === 1}>FEB</span>
-            {:else if item === 2}
-              <span class="month-name" class:currentText={$thisMonth === 2}>MAR</span>
-            {:else if item === 3}
-              <span class="month-name" class:currentText={$thisMonth === 3}>APR</span>
-            {:else if item === 4}
-              <span class="month-name" class:currentText={$thisMonth === 4}>MAY</span>
-            {:else if item === 5}
-              <span class="month-name" class:currentText={$thisMonth === 5}>JUN</span>
-            {:else if item === 6}
-              <span class="month-name" class:currentText={$thisMonth === 6}>JUL</span>
-            {:else if item === 7}
-              <span class="month-name" class:currentText={$thisMonth === 7}>AUG</span>
-            {:else if item === 8}
-              <span class="month-name" class:currentText={$thisMonth === 8}>SEP</span>
-            {:else if item === 9}
-              <span class="month-name" class:currentText={$thisMonth === 9}>OCT</span>
-            {:else if item === 10}
-              <span class="month-name" class:currentText={$thisMonth === 10}>NOV</span>
-            {:else if item === 11}
-              <span class="month-name" class:currentText={$thisMonth === 11}>DEC</span>
-            {/if}
-            <!-- age -->
-            {#if item % 12 === 0}
-              <span 
-                class="cursor-default age"
-                class:textBold={(Math.floor(item / 12) + 1) % 10 === 0 || item === 0}
-                class:currentText={Math.floor(item / 12) === $thisYear - $userInfo.birthday.year}
-              >
-                {Math.floor(item / 12) + 1}
-              </span>
-            {/if}
-            <!-- // age -->
-            <!-- fold button -->
-            {#if item != 1199 && item % 12 === 11 && (Math.floor(item / 12) + 1) % 10 === 0 || item === 11}
-              <button
-                on:click={hideHandler}
-                class="fold-button"
-                class:b10={item === 12 * 1 - 1}
-                class:b20={item === 12 * 10 - 1}
-                class:b30={item === 12 * 20 - 1}
-                class:b40={item === 12 * 30 - 1}
-                class:b50={item === 12 * 40 - 1}
-                class:b60={item === 12 * 50 - 1}
-                class:b70={item === 12 * 60 - 1}
-                class:b80={item === 12 * 70 - 1}
-                class:b90={item === 12 * 80 - 1}
-                class:b100={item === 12 * 90 - 1}
-              >
-                <i class="fas fa-chevron-down"></i>
-              </button>
+    {#if $showModal}
+      <Modal on:click={clickHandler} {annual} {monthly} {weekly} />
+    {/if}
+    <div class="container" class:annual class:monthly class:weekly>
+      <div
+        class="calendar--grid"
+        on:click={clickHandler}
+        on:mouseover={mouseoverHandler}
+        on:mouseout={mouseoutHandler}
+        in:fade
+      >
+        <!-- <div class="time">오늘은 {thisYear}년 {$thisMonth + 1}월 {date.getDate()}일 {$week[date.getDay()]}요일입니다.</div> -->
+        {#each $squareList as item}
+          <!-- Annual -->
+          {#if annual}
+            <div
+              class="item"
+              class:past={$userInfo.birthday.year + item < $thisYear}
+              class:current={$userInfo.birthday.year + item === $thisYear}
+              class:circle={$userInfo.annual[$userInfo.birthday.year + item] !==
+                undefined &&
+                $userInfo.annual[$userInfo.birthday.year + item].length > 0}
+              data-year={$userInfo.birthday.year + item}
+            >
+              {$userInfo.birthday.year + item}
+            </div>
+            <!-- Monthly -->
+          {:else if monthly}
+            <div
+              class="item"
+              class:past={$userInfo.birthday.year + Math.floor(item / 12) <
+                $thisYear ||
+                (Math.floor(item / 12) ===
+                  $thisYear - $userInfo.birthday.year &&
+                  item % 12 < $thisMonth)}
+              class:current={Math.floor(item / 12) ===
+                $thisYear - $userInfo.birthday.year && item % 12 === $thisMonth}
+              class:allThisMonthPast={item % 12 === $thisMonth &&
+                Math.floor(item / 12) < $thisYear - $userInfo.birthday.year}
+              class:allThisMonthFuture={item % 12 === $thisMonth &&
+                Math.floor(item / 12) > $thisYear - $userInfo.birthday.year}
+              class:thisYear={Math.floor(item / 12) ===
+                $thisYear - $userInfo.birthday.year}
+              class:before10={12 * 1 - 1 < item && item < 12 * 9}
+              class:before20={12 * 10 - 1 < item && item < 12 * 19}
+              class:before30={12 * 20 - 1 < item && item < 12 * 29}
+              class:before40={12 * 30 - 1 < item && item < 12 * 39}
+              class:before50={12 * 40 - 1 < item && item < 12 * 49}
+              class:before60={12 * 50 - 1 < item && item < 12 * 59}
+              class:before70={12 * 60 - 1 < item && item < 12 * 69}
+              class:before80={12 * 70 - 1 < item && item < 12 * 79}
+              class:before90={12 * 80 - 1 < item && item < 12 * 89}
+              class:before100={12 * 90 - 1 < item && item < 12 * 99}
+              class:circle={$userInfo.monthly[
+                `${Math.floor(item / 12) + 1} ${(item % 12) + 1}`
+              ] !== undefined &&
+                $userInfo.monthly[
+                  `${Math.floor(item / 12) + 1} ${(item % 12) + 1}`
+                ].length > 0}
+              data-id={item % 12}
+              data-age={Math.floor(item / 12)}
+            >
+              {#if item === 0}
+                <span class="month-name" class:currentText={$thisMonth === 0}
+                  >JAN</span
+                >
+              {:else if item === 1}
+                <span class="month-name" class:currentText={$thisMonth === 1}
+                  >FEB</span
+                >
+              {:else if item === 2}
+                <span class="month-name" class:currentText={$thisMonth === 2}
+                  >MAR</span
+                >
+              {:else if item === 3}
+                <span class="month-name" class:currentText={$thisMonth === 3}
+                  >APR</span
+                >
+              {:else if item === 4}
+                <span class="month-name" class:currentText={$thisMonth === 4}
+                  >MAY</span
+                >
+              {:else if item === 5}
+                <span class="month-name" class:currentText={$thisMonth === 5}
+                  >JUN</span
+                >
+              {:else if item === 6}
+                <span class="month-name" class:currentText={$thisMonth === 6}
+                  >JUL</span
+                >
+              {:else if item === 7}
+                <span class="month-name" class:currentText={$thisMonth === 7}
+                  >AUG</span
+                >
+              {:else if item === 8}
+                <span class="month-name" class:currentText={$thisMonth === 8}
+                  >SEP</span
+                >
+              {:else if item === 9}
+                <span class="month-name" class:currentText={$thisMonth === 9}
+                  >OCT</span
+                >
+              {:else if item === 10}
+                <span class="month-name" class:currentText={$thisMonth === 10}
+                  >NOV</span
+                >
+              {:else if item === 11}
+                <span class="month-name" class:currentText={$thisMonth === 11}
+                  >DEC</span
+                >
+              {/if}
+              <!-- age -->
+              {#if item % 12 === 0}
+                <span
+                  class="cursor-default age"
+                  class:textBold={(Math.floor(item / 12) + 1) % 10 === 0 ||
+                    item === 0}
+                  class:currentText={Math.floor(item / 12) ===
+                    $thisYear - $userInfo.birthday.year}
+                >
+                  {Math.floor(item / 12) + 1}
+                </span>
+              {/if}
+              <!-- // age -->
+              <!-- fold button -->
+              {#if (item != 1199 && item % 12 === 11 && (Math.floor(item / 12) + 1) % 10 === 0) || item === 11}
+                <button
+                  on:click={hideHandler}
+                  class="fold-button"
+                  class:b10={item === 12 * 1 - 1}
+                  class:b20={item === 12 * 10 - 1}
+                  class:b30={item === 12 * 20 - 1}
+                  class:b40={item === 12 * 30 - 1}
+                  class:b50={item === 12 * 40 - 1}
+                  class:b60={item === 12 * 50 - 1}
+                  class:b70={item === 12 * 60 - 1}
+                  class:b80={item === 12 * 70 - 1}
+                  class:b90={item === 12 * 80 - 1}
+                  class:b100={item === 12 * 90 - 1}
+                >
+                  <i class="fas fa-chevron-down" />
+                </button>
+                <!-- // fold button -->
+              {/if}
+            </div>
+            <!-- // Monthly  -->
+            <!-- Weekly -->
+          {:else if weekly}
+            <div
+              class="item"
+              class:past={$userInfo.birthday.year + Math.floor(item / 52) <
+                $thisYear ||
+                ($userInfo.birthday.year + Math.floor(item / 52) == $thisYear &&
+                  item % 52 < $weekNum - 1)}
+              class:current={Math.floor(item / 52) ===
+                $thisYear - $userInfo.birthday.year &&
+                item % 52 === $weekNum - 1}
+              class:allThisMonthPast={item % 52 === $weekNum - 1 &&
+                Math.floor(item / 52) < $thisYear - $userInfo.birthday.year}
+              class:allThisMonthFuture={item % 52 === $weekNum - 1 &&
+                Math.floor(item / 52) > $thisYear - $userInfo.birthday.year}
+              class:thisYear={Math.floor(item / 52) ===
+                $thisYear - $userInfo.birthday.year}
+              class:before10={52 * 1 - 1 < item && item < 52 * 9}
+              class:before20={52 * 10 - 1 < item && item < 52 * 19}
+              class:before30={52 * 20 - 1 < item && item < 52 * 29}
+              class:before40={52 * 30 - 1 < item && item < 52 * 39}
+              class:before50={52 * 40 - 1 < item && item < 52 * 49}
+              class:before60={52 * 50 - 1 < item && item < 52 * 59}
+              class:before70={52 * 60 - 1 < item && item < 52 * 69}
+              class:before80={52 * 70 - 1 < item && item < 52 * 79}
+              class:before90={52 * 80 - 1 < item && item < 52 * 89}
+              class:before100={52 * 90 - 1 < item && item < 52 * 99}
+              class:circle={$userInfo.weekly[
+                `${Math.floor(item / 52) + 1} ${(item % 52) + 1}`
+              ] !== undefined &&
+                $userInfo.weekly[
+                  `${Math.floor(item / 52) + 1} ${(item % 52) + 1}`
+                ].length > 0}
+              data-id={item % 52}
+              data-age={Math.floor(item / 52)}
+            >
+              {#if item < 52}
+                <span
+                  class="top-item cursor-default"
+                  class:currentText={item === $weekNum - 1}>{item + 1}</span
+                >
+              {/if}
+              {#if item % 52 === 0}
+                <span
+                  class="left-item cursor-default"
+                  class:textBold={(Math.floor(item / 52) + 1) % 10 === 0 ||
+                    item === 0}
+                  class:currentText={Math.floor(item / 52) ===
+                    $thisYear - $userInfo.birthday.year}
+                >
+                  {Math.floor(item / 52) + 1}
+                </span>
+              {/if}
+              <!-- fold button -->
+              {#if (item != 5199 && item % 52 === 51 && (Math.floor(item / 52) + 1) % 10 === 0) || item === 51}
+                <button
+                  on:click={hideHandler}
+                  class="fold-button"
+                  class:b10={item === 52 * 1 - 1}
+                  class:b20={item === 52 * 10 - 1}
+                  class:b30={item === 52 * 20 - 1}
+                  class:b40={item === 52 * 30 - 1}
+                  class:b50={item === 52 * 40 - 1}
+                  class:b60={item === 52 * 50 - 1}
+                  class:b70={item === 52 * 60 - 1}
+                  class:b80={item === 52 * 70 - 1}
+                  class:b90={item === 52 * 80 - 1}
+                  class:b100={item === 52 * 90 - 1}
+                >
+                  <i class="fas fa-chevron-down" />
+                </button>
+              {/if}
               <!-- // fold button -->
-            {/if}
-          </div>
-        <!-- // Monthly  -->
-        <!-- Weekly -->
-        {:else if weekly}
-          <div
-            class="item"
-            class:past={($userInfo.birthday.year + Math.floor(item / 52) < $thisYear) || (($userInfo.birthday.year + Math.floor(item / 52) == $thisYear) && (item % 52 < $weekNum - 1))}
-            class:current={(Math.floor(item / 52) === ($thisYear - $userInfo.birthday.year)) && (item % 52 === $weekNum - 1)}
-            class:allThisMonthPast={item % 52 === $weekNum - 1 && (Math.floor(item / 52) < ($thisYear - $userInfo.birthday.year))}
-            class:allThisMonthFuture={item % 52 === $weekNum - 1 && (Math.floor(item / 52) > ($thisYear - $userInfo.birthday.year))}
-            class:thisYear={Math.floor(item / 52) === ($thisYear - $userInfo.birthday.year)}
-            class:before10={52 * 1 - 1 < item && item < 52 * 9}
-            class:before20={52 * 10 - 1 < item && item < 52 * 19}
-            class:before30={52 * 20 - 1 < item && item < 52 * 29}
-            class:before40={52 * 30 - 1 < item && item < 52 * 39}
-            class:before50={52 * 40 - 1 < item && item < 52 * 49}
-            class:before60={52 * 50 - 1 < item && item < 52 * 59}
-            class:before70={52 * 60 - 1 < item && item < 52 * 69}
-            class:before80={52 * 70 - 1 < item && item < 52 * 79}
-            class:before90={52 * 80 - 1 < item && item < 52 * 89}
-            class:before100={52 * 90 - 1 < item && item < 52 * 99}
-            class:circle={$userInfo.weekly[`${Math.floor(item / 52) + 1} ${item % 52 + 1}`] !== undefined && $userInfo.weekly[`${Math.floor(item / 52) + 1} ${item % 52 + 1}`].length > 0}
-            data-id={item % 52}
-            data-age={Math.floor(item / 52)}
-          >
-            {#if item < 52}
-              <span class="top-item cursor-default" class:currentText={item === $weekNum - 1}>{item + 1}</span>
-            {/if}
-            {#if item % 52 === 0}
-              <span
-                class="left-item cursor-default"
-                class:textBold={(Math.floor(item / 52) + 1) % 10 === 0 || item === 0}
-                class:currentText={Math.floor(item / 52) === $thisYear - $userInfo.birthday.year}
-              >
-                {Math.floor(item / 52) + 1}
-              </span>
-            {/if}
-            <!-- fold button -->
-            {#if item != 5199 && item % 52 === 51 && (Math.floor(item / 52) + 1) % 10 === 0 || item === 51}
-              <button
-                on:click={hideHandler}
-                class="fold-button"
-                class:b10={item === 52 * 1 - 1}
-                class:b20={item === 52 * 10 - 1}
-                class:b30={item === 52 * 20 - 1}
-                class:b40={item === 52 * 30 - 1}
-                class:b50={item === 52 * 40 - 1}
-                class:b60={item === 52 * 50 - 1}
-                class:b70={item === 52 * 60 - 1}
-                class:b80={item === 52 * 70 - 1}
-                class:b90={item === 52 * 80 - 1}
-                class:b100={item === 52 * 90 - 1}
-              >
-                <i class="fas fa-chevron-down"></i>
-              </button>
-            {/if}
-            <!-- // fold button -->
-          </div>
-        {/if}
-      {/each}
+            </div>
+          {/if}
+        {/each}
+      </div>
     </div>
-  </div>
   {:else}
     <div class="birth-form-container">
       <h2>생일을 입력해주세요.😊👀</h2>
       <form on:submit|preventDefault={submitHandler}>
-        <input type="date" id="birthday" name="birthday">
+        <input type="date" id="birthday" name="birthday" />
         <button type="submit">시작하기</button>
       </form>
       <div class="birth-img-wrap">
-        <img class="party-img" src="/img/party.svg" alt="">
-        <img class="birthday-img" src="/img/birthday.svg" alt="">
+        <img class="party-img" src="/img/party.svg" alt="" />
+        <img class="birthday-img" src="/img/birthday.svg" alt="" />
       </div>
     </div>
   {/if}
@@ -382,7 +491,7 @@
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-	}
+  }
 
   .birth-form-container h2 {
     font-size: 30px;
@@ -391,7 +500,7 @@
 
   .birth-form-container form {
     display: flex;
-		justify-content: center;
+    justify-content: center;
   }
 
   .birth-form-container input {
@@ -543,7 +652,10 @@
     background-color: var(--this-year-past-color) !important;
   }
 
-  .allThisMonthPast:hover, .allThisMonthFuture:hover, .thisYear:hover, .thisYear.past:hover {
+  .allThisMonthPast:hover,
+  .allThisMonthFuture:hover,
+  .thisYear:hover,
+  .thisYear.past:hover {
     opacity: 0.7;
   }
 
@@ -558,7 +670,8 @@
     border-radius: 1px;
   }
 
-  .weekly .top-item, .weekly .left-item {
+  .weekly .top-item,
+  .weekly .left-item {
     position: absolute;
     font-size: 12px;
   }

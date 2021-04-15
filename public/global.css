@@ -111,6 +111,22 @@ h3.ce-header,
 h4.ce-header,
 h5.ce-header,
 h6.ce-header {
-  margin: 0.5rem 0;
+  margin: 1.4rem 0 0.5rem;
   padding: 0;
+}
+
+.cdx-block {
+  padding: 0;
+}
+
+.ce-paragraph {
+  line-height: 1.6 !important;
+}
+
+.item.hidden {
+  display: none !important;
+}
+
+.modal .hidden {
+  visibility: hidden;
 }
