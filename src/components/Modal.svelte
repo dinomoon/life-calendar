@@ -1,23 +1,25 @@
 <script>
   import { onDestroy, onMount } from 'svelte';
-  import { clickedDay, userDocId, userInfo } from '../store.js';
-
-  export let annual;
-  export let monthly;
-  export let weekly;
+  import { clickedDay, userDocId, userInfo, activeTab } from '../store.js';
 
   let value = '';
   let editor;
 
   onMount(() => {
-    if (annual) {
-      value = $userInfo.annual[$clickedDay.year] || '';
-    } else if (monthly) {
-      value =
-        $userInfo.monthly[`${$clickedDay.age} ${$clickedDay.month}`] || '';
-    } else if (weekly) {
-      value = $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`] || '';
+    switch ($activeTab) {
+      case '연간':
+        value = $userInfo.annual[$clickedDay.year] || '';
+        break;
+      case '월간':
+        value =
+          $userInfo.monthly[`${$clickedDay.age} ${$clickedDay.month}`] || '';
+        break;
+      case '주간':
+        value =
+          $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`] || '';
+        break;
     }
+
     ClassicEditor.create(document.querySelector('#editor'), {
       // cloudServices: {
       //   tokenUrl: 'https://www.googleapis.com/auth/firebase.database',
@@ -50,45 +52,49 @@
 
   function saveData() {
     if (editor.getData() !== '') {
-      if (annual) {
-        db.collection('users')
-          .doc($userDocId)
-          .set(
-            {
-              annual: {
-                [$clickedDay.year]: editor.getData(),
+      switch ($activeTab) {
+        case '연간':
+          db.collection('users')
+            .doc($userDocId)
+            .set(
+              {
+                annual: {
+                  [$clickedDay.year]: editor.getData(),
+                },
               },
-            },
-            { merge: true },
-          );
-      } else if (monthly) {
-        db.collection('users')
-          .doc($userDocId)
-          .set(
-            {
-              monthly: {
-                [`${$clickedDay.age} ${$clickedDay.month}`]: editor.getData(),
+              { merge: true },
+            );
+          break;
+        case '월간':
+          db.collection('users')
+            .doc($userDocId)
+            .set(
+              {
+                monthly: {
+                  [`${$clickedDay.age} ${$clickedDay.month}`]: editor.getData(),
+                },
               },
-            },
-            { merge: true },
-          );
-      } else if (weekly) {
-        db.collection('users')
-          .doc($userDocId)
-          .set(
-            {
-              weekly: {
-                [`${$clickedDay.age} ${$clickedDay.week}`]: editor.getData(),
+              { merge: true },
+            );
+          break;
+        case '주간':
+          db.collection('users')
+            .doc($userDocId)
+            .set(
+              {
+                weekly: {
+                  [`${$clickedDay.age} ${$clickedDay.week}`]: editor.getData(),
+                },
               },
-            },
-            { merge: true },
-          );
+              { merge: true },
+            );
+          break;
       }
     }
   }
 </script>
 
-{#if annual}
+{#if $activeTab === '연간'}
   <div class="backdrop" on:click|self>
     <div class="modal">
       <header>
@@ -111,7 +117,7 @@
       <div id="editor" />
     </div>
   </div>
-{:else if monthly}
+{:else if $activeTab === '월간'}
   <div class="backdrop" on:click|self>
     <div class="modal">
       <header>
@@ -120,7 +126,7 @@
       <div id="editor" />
     </div>
   </div>
-{:else if weekly}
+{:else if $activeTab === '주간'}
   <div class="backdrop" on:click|self>
     <div class="modal">
       <header>

@@ -28,7 +28,6 @@ export const clickedDay = writable({
 });
 export const showModal = writable(false);
 export const squareList = writable(null);
-export const birthdayValid = writable(false);
 export const date = writable(time);
 export const thisYear = writable(time.getFullYear());
 export const thisMonth = writable(time.getMonth());

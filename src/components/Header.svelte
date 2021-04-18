@@ -1,17 +1,31 @@
 <script>
   import { push } from 'svelte-spa-router';
 
-	import {loggedIn, calendarTabs, firebaseLoggedIn, kakaoLoggedIn, activeTab, userInfo} from '../store';
+  import {
+    loggedIn,
+    calendarTabs,
+    firebaseLoggedIn,
+    kakaoLoggedIn,
+    activeTab,
+    userInfo,
+  } from '../store';
 
   export let links;
   let borderBottom = false;
-  let obj = {'로그인': 'login', '회원가입': 'signup', '도움말': 'help', '연간': 'annual', '월간': 'monthly', '주간': 'weekly'}
+  let obj = {
+    로그인: 'login',
+    회원가입: 'signup',
+    도움말: 'help',
+    연간: 'annual',
+    월간: 'monthly',
+    주간: 'weekly',
+  };
 
-  const pushHome = () => {
+  const pushHome = async () => {
     push('/');
     activeTab.set('연간');
-    userInfo.set(null);
-  }
+    await userInfo.set(null);
+  };
 
   const logoutHandler = async () => {
     if ($firebaseLoggedIn) {
@@ -30,7 +44,7 @@
         console.log(error);
       }
     }
-  }
+  };
 
   window.onscroll = () => {
     if (window.pageYOffset > 80) {
@@ -38,22 +52,24 @@
     } else {
       borderBottom = false;
     }
-  }
+  };
 </script>
 
-<header class:loggedIn={$loggedIn} class:borderBottom={borderBottom}>
-	<div class="container">
+<header class:loggedIn={$loggedIn} class:borderBottom>
+  <div class="container">
     <h1>
-      <a href="/#/">
-        Life Calendar
-      </a>
+      <a href="/#/"> Life Calendar </a>
     </h1>
     {#if $loggedIn && $userInfo}
       <nav>
         <ul class="calendar-tabs">
           {#each $calendarTabs as tab}
             <li>
-              <a href="/#/{obj[tab]}" class:activeTab={tab === $activeTab} class:notActiveTab={tab !== $activeTab}>{tab}</a>
+              <a
+                href="/#/{obj[tab]}"
+                class:activeTab={tab === $activeTab}
+                class:notActiveTab={tab !== $activeTab}>{tab}</a
+              >
             </li>
           {/each}
         </ul>
@@ -68,7 +84,11 @@
             </li>
           {:else}
             <li>
-              <a href="/#/{obj[link]}" class:signButton={link === '로그인' || link === '회원가입'}>{link}</a>
+              <a
+                href="/#/{obj[link]}"
+                class:signButton={link === '로그인' || link === '회원가입'}
+                >{link}</a
+              >
             </li>
           {/if}
         {/each}
@@ -126,9 +146,9 @@
   header.borderBottom {
     height: 70px;
   }
-  
+
   .borderBottom .container {
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   }
 
   .container {
@@ -165,20 +185,21 @@
   }
 
   .signButton:hover {
-    background-color: rgba(0,0,0,0.8);
+    background-color: rgba(0, 0, 0, 0.8);
   }
 
   .logout-btn {
     transition: 0.3s;
-    border: 1px solid rgba(0,0,0,0.2);
+    border: 1px solid rgba(0, 0, 0, 0.2);
   }
 
   .logout-btn:hover {
-    background-color: rgba(0,0,0,0.8);
+    background-color: rgba(0, 0, 0, 0.8);
     color: #fff;
   }
 
-  ul li a, button {
+  ul li a,
+  button {
     font-size: 18px;
     cursor: pointer;
     padding: 6px 20px;
