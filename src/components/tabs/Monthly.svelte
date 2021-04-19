@@ -6,69 +6,81 @@
     thisYear,
     squareList,
     thisMonth,
-    beforeBtnClasses,
     monthlyFoldObj,
-    beforeBtnObj,
   } from '../../store';
   import { fade } from 'svelte/transition';
 
   squareList.set(Array.from(Array(1200).keys()));
   let calendarGrid;
+  let btns;
+  let items;
 
   onMount(() => {
     calendarGrid = document.querySelector('.calendar--grid');
+    btns = calendarGrid.querySelectorAll('button');
+    items = calendarGrid.querySelectorAll('.item');
 
     if (JSON.parse(localStorage.getItem('monthly-fold-obj')) === null) {
       localStorage.setItem('monthly-fold-obj', JSON.stringify($monthlyFoldObj));
     }
 
-    $beforeBtnClasses.forEach((btnClass) => {
-      if (
-        JSON.parse(localStorage.getItem('monthly-fold-obj'))[btnClass] === true
-      ) {
-        const btn = calendarGrid.querySelector(`.${btnClass}`);
-        const icon = btn.querySelector('i');
-        icon.classList.add('fold');
-        const items = calendarGrid.querySelectorAll($beforeBtnObj[btnClass]);
-        items.forEach((item) => item.classList.add('hidden'));
+    const obj = JSON.parse(localStorage.getItem('monthly-fold-obj'));
+    monthlyFoldObj.set(obj);
+
+    for (const key in obj) {
+      if (key === '1' && obj[key]) {
+        items.forEach((item) => {
+          if (item.dataset.age >= +key && item.dataset.age <= +key + 7) {
+            item.classList.add('hidden');
+          }
+        });
+      } else if (key !== '1' && obj[key]) {
+        items.forEach((item) => {
+          if (item.dataset.age >= +key && item.dataset.age <= +key + 8) {
+            item.classList.add('hidden');
+          }
+        });
       }
-    });
+      for (let btn of btns) {
+        if (obj[key] && key === btn.dataset.btn) {
+          btn.children[0].classList.add('fold');
+        }
+      }
+    }
   });
 
   function hideHandler(e) {
     let button = null;
     let icon = null;
-    let classList = null;
-    let items = null;
+    let data = null;
 
     if (e.target.tagName === 'BUTTON') {
       button = e.target;
       icon = button.children[0];
-      classList = button.classList;
+      data = button.dataset.btn;
     } else {
       icon = e.target;
       button = icon.parentNode;
-      classList = button.classList;
+      data = button.dataset.btn;
     }
 
-    icon.classList.toggle('fold');
+    if (data === '1') {
+      items.forEach((item) => {
+        if (item.dataset.age >= +data && item.dataset.age <= +data + 7) {
+          item.classList.toggle('hidden');
+        }
+      });
+    } else {
+      items.forEach((item) => {
+        if (item.dataset.age >= +data && item.dataset.age <= +data + 8) {
+          item.classList.toggle('hidden');
+        }
+      });
+    }
 
-    $beforeBtnClasses.forEach((btnClass) => {
-      if (classList.contains(btnClass)) {
-        monthlyFoldObj.set(
-          JSON.parse(localStorage.getItem('monthly-fold-obj')),
-        );
-        $monthlyFoldObj[btnClass] = $monthlyFoldObj[btnClass] ? false : true;
-        localStorage.setItem(
-          'monthly-fold-obj',
-          JSON.stringify($monthlyFoldObj),
-        );
-        items = calendarGrid.querySelectorAll($beforeBtnObj[btnClass]);
-      }
-    });
-    items.forEach((item) => {
-      item.classList.toggle('hidden');
-    });
+    $monthlyFoldObj[data] = $monthlyFoldObj[data] ? false : true;
+    localStorage.setItem('monthly-fold-obj', JSON.stringify($monthlyFoldObj));
+    icon.classList.toggle('fold');
   }
 </script>
 
@@ -87,16 +99,6 @@
         $thisYear - $userInfo.birthday.year && item % 12 < $thisMonth}
       class:all-this-horizontal-future={Math.floor(item / 12) ===
         $thisYear - $userInfo.birthday.year && item % 12 > $thisMonth}
-      class:before10={12 * 1 - 1 < item && item < 12 * 9}
-      class:before20={12 * 10 - 1 < item && item < 12 * 19}
-      class:before30={12 * 20 - 1 < item && item < 12 * 29}
-      class:before40={12 * 30 - 1 < item && item < 12 * 39}
-      class:before50={12 * 40 - 1 < item && item < 12 * 49}
-      class:before60={12 * 50 - 1 < item && item < 12 * 59}
-      class:before70={12 * 60 - 1 < item && item < 12 * 69}
-      class:before80={12 * 70 - 1 < item && item < 12 * 79}
-      class:before90={12 * 80 - 1 < item && item < 12 * 89}
-      class:before100={12 * 90 - 1 < item && item < 12 * 99}
       class:circle={$userInfo.monthly[
         `${Math.floor(item / 12) + 1} ${(item % 12) + 1}`
       ] !== undefined &&
@@ -149,16 +151,7 @@
         <button
           on:click={hideHandler}
           class="fold-button"
-          class:b10={item === 12 * 1 - 1}
-          class:b20={item === 12 * 10 - 1}
-          class:b30={item === 12 * 20 - 1}
-          class:b40={item === 12 * 30 - 1}
-          class:b50={item === 12 * 40 - 1}
-          class:b60={item === 12 * 50 - 1}
-          class:b70={item === 12 * 60 - 1}
-          class:b80={item === 12 * 70 - 1}
-          class:b90={item === 12 * 80 - 1}
-          class:b100={item === 12 * 90 - 1}
+          data-btn={Math.ceil(item / 12)}
         >
           <i class="fas fa-chevron-down" />
         </button>
