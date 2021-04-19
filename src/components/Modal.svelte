@@ -39,14 +39,15 @@
     saveData();
   });
 
-  const clickHandler = async (dir) => {
+  const clickHandler = async (dir, date, adv) => {
     await saveData();
     if (dir === 'prev') {
-      clickedDay.set({ year: $clickedDay.year - 1 });
+      clickedDay.set({ [date]: $clickedDay[date] - 1 });
     } else if (dir === 'next') {
-      clickedDay.set({ year: $clickedDay.year + 1 });
+      clickedDay.set({ [date]: $clickedDay[date] + 1 });
     }
-    value = $userInfo.annual[$clickedDay.year] || '';
+
+    value = $userInfo[adv][$clickedDay[date]] || '';
     editor.setData(value);
   };
 
@@ -101,7 +102,7 @@
         <span
           class="prev"
           class:hidden={$clickedDay.year === $userInfo.birthday.year}
-          on:click={() => clickHandler('prev')}
+          on:click={() => clickHandler('prev', 'year', 'annual')}
         >
           {$clickedDay.year - 1}년
         </span>
@@ -109,7 +110,7 @@
         <span
           class="next"
           class:hidden={$clickedDay.year === $userInfo.birthday.year + 99}
-          on:click={() => clickHandler('next')}
+          on:click={() => clickHandler('next', 'year', 'annual')}
         >
           {$clickedDay.year + 1}년
         </span>
@@ -121,7 +122,21 @@
   <div class="backdrop" on:click|self>
     <div class="modal">
       <header>
+        <span
+          class="prev"
+          class:hidden={$clickedDay.month === 1}
+          on:click={() => clickHandler('prev', 'month', 'monthly')}
+        >
+          {$clickedDay.month - 1}월
+        </span>
         <h2>{$clickedDay.month}월</h2>
+        <span
+          class="next"
+          class:hidden={$clickedDay.month === 12}
+          on:click={() => clickHandler('next', 'month', 'monthly')}
+        >
+          {$clickedDay.month + 1}월
+        </span>
       </header>
       <div id="editor" />
     </div>
@@ -130,7 +145,21 @@
   <div class="backdrop" on:click|self>
     <div class="modal">
       <header>
-        <h2>{$clickedDay.age} - {$clickedDay.week}주</h2>
+        <span
+          class="prev"
+          class:hidden={$clickedDay.week === 1}
+          on:click={() => clickHandler('prev', 'week', 'weekly')}
+        >
+          {$clickedDay.week - 1}주
+        </span>
+        <h2>{$clickedDay.week}주</h2>
+        <span
+          class="next"
+          class:hidden={$clickedDay.week === 52}
+          on:click={() => clickHandler('next', 'week', 'weekly')}
+        >
+          {$clickedDay.week + 1}주
+        </span>
       </header>
       <div id="editor" />
     </div>
@@ -155,7 +184,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-size: 1rem;
     width: 60vw;
     height: 80vh;
     padding: 40px 100px 60px;
@@ -163,7 +191,7 @@
     border-radius: 4px;
   }
 
-  .modal header {
+  header {
     width: 100%;
     display: flex;
     align-items: baseline;
@@ -174,8 +202,13 @@
     user-select: none;
   }
 
-  .modal header span {
+  header h2 {
+    font-size: 24px;
+  }
+
+  header span {
     display: inline-block;
+    font-size: 20px;
     padding: 10px;
     color: #666;
     cursor: pointer;

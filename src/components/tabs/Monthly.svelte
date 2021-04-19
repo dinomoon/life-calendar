@@ -11,6 +11,21 @@
   import { fade } from 'svelte/transition';
 
   squareList.set(Array.from(Array(1200).keys()));
+
+  let monthName = [
+    'JAN',
+    'FEB',
+    'MAR',
+    'APR',
+    'MAY',
+    'JUN',
+    'JUL',
+    'AUG',
+    'SEP',
+    'OCT',
+    'NOV',
+    'DEC',
+  ];
   let calendarGrid;
   let btns;
   let items;
@@ -49,20 +64,10 @@
     }
   });
 
-  function hideHandler(e) {
-    let button = null;
-    let icon = null;
-    let data = null;
-
-    if (e.target.tagName === 'BUTTON') {
-      button = e.target;
-      icon = button.children[0];
-      data = button.dataset.btn;
-    } else {
-      icon = e.target;
-      button = icon.parentNode;
-      data = button.dataset.btn;
-    }
+  async function hideHandler(e) {
+    let target = e.currentTarget;
+    let icon = target.children[0];
+    let data = target.dataset.btn;
 
     if (data === '1') {
       items.forEach((item) => {
@@ -78,7 +83,10 @@
       });
     }
 
-    $monthlyFoldObj[data] = $monthlyFoldObj[data] ? false : true;
+    await monthlyFoldObj.update((obj) => {
+      obj[data] = !obj[data];
+      return obj;
+    });
     localStorage.setItem('monthly-fold-obj', JSON.stringify($monthlyFoldObj));
     icon.classList.toggle('fold');
   }
@@ -107,39 +115,17 @@
       data-id={item % 12}
       data-age={Math.floor(item / 12)}
     >
-      {#if item === 0}
-        <span class="month-name" class:currentText={$thisMonth === 0}>JAN</span>
-      {:else if item === 1}
-        <span class="month-name" class:currentText={$thisMonth === 1}>FEB</span>
-      {:else if item === 2}
-        <span class="month-name" class:currentText={$thisMonth === 2}>MAR</span>
-      {:else if item === 3}
-        <span class="month-name" class:currentText={$thisMonth === 3}>APR</span>
-      {:else if item === 4}
-        <span class="month-name" class:currentText={$thisMonth === 4}>MAY</span>
-      {:else if item === 5}
-        <span class="month-name" class:currentText={$thisMonth === 5}>JUN</span>
-      {:else if item === 6}
-        <span class="month-name" class:currentText={$thisMonth === 6}>JUL</span>
-      {:else if item === 7}
-        <span class="month-name" class:currentText={$thisMonth === 7}>AUG</span>
-      {:else if item === 8}
-        <span class="month-name" class:currentText={$thisMonth === 8}>SEP</span>
-      {:else if item === 9}
-        <span class="month-name" class:currentText={$thisMonth === 9}>OCT</span>
-      {:else if item === 10}
-        <span class="month-name" class:currentText={$thisMonth === 10}>NOV</span
-        >
-      {:else if item === 11}
-        <span class="month-name" class:currentText={$thisMonth === 11}>DEC</span
+      {#if item >= 0 && item <= 11}
+        <span class="month-name" class:current-text={$thisMonth === item}
+          >{monthName[item]}</span
         >
       {/if}
       <!-- age -->
       {#if item % 12 === 0}
         <span
           class="cursor-default age"
-          class:textBold={(Math.floor(item / 12) + 1) % 10 === 0 || item === 0}
-          class:currentText={Math.floor(item / 12) ===
+          class:text-bold={(Math.floor(item / 12) + 1) % 10 === 0 || item === 0}
+          class:current-text={Math.floor(item / 12) ===
             $thisYear - $userInfo.birthday.year}
         >
           {Math.floor(item / 12) + 1}

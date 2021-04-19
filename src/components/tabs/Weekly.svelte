@@ -49,21 +49,11 @@
     }
   });
 
-  function hideHandler(e) {
-    let button = null;
-    let icon = null;
-    let data = null;
+  async function hideHandler(e) {
+    let target = e.currentTarget;
+    let icon = target.children[0];
+    let data = target.dataset.btn;
     let item;
-
-    if (e.target.tagName === 'BUTTON') {
-      button = e.target;
-      icon = button.children[0];
-      data = button.dataset.btn;
-    } else {
-      icon = e.target;
-      button = icon.parentNode;
-      data = button.dataset.btn;
-    }
 
     if (data === '1') {
       for (item of items) {
@@ -79,7 +69,10 @@
       }
     }
 
-    $weeklyFoldObj[data] = $weeklyFoldObj[data] ? false : true;
+    await weeklyFoldObj.update((obj) => {
+      obj[data] = !obj[data];
+      return obj;
+    });
     localStorage.setItem('weekly-fold-obj', JSON.stringify($weeklyFoldObj));
     icon.classList.toggle('fold');
   }
@@ -111,14 +104,14 @@
       {#if item < 52}
         <span
           class="top-item cursor-default"
-          class:currentText={item === $weekNum - 1}>{item + 1}</span
+          class:current-text={item === $weekNum - 1}>{item + 1}</span
         >
       {/if}
       {#if item % 52 === 0}
         <span
           class="left-item cursor-default"
-          class:textBold={(Math.floor(item / 52) + 1) % 10 === 0 || item === 0}
-          class:currentText={Math.floor(item / 52) ===
+          class:text-bold={(Math.floor(item / 52) + 1) % 10 === 0 || item === 0}
+          class:current-text={Math.floor(item / 52) ===
             $thisYear - $userInfo.birthday.year}
         >
           {Math.floor(item / 52) + 1}

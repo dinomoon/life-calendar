@@ -23,7 +23,6 @@
 
   const pushHome = async () => {
     push('/');
-    activeTab.set('연간');
     await userInfo.set(null);
   };
 
