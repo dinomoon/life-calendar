@@ -42,12 +42,17 @@
   const clickHandler = async (dir, date, adv) => {
     await saveData();
     if (dir === 'prev') {
-      clickedDay.set({ [date]: $clickedDay[date] - 1 });
+      clickedDay.set({ ...$clickedDay, [date]: $clickedDay[date] - 1 });
     } else if (dir === 'next') {
-      clickedDay.set({ [date]: $clickedDay[date] + 1 });
+      clickedDay.set({ ...$clickedDay, [date]: $clickedDay[date] + 1 });
     }
 
-    value = $userInfo[adv][$clickedDay[date]] || '';
+    if (adv === 'annual') {
+      value = $userInfo[adv][$clickedDay[date]] || '';
+    } else {
+      value = $userInfo[adv][`${$clickedDay.age} ${$clickedDay[date]}`] || '';
+    }
+
     editor.setData(value);
   };
 

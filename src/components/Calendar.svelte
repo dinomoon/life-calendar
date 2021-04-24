@@ -1,15 +1,24 @@
 <script>
   import { onMount } from 'svelte';
-  import { userInfo, colors, clickedDay, showModal, activeTab } from '../store';
-  import Birthday from './Birthday.svelte';
+  import { push } from 'svelte-spa-router';
+  import {
+    userInfo,
+    colors,
+    clickedDay,
+    showModal,
+    activeTab,
+    loggedIn,
+  } from '../store';
   import Modal from './Modal.svelte';
   import Annual from './tabs/Annual.svelte';
   import Monthly from './tabs/Monthly.svelte';
   import Weekly from './tabs/Weekly.svelte';
-
   let calendarGrid = null;
 
   onMount(() => {
+    if ($loggedIn === false) {
+      push('/');
+    }
     calendarGrid = document.querySelector('.calendar--grid');
   });
 
@@ -35,14 +44,12 @@
       showModal.set(false);
     }
   };
-
   function mouseoverHandler(e) {
     let items = null;
     let ages = null;
     const hoverColor = $colors['hover-item-color'];
     const currentHoverColor = $colors['current-hover-item-color'];
     const target = e.target;
-
     if (target.classList.contains('item')) {
       if ($activeTab === '연간') {
         target.style.backgroundColor = currentHoverColor;
@@ -52,10 +59,8 @@
       } else {
         const hoverId = target.dataset.id;
         const hoverAge = target.dataset.age;
-
         items = calendarGrid.querySelectorAll(`[data-id="${hoverId}"]`);
         ages = calendarGrid.querySelectorAll(`[data-age="${hoverAge}"]`);
-
         items.forEach((item) => {
           item.style.backgroundColor = hoverColor;
         });
@@ -66,14 +71,12 @@
       }
     }
   }
-
   function mouseoutHandler(e) {
     let items = null;
     let ages = null;
     const pastColor = $colors['past-background-color'];
     const itemColor = $colors['item-background-color'];
     let target = e.target;
-
     if (target.classList.contains('item')) {
       if ($activeTab === '연간') {
         target.style.color = '#000';
@@ -85,10 +88,8 @@
       } else {
         const hoverId = target.dataset.id;
         const hoverAge = target.dataset.age;
-
         items = calendarGrid.querySelectorAll(`[data-id="${hoverId}"]`);
         ages = calendarGrid.querySelectorAll(`[data-age="${hoverAge}"]`);
-
         items.forEach((item) => {
           item.style.backgroundColor = item.classList.contains('past')
             ? pastColor
@@ -106,9 +107,6 @@
 
 <section>
   {#if $userInfo}
-    {#if $showModal}
-      <Modal on:click={clickHandler} />
-    {/if}
     <div class="container">
       <!-- <div class="time">오늘은 {thisYear}년 {$thisMonth + 1}월 {date.getDate()}일 {$week[date.getDay()]}요일입니다.</div> -->
       {#if $activeTab === '연간'}
@@ -131,8 +129,9 @@
         />
       {/if}
     </div>
-  {:else}
-    <Birthday />
+  {/if}
+  {#if $showModal}
+    <Modal on:click={clickHandler} />
   {/if}
 </section>
 
@@ -140,7 +139,6 @@
   section {
     padding-top: 6rem;
   }
-
   .container {
     max-width: 100%;
     margin: 0 auto;

@@ -171,5 +171,5 @@ i {
 .all-this-horizontal-past:hover,
 .all-this-horizontal-future:hover,
 .item.current:hover {
-  opacity: 0.7 !important;
+  opacity: 0.8;
 }

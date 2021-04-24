@@ -21,16 +21,10 @@
     주간: 'weekly',
   };
 
-  const pushHome = async () => {
-    push('/');
-    await userInfo.set(null);
-  };
-
   const logoutHandler = async () => {
     if ($firebaseLoggedIn) {
       try {
         await auth.signOut();
-        pushHome();
       } catch (error) {
         console.log(error);
       }
@@ -38,7 +32,6 @@
       try {
         await window.Kakao.Auth.logout();
         kakaoLoggedIn.set(false);
-        pushHome();
       } catch (error) {
         console.log(error);
       }
@@ -52,12 +45,20 @@
       borderBottom = false;
     }
   };
+
+  function clickHandler() {
+    if ($loggedIn) {
+      push('/annual');
+    } else {
+      push('/');
+    }
+  }
 </script>
 
 <header class:loggedIn={$loggedIn} class:borderBottom>
   <div class="container">
     <h1>
-      <a href="/#/"> Life Calendar </a>
+      <a href="/#/" on:click|preventDefault={clickHandler}>Life Calendar</a>
     </h1>
     {#if $loggedIn && $userInfo}
       <nav>

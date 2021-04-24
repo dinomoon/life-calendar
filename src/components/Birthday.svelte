@@ -1,19 +1,22 @@
 <script>
-  import { userId } from '../store';
+  import { push } from 'svelte-spa-router';
+
+  import { loading, userInfo, userDocId, userId } from '../store';
 
   let birthdayValid = false;
 
   const submitHandler = async (e) => {
-    birthdayValid.set(true);
+    birthdayValid = true;
     const birthday = e.target['birthday'].value;
     const birthArray = birthday.split('-');
     const year = +birthArray[0];
     const month = +birthArray[1];
     const day = +birthArray[2];
 
-    birthdayValid.set(birthday ? true : false);
+    birthdayValid = birthday ? true : false;
 
     if (birthdayValid) {
+      loading.set(true);
       await db.collection('users').add({
         userId: $userId,
         birthday: { year, month, day },
@@ -21,23 +24,42 @@
         monthly: {},
         weekly: {},
       });
+
+      await db
+        .collection('users')
+        .get()
+        .then((snapshot) => {
+          snapshot.docs.forEach((doc) => {
+            if (doc.data().userId === $userId) {
+              userInfo.set(doc.data());
+              userDocId.set(doc.id);
+              push('/annual');
+            }
+          });
+        });
     }
   };
 </script>
 
-<div class="birth-form-container">
-  <h2>생일을 입력해주세요.😊👀</h2>
-  <form on:submit|preventDefault={submitHandler}>
-    <input type="date" id="birthday" name="birthday" />
-    <button type="submit">시작하기</button>
-  </form>
-  <div class="birth-img-wrap">
-    <img class="party-img" src="/img/party.svg" alt="" />
-    <img class="birthday-img" src="/img/birthday.svg" alt="" />
+<section>
+  <div class="birth-form-container">
+    <h2>생일을 입력해주세요.😊👀</h2>
+    <form on:submit|preventDefault={submitHandler}>
+      <input type="date" id="birthday" name="birthday" />
+      <button type="submit">시작하기</button>
+    </form>
+    <div class="birth-img-wrap">
+      <img class="party-img" src="/img/party.svg" alt="" />
+      <img class="birthday-img" src="/img/birthday.svg" alt="" />
+    </div>
   </div>
-</div>
+</section>
 
 <style>
+  section {
+    padding-top: 6rem;
+  }
+
   .birth-form-container {
     width: 1200px;
     margin: 0 auto;

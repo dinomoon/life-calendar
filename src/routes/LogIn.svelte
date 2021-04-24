@@ -1,11 +1,10 @@
 <script>
-  import {push} from 'svelte-spa-router';
-	import {kakaoLoggedIn, userId} from '../store';
+  import { kakaoLoggedIn, loading, userId } from '../store';
 
   let valid = false;
 
-  let fields = {email: '', password: ''};
-  let errors = {email: '', password: ''};
+  let fields = { email: '', password: '' };
+  let errors = { email: '', password: '' };
 
   function validateEmail(email) {
     let re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
@@ -17,52 +16,54 @@
 
     // valid email
     if (validateEmail(fields.email)) {
-        errors.email = '';
+      errors.email = '';
     } else if (fields.email === '') {
       valid = false;
-      errors.email = '이메일을 입력해주세요.'
+      errors.email = '이메일을 입력해주세요.';
     } else {
       valid = false;
-      errors.email = '올바른 이메일이 아닙니다.'
+      errors.email = '올바른 이메일이 아닙니다.';
     }
-    
+
     // valid password
     if (fields.password === '') {
       valid = false;
-      errors.password = '비밀번호를 입력해주세요.'
+      errors.password = '비밀번호를 입력해주세요.';
     } else {
       errors.password = '';
     }
 
     if (valid) {
-      auth.signInWithEmailAndPassword(fields.email, fields.password).then(() => {
-        push('/')
-      }).catch(error => {
-        let errorCode = error.code;
-        let errorMessage = error.message;
+      auth
+        .signInWithEmailAndPassword(fields.email, fields.password)
+        .then(() => {})
+        .catch((error) => {
+          let errorCode = error.code;
+          let errorMessage = error.message;
 
-        switch (errorCode) {
-          case 'auth/invalid-email':
-            alert('아이디 또는 비밀번호를 확인해주세요.')
-            break;
-          case 'auth/user-disabled':
-            alert('아이디 또는 비밀번호를 확인해주세요.')
-            break;
-          case 'auth/user-not-found':
-            alert('이메일을 확인해주세요.')
-            break;
-          case 'auth/wrong-password':
-            alert('비밀번호를 확인해주세요.')
-            break;
-          default:
-            return;
-        }
-        console.log(errorMessage);
-      })
+          switch (errorCode) {
+            case 'auth/invalid-email':
+              alert('아이디 또는 비밀번호를 확인해주세요.');
+              break;
+            case 'auth/user-disabled':
+              alert('아이디 또는 비밀번호를 확인해주세요.');
+              break;
+            case 'auth/user-not-found':
+              alert('이메일을 확인해주세요.');
+              break;
+            case 'auth/wrong-password':
+              alert('비밀번호를 확인해주세요.');
+              break;
+            default:
+              return;
+          }
+          console.log(errorMessage);
+        });
     }
-  }
+  };
 
   const socialLoginHandler = async (e) => {
+    // loading.set(true);
     let clickedSocial = null;
     let provider = null;
     if (e.target.type === 'button') {
@@ -71,27 +72,26 @@
       clickedSocial = e.target.parentNode.classList[0];
     }
 
-    switch(clickedSocial) {
+    switch (clickedSocial) {
       case 'kakao':
         await Kakao.Auth.login({
           scope: 'profile',
-          success: function(authObj) {
-            kakaoLoggedIn.set(true);
+          success: function (authObj) {
             window.Kakao.API.request({
               url: '/v2/user/me',
-              success: res => {
+              success: (res) => {
                 userId.set(res.id);
-                push('/')
-              }
-            })
-          }
-        })
+                kakaoLoggedIn.set(true);
+              },
+            });
+          },
+        });
         break;
       case 'facebook':
         provider = new firebase.auth.FacebookAuthProvider();
         break;
       case 'google':
-        provider = new firebase.auth.GoogleAuthProvider()
+        provider = new firebase.auth.GoogleAuthProvider();
         break;
       default:
         return;
@@ -99,48 +99,57 @@
 
     if (provider) {
       await firebase.auth().signInWithPopup(provider);
-      push('/');
     }
-  }
+  };
 </script>
 
 <div class="container">
   <h2 class="title">로그인</h2>
   <form on:submit|preventDefault={emailLoginHandler}>
     <label for="email">이메일</label>
-    <input type="text" placeholder="example@naver.com" id="email" bind:value={fields.email}>
+    <input
+      type="text"
+      placeholder="example@naver.com"
+      id="email"
+      bind:value={fields.email}
+    />
     <p class="error">
       {#if errors.email}
-        <i class="fas fa-exclamation-triangle"></i>
+        <i class="fas fa-exclamation-triangle" />
         {errors.email}
       {/if}
     </p>
     <label for="password">비밀번호</label>
-    <input type="password" placeholder="*******" id="password" bind:value={fields.password}>
+    <input
+      type="password"
+      placeholder="*******"
+      id="password"
+      bind:value={fields.password}
+    />
     <p class="error">
       {#if errors.password}
-        <i class="fas fa-exclamation-triangle"></i>
+        <i class="fas fa-exclamation-triangle" />
         {errors.password}
       {/if}
     </p>
     <button type="submit" class="email">로그인</button>
   </form>
   <div class="or">
-    <span class="line"></span>
+    <span class="line" />
     <span class="text">또는</span>
-    <span class="line"></span>
+    <span class="line" />
   </div>
   <div class="social-login" on:click={socialLoginHandler}>
     <button type="button" class="kakao">
-      <i class="fas fa-comment"></i>
+      <i class="fas fa-comment" />
       <span>카카오로 시작하기</span>
     </button>
     <button type="button" class="facebook">
-      <i class="fab fa-facebook-square"></i>
+      <i class="fab fa-facebook-square" />
       <span>페이스북으로 시작하기</span>
     </button>
     <button type="button" class="google">
-      <img class="google-icon" src="/img/google-icon.svg" alt="">
+      <img class="google-icon" src="/img/google-icon.svg" alt="" />
       <span>구글로 시작하기</span>
     </button>
   </div>
@@ -168,7 +177,8 @@
     padding-left: 1rem;
   }
 
-  input, button {
+  input,
+  button {
     width: 100%;
     height: 50px;
   }
@@ -253,7 +263,7 @@
     background-color: #343a40;
     color: #fff;
   }
-  
+
   .social-login .google:hover {
     background-color: #212529;
   }

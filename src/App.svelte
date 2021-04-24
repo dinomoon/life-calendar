@@ -1,6 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
-  import Router, { location } from 'svelte-spa-router';
+  import Router, { location, push } from 'svelte-spa-router';
   import routes from './routes';
 
   import Header from './components/Header.svelte';
@@ -13,25 +12,59 @@
     kakaoLoggedIn,
     activeTab,
     userId,
+    userInfo,
+    userDocId,
   } from './store';
 
   let links = [];
 
-  onMount(() => {
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        firebaseLoggedIn.set(true);
-        userId.set(user.uid);
-      } else {
-        firebaseLoggedIn.set(false);
-      }
-    });
+  $: if ($userDocId) {
+    db.collection('users')
+      .doc($userDocId)
+      .onSnapshot((doc) => {
+        userInfo.set(doc.data());
+      });
+  }
+
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      firebaseLoggedIn.set(true);
+      userId.set(user.uid);
+    } else {
+      firebaseLoggedIn.set(false);
+    }
   });
+
+  async function getUser() {
+    await db
+      .collection('users')
+      .get()
+      .then((snapshot) => {
+        snapshot.docs.forEach((doc) => {
+          if (doc.data().userId === $userId) {
+            userInfo.set(doc.data());
+            userDocId.set(doc.id);
+          } else {
+          }
+        });
+      })
+      .then(() => {
+        if ($userInfo === null) {
+          push('/birthday');
+        } else {
+          push('/annual');
+        }
+      });
+  }
 
   $: if ($firebaseLoggedIn || $kakaoLoggedIn) {
     loggedIn.set(true);
+    getUser();
   } else {
+    push('/');
     loggedIn.set(false);
+    // userInfo.set(null);
+    // userId.set(null);
   }
 
   $: if ($loggedIn) {
