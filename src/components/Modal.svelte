@@ -120,7 +120,7 @@
           {$clickedDay.year + 1}년
         </span>
       </header>
-      <div id="editor" />
+      <textarea id="editor" placeholder="여기에 기록을 할 수 있어요." />
     </div>
   </div>
 {:else if $activeTab === '월간'}
@@ -143,7 +143,7 @@
           {$clickedDay.month + 1}월
         </span>
       </header>
-      <div id="editor" />
+      <textarea id="editor" placeholder="여기에 기록을 할 수 있어요." />
     </div>
   </div>
 {:else if $activeTab === '주간'}
@@ -166,7 +166,7 @@
           {$clickedDay.week + 1}주
         </span>
       </header>
-      <div id="editor" />
+      <textarea id="editor" placeholder="여기에 기록을 할 수 있어요." />
     </div>
   </div>
 {/if}
@@ -191,9 +191,10 @@
     align-items: center;
     width: 60vw;
     height: 80vh;
-    padding: 40px 100px 60px;
+    padding: 40px 80px 60px;
     background-color: #fff;
     border-radius: 4px;
+    overflow-y: auto;
   }
 
   header {
@@ -217,5 +218,13 @@
     padding: 10px;
     color: #666;
     cursor: pointer;
+  }
+
+  :global(.ck-editor__editable_inline) {
+    width: calc(60vw - 160px);
+  }
+
+  :global(.ck-editor__editable_inline ol, .ck-editor__editable_inline ul) {
+    padding-left: 2rem;
   }
 </style>
