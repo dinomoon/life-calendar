@@ -2,8 +2,8 @@ import Home from './routes/Home.svelte';
 import LogIn from './routes/LogIn.svelte';
 import SignUp from './routes/SignUp.svelte';
 import Help from './routes/Help.svelte';
+import Birthday from './routes/Birthday.svelte';
 import Calendar from './components/Calendar.svelte';
-import Birthday from './components/Birthday.svelte';
 
 const routes = {
   '/': Home,

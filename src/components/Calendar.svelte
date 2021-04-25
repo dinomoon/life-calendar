@@ -10,9 +10,9 @@
     loggedIn,
   } from '../store';
   import Modal from './Modal.svelte';
-  import Annual from './tabs/Annual.svelte';
-  import Monthly from './tabs/Monthly.svelte';
-  import Weekly from './tabs/Weekly.svelte';
+  import Annual from '../routes/tabs/Annual.svelte';
+  import Monthly from '../routes/tabs/Monthly.svelte';
+  import Weekly from '../routes/tabs/Weekly.svelte';
   let calendarGrid = null;
 
   onMount(() => {
