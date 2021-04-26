@@ -1,5 +1,5 @@
 <script>
-  import {loggedIn} from '../store';
+  import { loggedIn } from '../store';
 
   let year = new Date().getFullYear();
 </script>
@@ -15,7 +15,7 @@
   }
 
   .copyright {
-    color: #aaa;
+    color: #888;
     display: inline-block;
     padding: 20px;
     font-size: 12px;

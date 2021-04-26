@@ -1,5 +1,5 @@
 <script>
-  import { userInfo, thisYear, squareList, loading } from '../../store';
+  import { userInfo, thisYear, squareList } from '../../store';
   import { fade } from 'svelte/transition';
 
   squareList.set(Array.from(Array(100).keys()));

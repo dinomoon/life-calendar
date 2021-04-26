@@ -44,7 +44,6 @@
           if (doc.data().userId === $userId) {
             userInfo.set(doc.data());
             userDocId.set(doc.id);
-          } else {
           }
         });
       })
@@ -63,21 +62,21 @@
   } else {
     push('/');
     loggedIn.set(false);
-    // userInfo.set(null);
-    // userId.set(null);
+    userInfo.set(null);
+    userId.set(null);
   }
 
   $: if ($loggedIn) {
     links = ['도움말', '로그아웃'];
     switch ($location) {
       case '/annual':
-        activeTab.set('연간');
+        activeTab.set('annual');
         break;
       case '/monthly':
-        activeTab.set('월간');
+        activeTab.set('monthly');
         break;
       case '/weekly':
-        activeTab.set('주간');
+        activeTab.set('weekly');
         break;
       default:
         break;

@@ -26,14 +26,14 @@
   const clickHandler = async (e) => {
     const classList = e.target.classList;
     if (classList.contains('item')) {
-      if ($activeTab === '연간') {
+      if ($activeTab === 'annual') {
         await clickedDay.set({ year: +e.target.dataset.year });
-      } else if ($activeTab === '월간') {
+      } else if ($activeTab === 'monthly') {
         clickedDay.set({
           month: +e.target.dataset.id + 1,
           age: +e.target.dataset.age + 1,
         });
-      } else if ($activeTab === '주간') {
+      } else if ($activeTab === 'weekly') {
         clickedDay.set({
           week: +e.target.dataset.id + 1,
           age: +e.target.dataset.age + 1,
@@ -51,7 +51,7 @@
     const currentHoverColor = $colors['current-hover-item-color'];
     const target = e.target;
     if (target.classList.contains('item')) {
-      if ($activeTab === '연간') {
+      if ($activeTab === 'annual') {
         target.style.backgroundColor = currentHoverColor;
         target.style.color = $colors['item-background-color'];
         let age = target.textContent - $userInfo.birthday.year + 1;
@@ -78,7 +78,7 @@
     const itemColor = $colors['item-background-color'];
     let target = e.target;
     if (target.classList.contains('item')) {
-      if ($activeTab === '연간') {
+      if ($activeTab === 'annual') {
         target.style.color = '#000';
         target.style.backgroundColor = target.classList.contains('past')
           ? pastColor
@@ -109,19 +109,19 @@
   {#if $userInfo}
     <div class="container">
       <!-- <div class="time">오늘은 {thisYear}년 {$thisMonth + 1}월 {date.getDate()}일 {$week[date.getDay()]}요일입니다.</div> -->
-      {#if $activeTab === '연간'}
+      {#if $activeTab === 'annual'}
         <Annual
           on:click={clickHandler}
           on:mouseover={mouseoverHandler}
           on:mouseout={mouseoutHandler}
         />
-      {:else if $activeTab === '월간'}
+      {:else if $activeTab === 'monthly'}
         <Monthly
           on:click={clickHandler}
           on:mouseover={mouseoverHandler}
           on:mouseout={mouseoutHandler}
         />
-      {:else if $activeTab === '주간'}
+      {:else if $activeTab === 'weekly'}
         <Weekly
           on:click={clickHandler}
           on:mouseover={mouseoverHandler}

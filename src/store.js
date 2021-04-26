@@ -13,7 +13,7 @@ export const loggedIn = writable(false);
 export const firebaseLoggedIn = writable(false);
 export const kakaoLoggedIn = writable(false);
 export const calendarTabs = writable(['연간', '월간', '주간']);
-export const activeTab = writable('연간');
+export const activeTab = writable('annual');
 export const userId = writable(null);
 // export const userInfo = writable({
 //   birthday: { year: 1994 },

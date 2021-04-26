@@ -67,8 +67,8 @@
             <li>
               <a
                 href="/#/{obj[tab]}"
-                class:activeTab={tab === $activeTab}
-                class:notActiveTab={tab !== $activeTab}>{tab}</a
+                class:activeTab={obj[tab] === $activeTab}
+                class:notActiveTab={obj[tab] !== $activeTab}>{tab}</a
               >
             </li>
           {/each}

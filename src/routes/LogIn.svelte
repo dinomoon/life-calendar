@@ -1,5 +1,5 @@
 <script>
-  import { kakaoLoggedIn, loading, userId } from '../store';
+  import { kakaoLoggedIn, userId } from '../store';
 
   let valid = false;
 

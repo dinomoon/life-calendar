@@ -7,52 +7,54 @@
 
   const submitHandler = async (e) => {
     birthdayValid = true;
-    const birthday = e.target['birthday'].value;
-    const birthArray = birthday.split('-');
-    const year = +birthArray[0];
-    const month = +birthArray[1];
-    const day = +birthArray[2];
+    const year = +e.target['birthday'].value;
+    // const birthArray = birthday.split('-');
+    // const year = +birthArray[0];
+    // const month = +birthArray[1];
+    // const day = +birthArray[2];
 
-    birthdayValid = birthday ? true : false;
+    // birthdayValid = birthday ? true : false;
 
     if (birthdayValid) {
       loading.set(true);
-      await db.collection('users').add({
+
+      const initialData = {
         userId: $userId,
-        birthday: { year, month, day },
+        birthday: { year },
         annual: {},
         monthly: {},
         weekly: {},
-      });
+      };
 
       await db
         .collection('users')
-        .get()
-        .then((snapshot) => {
-          snapshot.docs.forEach((doc) => {
-            if (doc.data().userId === $userId) {
-              userInfo.set(doc.data());
-              userDocId.set(doc.id);
-              push('/annual');
-            }
-          });
+        .add(initialData)
+        .then((docRef) => {
+          userInfo.set(initialData);
+          userDocId.set(docRef.id);
+          push('/annual');
+          loading.set(false);
         });
     }
   };
 </script>
 
 <section>
-  <div class="birth-form-container">
-    <h2>생일을 입력해주세요.😊👀</h2>
-    <form on:submit|preventDefault={submitHandler}>
-      <input type="date" id="birthday" name="birthday" />
-      <button type="submit">시작하기</button>
-    </form>
-    <div class="birth-img-wrap">
-      <img class="party-img" src="/img/party.svg" alt="" />
-      <img class="birthday-img" src="/img/birthday.svg" alt="" />
+  {#if $loading}
+    <h2>Loading...</h2>
+  {:else}
+    <div class="birth-form-container">
+      <h2>태어난 연도를 입력해주세요.😊👀</h2>
+      <form on:submit|preventDefault={submitHandler}>
+        <input type="number" id="birthday" />
+        <button type="submit">시작하기</button>
+      </form>
+      <div class="birth-img-wrap">
+        <img class="party-img" src="/img/party.svg" alt="" />
+        <img class="birthday-img" src="/img/birthday.svg" alt="" />
+      </div>
     </div>
-  </div>
+  {/if}
 </section>
 
 <style>
