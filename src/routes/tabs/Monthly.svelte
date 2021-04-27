@@ -10,7 +10,7 @@
   } from '../../store';
   import { fade } from 'svelte/transition';
 
-  squareList.set(Array.from(Array(1200).keys()));
+  squareList.set(new Array(1200));
 
   let monthName = [
     'JAN',
@@ -26,15 +26,11 @@
     'NOV',
     'DEC',
   ];
-  let calendarGrid;
-  let btns;
-  let items;
+  let btns = [];
+  let items = [];
+  let btnIdx = 0;
 
   onMount(() => {
-    calendarGrid = document.querySelector('.calendar--grid');
-    btns = calendarGrid.querySelectorAll('button');
-    items = calendarGrid.querySelectorAll('.item');
-
     if (JSON.parse(localStorage.getItem('monthly-fold-obj')) === null) {
       localStorage.setItem('monthly-fold-obj', JSON.stringify($monthlyFoldObj));
     }
@@ -93,51 +89,53 @@
 </script>
 
 <div class="calendar--grid" on:click on:mouseover on:mouseout in:fade>
-  {#each $squareList as item}
+  {#each $squareList as _, idx}
     <div
+      bind:this={items[idx]}
       class="item"
-      class:past={$userInfo.birthday.year + Math.floor(item / 12) < $thisYear}
-      class:current={Math.floor(item / 12) ===
-        $thisYear - $userInfo.birthday.year && item % 12 === $thisMonth}
-      class:all-this-vertical-past={item % 12 === $thisMonth &&
-        Math.floor(item / 12) < $thisYear - $userInfo.birthday.year}
-      class:all-this-vertical-future={item % 12 === $thisMonth &&
-        Math.floor(item / 12) > $thisYear - $userInfo.birthday.year}
-      class:all-this-horizontal-past={Math.floor(item / 12) ===
-        $thisYear - $userInfo.birthday.year && item % 12 < $thisMonth}
-      class:all-this-horizontal-future={Math.floor(item / 12) ===
-        $thisYear - $userInfo.birthday.year && item % 12 > $thisMonth}
+      class:past={$userInfo.birthday.year + Math.floor(idx / 12) < $thisYear}
+      class:current={Math.floor(idx / 12) ===
+        $thisYear - $userInfo.birthday.year && idx % 12 === $thisMonth}
+      class:all-this-vertical-past={idx % 12 === $thisMonth &&
+        Math.floor(idx / 12) < $thisYear - $userInfo.birthday.year}
+      class:all-this-vertical-future={idx % 12 === $thisMonth &&
+        Math.floor(idx / 12) > $thisYear - $userInfo.birthday.year}
+      class:all-this-horizontal-past={Math.floor(idx / 12) ===
+        $thisYear - $userInfo.birthday.year && idx % 12 < $thisMonth}
+      class:all-this-horizontal-future={Math.floor(idx / 12) ===
+        $thisYear - $userInfo.birthday.year && idx % 12 > $thisMonth}
       class:circle={$userInfo.monthly[
-        `${Math.floor(item / 12) + 1} ${(item % 12) + 1}`
+        `${Math.floor(idx / 12) + 1} ${(idx % 12) + 1}`
       ] !== undefined &&
-        $userInfo.monthly[`${Math.floor(item / 12) + 1} ${(item % 12) + 1}`]
+        $userInfo.monthly[`${Math.floor(idx / 12) + 1} ${(idx % 12) + 1}`]
           .length > 0}
-      data-id={item % 12}
-      data-age={Math.floor(item / 12)}
+      data-id={idx % 12}
+      data-age={Math.floor(idx / 12)}
     >
-      {#if item >= 0 && item <= 11}
-        <span class="month-name" class:current-text={$thisMonth === item}
-          >{monthName[item]}</span
+      {#if idx >= 0 && idx <= 11}
+        <span class="month-name" class:current-text={$thisMonth === idx}
+          >{monthName[idx]}</span
         >
       {/if}
       <!-- age -->
-      {#if item % 12 === 0}
+      {#if idx % 12 === 0}
         <span
           class="cursor-default age"
-          class:text-bold={(Math.floor(item / 12) + 1) % 10 === 0 || item === 0}
-          class:current-text={Math.floor(item / 12) ===
+          class:text-bold={(Math.floor(idx / 12) + 1) % 10 === 0 || idx === 0}
+          class:current-text={Math.floor(idx / 12) ===
             $thisYear - $userInfo.birthday.year}
         >
-          {Math.floor(item / 12) + 1}
+          {Math.floor(idx / 12) + 1}
         </span>
       {/if}
       <!-- // age -->
       <!-- fold button -->
-      {#if (item != 1199 && item % 12 === 11 && (Math.floor(item / 12) + 1) % 10 === 0) || item === 11}
+      {#if (idx != 1199 && idx % 12 === 11 && (Math.floor(idx / 12) + 1) % 10 === 0) || idx === 11}
         <button
           on:click={hideHandler}
           class="fold-button"
-          data-btn={Math.ceil(item / 12)}
+          data-btn={Math.ceil(idx / 12)}
+          bind:this={btns[btnIdx++]}
         >
           <i class="fas fa-chevron-down" />
         </button>

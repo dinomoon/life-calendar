@@ -33,7 +33,6 @@
           userInfo.set(initialData);
           userDocId.set(docRef.id);
           push('/annual');
-          loading.set(false);
         });
     }
   };

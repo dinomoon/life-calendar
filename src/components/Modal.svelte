@@ -14,6 +14,70 @@
   let editor;
   const modalTransition = { y: -50, duration: 400 };
 
+  class UploadAdapter {
+    constructor(loader) {
+      this.loader = loader;
+    }
+
+    upload() {
+      return this.loader.file.then(
+        (file) =>
+          new Promise((resolve, reject) => {
+            this._initRequest();
+            this._initListeners(resolve, reject, file);
+            this._sendRequest(file);
+          }),
+      );
+    }
+    _initRequest() {
+      const xhr = (this.xhr = new XMLHttpRequest());
+      xhr.open(
+        'POST',
+        'https://firebasestorage.googleapis.com/v0/b/life-calendar-ce63c.appspot.com/o/images',
+        true,
+      );
+
+      xhr.responseType = 'json';
+    }
+
+    _initListeners(resolve, reject, file) {
+      const xhr = this.xhr;
+      const loader = this.loader;
+      const genericErrorText = '파일을 업로드 할 수 없습니다.';
+
+      xhr.addEventListener('error', () => {
+        reject(genericErrorText);
+      });
+      xhr.addEventListener('abort', () => reject());
+      xhr.addEventListener('load', () => {
+        const response = xhr.response;
+        if (!response || response.error) {
+          return reject(
+            response && response.error
+              ? response.error.message
+              : genericErrorText,
+          );
+        }
+
+        resolve({
+          default: response.url, //업로드된 파일 주소
+        });
+      });
+    }
+
+    _sendRequest(file) {
+      const data = new FormData();
+      data.append('upload', file);
+      this.xhr.send(data);
+    }
+  }
+
+  function MyCustomUploadAdapterPlugin(editor) {
+    editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+      return new UploadAdapter(loader);
+    };
+  }
+
   onMount(() => {
     switch ($activeTab) {
       case 'annual':
@@ -36,6 +100,7 @@
       //   tokenUrl: 'https://www.googleapis.com/auth/firebase.database',
       //   uploadUrl: 'https://www.googleapis.com/auth/firebase.database',
       // },
+      extraPlugins: [MyCustomUploadAdapterPlugin],
       toolbar: {
         items: [
           'heading',
@@ -81,7 +146,6 @@
   const clickHandler = async (e, dir) => {
     const date = e.target.id;
     const lastMonthOrWeek = date === 'month' ? 12 : 52;
-    console.log(lastMonthOrWeek);
     await saveData();
 
     // clickedDay 재설정
@@ -278,6 +342,10 @@
     user-select: none;
   }
 
+  header h2 {
+    font-weight: normal;
+  }
+
   header .left,
   header .right {
     flex: 1;
@@ -290,7 +358,6 @@
 
   header .left {
     font-size: 20px;
-    font-weight: normal;
   }
 
   header .right h2 {
@@ -303,8 +370,13 @@
     display: inline-block;
     font-size: 20px;
     padding: 10px;
-    color: #666;
+    color: rgba(0, 0, 0, 0.2);
     cursor: pointer;
+  }
+
+  .prev:hover,
+  .next:hover {
+    color: rgba(0, 0, 0, 0.6);
   }
 
   :global(.ck-editor__editable_inline) {

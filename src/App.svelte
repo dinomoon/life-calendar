@@ -14,6 +14,7 @@
     userId,
     userInfo,
     userDocId,
+    loading,
   } from './store';
 
   let links = [];
@@ -64,6 +65,7 @@
     loggedIn.set(false);
     userInfo.set(null);
     userId.set(null);
+    loading.set(false);
   }
 
   $: if ($loggedIn) {

@@ -128,7 +128,7 @@ label {
   transform: rotate(-90deg);
 }
 
-i {
+.fold-button i {
   transition: all 0.3s;
 }
 
@@ -143,7 +143,7 @@ i {
   background-color: var(--active-color);
 }
 
-.item.hidden {
+.row.hidden {
   display: none !important;
 }
 
