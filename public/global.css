@@ -4,8 +4,8 @@
   --border-color: #dee2e6;
   --past-background-color: rgba(0, 0, 0, 0.1);
   --current-item-color: #f5df4d;
-  --all-this-past-color: rgba(0, 0, 0, 0.4);
-  --all-this-future-color: lightpink;
+  --vh-past-color: rgba(0, 0, 0, 0.4);
+  --vh-future-color: lightpink;
   --active-color: #fa5252;
   --background-color: #fdf9f1;
   --item-background-color: #fffefc;
@@ -151,14 +151,14 @@ label {
   visibility: hidden;
 }
 
-.all-this-vertical-past,
-.all-this-horizontal-past {
-  background-color: var(--all-this-past-color) !important;
+.vertical-past,
+.horizontal-past {
+  background-color: var(--vh-past-color) !important;
 }
 
-.all-this-vertical-future,
-.all-this-horizontal-future {
-  background-color: var(--all-this-future-color) !important;
+.vertical-future,
+.horizontal-future {
+  background-color: var(--vh-future-color) !important;
 }
 
 .item.current {
@@ -166,10 +166,10 @@ label {
   border-color: #fff;
 }
 
-.all-this-vertical-past:hover,
-.all-this-vertical-future:hover,
-.all-this-horizontal-past:hover,
-.all-this-horizontal-future:hover,
+.vertical-past:hover,
+.vertical-future:hover,
+.horizontal-past:hover,
+.horizontal-future:hover,
 .item.current:hover {
   opacity: 0.8;
 }

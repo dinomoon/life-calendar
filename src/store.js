@@ -14,12 +14,12 @@ export const firebaseLoggedIn = writable(false);
 export const kakaoLoggedIn = writable(false);
 export const calendarTabs = writable(['연간', '월간', '주간']);
 export const activeTab = writable('annual');
+export const rowArray = writable(new Array(100));
+export const colArray = writable(null);
 export const userId = writable(null);
-// export const userInfo = writable({
-//   birthday: { year: 1994 },
-// });
 export const userInfo = writable(null);
 export const userDocId = writable(null);
+export const userAge = writable(null);
 export const clickedDay = writable({
   year: null,
   month: null,
@@ -27,7 +27,6 @@ export const clickedDay = writable({
   age: null,
 });
 export const showModal = writable(false);
-export const squareList = writable(null);
 export const date = writable(time);
 export const thisYear = writable(time.getFullYear());
 export const thisMonth = writable(time.getMonth());

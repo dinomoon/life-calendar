@@ -1,7 +1,14 @@
 <script>
   import { push } from 'svelte-spa-router';
 
-  import { loading, userInfo, userDocId, userId } from '../store';
+  import {
+    loading,
+    userInfo,
+    userDocId,
+    userId,
+    thisYear,
+    userAge,
+  } from '../store';
 
   let birthdayValid = false;
 
@@ -33,6 +40,7 @@
           userInfo.set(initialData);
           userDocId.set(docRef.id);
           push('/annual');
+          userAge.set($thisYear - $userInfo.birthday.year + 1);
         });
     }
   };

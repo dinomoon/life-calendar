@@ -4,13 +4,19 @@
   import {
     userInfo,
     thisYear,
-    squareList,
     thisMonth,
     monthlyFoldObj,
+    rowArray,
+    colArray,
+    userAge,
   } from '../../store';
   import { fade } from 'svelte/transition';
 
-  squareList.set(new Array(1200));
+  colArray.set(new Array(12));
+
+  let rows = [];
+  let btns = [];
+  let btnIdx = 0;
 
   let monthName = [
     'JAN',
@@ -26,9 +32,6 @@
     'NOV',
     'DEC',
   ];
-  let btns = [];
-  let items = [];
-  let btnIdx = 0;
 
   onMount(() => {
     if (JSON.parse(localStorage.getItem('monthly-fold-obj')) === null) {
@@ -40,15 +43,15 @@
 
     for (const key in obj) {
       if (key === '1' && obj[key]) {
-        items.forEach((item) => {
-          if (item.dataset.age >= +key && item.dataset.age <= +key + 7) {
-            item.classList.add('hidden');
+        rows.forEach((row, idx) => {
+          if (idx >= +key && idx <= +key + 7) {
+            row.classList.toggle('hidden');
           }
         });
       } else if (key !== '1' && obj[key]) {
-        items.forEach((item) => {
-          if (item.dataset.age >= +key && item.dataset.age <= +key + 8) {
-            item.classList.add('hidden');
+        rows.forEach((row, idx) => {
+          if (idx >= +key && idx <= +key + 8) {
+            row.classList.toggle('hidden');
           }
         });
       }
@@ -63,18 +66,18 @@
   async function hideHandler(e) {
     let target = e.currentTarget;
     let icon = target.children[0];
-    let data = target.dataset.btn;
+    let data = +target.dataset.btn;
 
-    if (data === '1') {
-      items.forEach((item) => {
-        if (item.dataset.age >= +data && item.dataset.age <= +data + 7) {
-          item.classList.toggle('hidden');
+    if (data === 1) {
+      rows.forEach((row, idx) => {
+        if (idx >= data && idx <= data + 7) {
+          row.classList.toggle('hidden');
         }
       });
     } else {
-      items.forEach((item) => {
-        if (item.dataset.age >= +data && item.dataset.age <= +data + 8) {
-          item.classList.toggle('hidden');
+      rows.forEach((row, idx) => {
+        if (idx >= data && idx <= data + 8) {
+          row.classList.toggle('hidden');
         }
       });
     }
@@ -89,65 +92,70 @@
 </script>
 
 <div class="calendar--grid" on:click on:mouseover on:mouseout in:fade>
-  {#each $squareList as _, idx}
-    <div
-      bind:this={items[idx]}
-      class="item"
-      class:past={$userInfo.birthday.year + Math.floor(idx / 12) < $thisYear}
-      class:current={Math.floor(idx / 12) ===
-        $thisYear - $userInfo.birthday.year && idx % 12 === $thisMonth}
-      class:all-this-vertical-past={idx % 12 === $thisMonth &&
-        Math.floor(idx / 12) < $thisYear - $userInfo.birthday.year}
-      class:all-this-vertical-future={idx % 12 === $thisMonth &&
-        Math.floor(idx / 12) > $thisYear - $userInfo.birthday.year}
-      class:all-this-horizontal-past={Math.floor(idx / 12) ===
-        $thisYear - $userInfo.birthday.year && idx % 12 < $thisMonth}
-      class:all-this-horizontal-future={Math.floor(idx / 12) ===
-        $thisYear - $userInfo.birthday.year && idx % 12 > $thisMonth}
-      class:circle={$userInfo.monthly[
-        `${Math.floor(idx / 12) + 1} ${(idx % 12) + 1}`
-      ] !== undefined &&
-        $userInfo.monthly[`${Math.floor(idx / 12) + 1} ${(idx % 12) + 1}`]
-          .length > 0}
-      data-id={idx % 12}
-      data-age={Math.floor(idx / 12)}
-    >
-      {#if idx >= 0 && idx <= 11}
-        <span class="month-name" class:current-text={$thisMonth === idx}
-          >{monthName[idx]}</span
+  {#each $rowArray as _, rowIdx}
+    <div class="row" bind:this={rows[rowIdx]}>
+      {#each $colArray as _, colIdx}
+        <div
+          class="item"
+          class:past={rowIdx < $userAge}
+          class:current={rowIdx + 1 === $userAge && colIdx === $thisMonth}
+          class:vertical-past={rowIdx < $userAge && colIdx === $thisMonth}
+          class:vertical-future={rowIdx + 1 > $userAge &&
+            colIdx % 12 === $thisMonth}
+          class:horizontal-past={rowIdx + 1 === $userAge && colIdx < $thisMonth}
+          class:horizontal-future={rowIdx + 1 === $userAge &&
+            colIdx > $thisMonth}
+          class:circle={$userInfo.monthly[`${rowIdx + 1} ${colIdx + 1}`] !==
+            undefined &&
+            $userInfo.monthly[`${rowIdx + 1} ${colIdx + 1}`].length !== 0}
+          data-id={colIdx}
+          data-age={rowIdx}
         >
-      {/if}
-      <!-- age -->
-      {#if idx % 12 === 0}
-        <span
-          class="cursor-default age"
-          class:text-bold={(Math.floor(idx / 12) + 1) % 10 === 0 || idx === 0}
-          class:current-text={Math.floor(idx / 12) ===
-            $thisYear - $userInfo.birthday.year}
-        >
-          {Math.floor(idx / 12) + 1}
-        </span>
-      {/if}
-      <!-- // age -->
-      <!-- fold button -->
-      {#if (idx != 1199 && idx % 12 === 11 && (Math.floor(idx / 12) + 1) % 10 === 0) || idx === 11}
-        <button
-          on:click={hideHandler}
-          class="fold-button"
-          data-btn={Math.ceil(idx / 12)}
-          bind:this={btns[btnIdx++]}
-        >
-          <i class="fas fa-chevron-down" />
-        </button>
-        <!-- // fold button -->
-      {/if}
+          <!-- month -->
+          {#if rowIdx === 0 && colIdx < 12}
+            <span class="month-name" class:current-text={$thisMonth === colIdx}
+              >{monthName[colIdx]}</span
+            >
+          {/if}
+          <!-- // month -->
+          <!-- age -->
+          {#if colIdx === 0}
+            <span
+              class="cursor-default age"
+              class:text-bold={rowIdx === 0 || (rowIdx + 1) % 10 === 0}
+              class:current-text={rowIdx ===
+                $thisYear - $userInfo.birthday.year}
+            >
+              {rowIdx + 1}
+            </span>
+          {/if}
+          <!-- // age -->
+          <!-- fold button -->
+          {#if (rowIdx === 0 || (rowIdx + 1) % 10 === 0) && colIdx === 11 && rowIdx !== 99}
+            <button
+              on:click={hideHandler}
+              class="fold-button"
+              data-btn={rowIdx + 1}
+              bind:this={btns[btnIdx++]}
+            >
+              <i class="fas fa-chevron-down" />
+            </button>
+            <!-- // fold button -->
+          {/if}
+        </div>
+      {/each}
     </div>
   {/each}
 </div>
 
 <style>
-  .calendar--grid {
+  .row {
+    display: inline-grid;
     grid-template-columns: repeat(12, 60px);
+    gap: 4px;
+  }
+
+  .calendar--grid {
     grid-template-rows: repeat(100, 30px);
     gap: 4px;
   }

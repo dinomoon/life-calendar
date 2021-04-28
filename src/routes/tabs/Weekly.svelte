@@ -4,19 +4,18 @@
   import {
     userInfo,
     thisYear,
-    squareList,
     weekNum,
     weeklyFoldObj,
+    rowArray,
+    colArray,
+    userAge,
   } from '../../store';
   import { fade } from 'svelte/transition';
 
-  squareList.set(new Array(5200));
-  let rowArray = new Array(100);
-  let itemArray = new Array(52);
+  colArray.set(new Array(52));
 
   let rows = [];
   let btns = [];
-  let items = [];
   let btnIdx = 0;
 
   onMount(async () => {
@@ -78,64 +77,43 @@
 </script>
 
 <div class="calendar--grid" on:click on:mouseover on:mouseout in:fade>
-  {#each rowArray as _, rowIdx}
+  {#each $rowArray as _, rowIdx}
     <div class="row" bind:this={rows[rowIdx]}>
-      {#each itemArray as _, itemIdx}
+      {#each $colArray as _, colIdx}
         <div
-          bind:this={items[rowIdx * 52 + itemIdx]}
           class="item"
-          class:past={$userInfo.birthday.year +
-            Math.floor((rowIdx * 52 + itemIdx) / 52) <
-            $thisYear}
-          class:current={Math.floor((rowIdx * 52 + itemIdx) / 52) ===
-            $thisYear - $userInfo.birthday.year &&
-            itemIdx % 52 === $weekNum - 1}
-          class:all-this-vertical-past={itemIdx % 52 === $weekNum - 1 &&
-            Math.floor((rowIdx * 52 + itemIdx) / 52) <
-              $thisYear - $userInfo.birthday.year}
-          class:all-this-vertical-future={itemIdx % 52 === $weekNum - 1 &&
-            Math.floor((rowIdx * 52 + itemIdx) / 52) >
-              $thisYear - $userInfo.birthday.year}
-          class:all-this-horizontal-past={Math.floor(
-            (rowIdx * 52 + itemIdx) / 52,
-          ) ===
-            $thisYear - $userInfo.birthday.year && itemIdx % 52 < $weekNum - 1}
-          class:all-this-horizontal-future={Math.floor(
-            (rowIdx * 52 + itemIdx) / 52,
-          ) ===
-            $thisYear - $userInfo.birthday.year && itemIdx % 52 > $weekNum - 1}
-          class:circle={$userInfo.weekly[
-            `${Math.floor(rowIdx * 52 + itemIdx / 52) + 1} ${
-              rowIdx * 52 + (itemIdx % 52) + 1
-            }`
-          ] !== undefined &&
-            $userInfo.weekly[
-              `${Math.floor(rowIdx * 52 + itemIdx / 52) + 1} ${
-                rowIdx * 52 + (itemIdx % 52) + 1
-              }`
-            ].length > 0}
-          data-id={itemIdx}
+          class:past={rowIdx < $userAge}
+          class:current={rowIdx + 1 === $userAge && colIdx + 1 === $weekNum}
+          class:vertical-past={rowIdx < $userAge && colIdx + 1 === $weekNum}
+          class:vertical-future={rowIdx + 1 > $userAge &&
+            (colIdx + 1) % 52 === $weekNum}
+          class:horizontal-past={rowIdx + 1 === $userAge && colIdx < $weekNum}
+          class:horizontal-future={rowIdx + 1 === $userAge &&
+            colIdx + 1 > $weekNum}
+          class:circle={$userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`] !==
+            undefined &&
+            $userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`].length !== 0}
+          data-id={colIdx}
           data-age={rowIdx}
         >
-          {#if rowIdx * 52 + itemIdx < 52}
+          {#if rowIdx === 0 && colIdx < 52}
             <span
               class="top-item cursor-default"
-              class:current-text={rowIdx * 52 + itemIdx === $weekNum - 1}
-              >{rowIdx * 52 + itemIdx + 1}</span
+              class:current-text={$weekNum === colIdx + 1}>{colIdx + 1}</span
             >
           {/if}
-          {#if itemIdx === 0}
+          {#if colIdx === 0}
             <span
               class="left-item cursor-default"
               class:text-bold={rowIdx === 0 || (rowIdx + 1) % 10 === 0}
-              class:current-text={Math.floor(rowIdx * 52 + itemIdx / 52) ===
+              class:current-text={Math.floor(rowIdx * 52 + colIdx / 52) ===
                 $thisYear - $userInfo.birthday.year}
             >
               {rowIdx + 1}
             </span>
           {/if}
           <!-- fold button -->
-          {#if (rowIdx === 0 || (rowIdx + 1) % 10 === 0) && itemIdx === 51 && rowIdx !== 99}
+          {#if (rowIdx === 0 || (rowIdx + 1) % 10 === 0) && colIdx === 51 && rowIdx !== 99}
             <button
               on:click={hideHandler}
               class="fold-button"

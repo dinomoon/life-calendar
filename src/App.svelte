@@ -15,6 +15,8 @@
     userInfo,
     userDocId,
     loading,
+    userAge,
+    thisYear,
   } from './store';
 
   let links = [];
@@ -53,6 +55,7 @@
           push('/birthday');
         } else {
           push('/annual');
+          userAge.set($thisYear - $userInfo.birthday.year + 1);
         }
       });
   }

@@ -1,22 +1,22 @@
 <script>
-  import { userInfo, thisYear, squareList } from '../../store';
+  import { userInfo, colArray, userAge } from '../../store';
   import { fade } from 'svelte/transition';
 
-  squareList.set(Array.from(Array(100).keys()));
+  colArray.set(new Array(100));
 </script>
 
 <div class="calendar--grid" on:click on:mouseover on:mouseout in:fade>
-  {#each $squareList as item}
+  {#each $colArray as _, colIdx}
     <div
       class="item"
-      class:past={$userInfo.birthday.year + item < $thisYear}
-      class:current={$userInfo.birthday.year + item === $thisYear}
-      class:circle={$userInfo.annual[$userInfo.birthday.year + item] !==
+      class:past={colIdx + 1 < $userAge}
+      class:current={colIdx + 1 === $userAge}
+      class:circle={$userInfo.annual[$userInfo.birthday.year + colIdx] !==
         undefined &&
-        $userInfo.annual[$userInfo.birthday.year + item].length > 0}
-      data-year={$userInfo.birthday.year + item}
+        $userInfo.annual[$userInfo.birthday.year + colIdx].length !== 0}
+      data-year={$userInfo.birthday.year + colIdx}
     >
-      {$userInfo.birthday.year + item}
+      {$userInfo.birthday.year + colIdx}
     </div>
   {/each}
 </div>
