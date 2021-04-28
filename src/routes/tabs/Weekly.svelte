@@ -14,7 +14,7 @@
 
   colArray.set(new Array(52));
 
-  let rows = [];
+  export let rows = [];
   let btns = [];
   let btnIdx = 0;
 
@@ -93,8 +93,8 @@
           class:circle={$userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`] !==
             undefined &&
             $userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`].length !== 0}
-          data-id={colIdx}
-          data-age={rowIdx}
+          data-row={rowIdx}
+          data-col={colIdx}
         >
           {#if rowIdx === 0 && colIdx < 52}
             <span
@@ -106,8 +106,7 @@
             <span
               class="left-item cursor-default"
               class:text-bold={rowIdx === 0 || (rowIdx + 1) % 10 === 0}
-              class:current-text={Math.floor(rowIdx * 52 + colIdx / 52) ===
-                $thisYear - $userInfo.birthday.year}
+              class:current-text={rowIdx + 1 === $userAge}
             >
               {rowIdx + 1}
             </span>

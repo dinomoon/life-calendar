@@ -1,6 +1,5 @@
 <script>
   import { onMount } from 'svelte';
-
   import {
     userInfo,
     thisYear,
@@ -14,10 +13,9 @@
 
   colArray.set(new Array(12));
 
-  let rows = [];
+  export let rows = [];
   let btns = [];
   let btnIdx = 0;
-
   let monthName = [
     'JAN',
     'FEB',
@@ -32,15 +30,12 @@
     'NOV',
     'DEC',
   ];
-
   onMount(() => {
     if (JSON.parse(localStorage.getItem('monthly-fold-obj')) === null) {
       localStorage.setItem('monthly-fold-obj', JSON.stringify($monthlyFoldObj));
     }
-
     const obj = JSON.parse(localStorage.getItem('monthly-fold-obj'));
     monthlyFoldObj.set(obj);
-
     for (const key in obj) {
       if (key === '1' && obj[key]) {
         rows.forEach((row, idx) => {
@@ -62,12 +57,10 @@
       }
     }
   });
-
   async function hideHandler(e) {
     let target = e.currentTarget;
     let icon = target.children[0];
     let data = +target.dataset.btn;
-
     if (data === 1) {
       rows.forEach((row, idx) => {
         if (idx >= data && idx <= data + 7) {
@@ -81,7 +74,6 @@
         }
       });
     }
-
     await monthlyFoldObj.update((obj) => {
       obj[data] = !obj[data];
       return obj;
@@ -108,8 +100,8 @@
           class:circle={$userInfo.monthly[`${rowIdx + 1} ${colIdx + 1}`] !==
             undefined &&
             $userInfo.monthly[`${rowIdx + 1} ${colIdx + 1}`].length !== 0}
-          data-id={colIdx}
-          data-age={rowIdx}
+          data-row={rowIdx}
+          data-col={colIdx}
         >
           <!-- month -->
           {#if rowIdx === 0 && colIdx < 12}
@@ -123,8 +115,7 @@
             <span
               class="cursor-default age"
               class:text-bold={rowIdx === 0 || (rowIdx + 1) % 10 === 0}
-              class:current-text={rowIdx ===
-                $thisYear - $userInfo.birthday.year}
+              class:current-text={rowIdx + 1 === $userAge}
             >
               {rowIdx + 1}
             </span>
@@ -154,22 +145,18 @@
     grid-template-columns: repeat(12, 60px);
     gap: 4px;
   }
-
   .calendar--grid {
     grid-template-rows: repeat(100, 30px);
     gap: 4px;
   }
-
   .circle::before {
     width: 6px;
     height: 6px;
   }
-
   .item .age {
     position: absolute;
     right: 130%;
   }
-
   .month-name {
     position: absolute;
     left: 50%;

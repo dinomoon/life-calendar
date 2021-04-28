@@ -8,12 +8,14 @@
     showModal,
     activeTab,
     loggedIn,
+    colArray,
   } from '../store';
   import Modal from './Modal.svelte';
   import Annual from '../routes/tabs/Annual.svelte';
   import Monthly from '../routes/tabs/Monthly.svelte';
   import Weekly from '../routes/tabs/Weekly.svelte';
-  let calendarGrid = null;
+  let calendarGrid;
+  let rows = [];
 
   onMount(() => {
     if ($loggedIn === false) {
@@ -26,18 +28,24 @@
   const clickHandler = async (e) => {
     const classList = e.target.classList;
     if (classList.contains('item')) {
-      if ($activeTab === 'annual') {
-        await clickedDay.set({ year: +e.target.dataset.year });
-      } else if ($activeTab === 'monthly') {
-        clickedDay.set({
-          month: +e.target.dataset.id + 1,
-          age: +e.target.dataset.age + 1,
-        });
-      } else if ($activeTab === 'weekly') {
-        clickedDay.set({
-          week: +e.target.dataset.id + 1,
-          age: +e.target.dataset.age + 1,
-        });
+      switch ($activeTab) {
+        case 'annual':
+          await clickedDay.set({ year: +e.target.dataset.year });
+          break;
+        case 'monthly':
+          clickedDay.set({
+            month: +e.target.dataset.col + 1,
+            age: +e.target.dataset.row + 1,
+          });
+          break;
+        case 'weekly':
+          clickedDay.set({
+            week: +e.target.dataset.col + 1,
+            age: +e.target.dataset.row + 1,
+          });
+          break;
+        default:
+          return;
       }
       showModal.set(true);
     } else if (classList.contains('backdrop')) {
@@ -45,8 +53,7 @@
     }
   };
   function mouseoverHandler(e) {
-    let items = null;
-    let ages = null;
+    let column = null;
     const hoverColor = $colors['hover-item-color'];
     const currentHoverColor = $colors['current-hover-item-color'];
     const target = e.target;
@@ -57,23 +64,24 @@
         let age = target.textContent - $userInfo.birthday.year + 1;
         target.textContent = age;
       } else {
-        const hoverId = target.dataset.id;
-        const hoverAge = target.dataset.age;
-        items = calendarGrid.querySelectorAll(`[data-id="${hoverId}"]`);
-        ages = calendarGrid.querySelectorAll(`[data-age="${hoverAge}"]`);
-        items.forEach((item) => {
+        const hoverRowIdx = target.dataset.row;
+        const hoverColIdx = target.dataset.col;
+        column = calendarGrid.querySelectorAll(`[data-col="${hoverColIdx}"]`);
+
+        let row = rows[hoverRowIdx];
+        for (let i = 0; i < $colArray.length; i++) {
+          row.children[i].style.backgroundColor = hoverColor;
+        }
+
+        column.forEach((item) => {
           item.style.backgroundColor = hoverColor;
-        });
-        ages.forEach((age) => {
-          age.style.backgroundColor = hoverColor;
         });
         target.style.backgroundColor = currentHoverColor;
       }
     }
   }
   function mouseoutHandler(e) {
-    let items = null;
-    let ages = null;
+    let column = null;
     const pastColor = $colors['past-background-color'];
     const itemColor = $colors['item-background-color'];
     let target = e.target;
@@ -86,17 +94,22 @@
         let year = +target.textContent + $userInfo.birthday.year - 1;
         target.textContent = year;
       } else {
-        const hoverId = target.dataset.id;
-        const hoverAge = target.dataset.age;
-        items = calendarGrid.querySelectorAll(`[data-id="${hoverId}"]`);
-        ages = calendarGrid.querySelectorAll(`[data-age="${hoverAge}"]`);
-        items.forEach((item) => {
-          item.style.backgroundColor = item.classList.contains('past')
+        const hoverRowIdx = target.dataset.row;
+        const hoverColIdx = target.dataset.col;
+
+        column = calendarGrid.querySelectorAll(`[data-col="${hoverColIdx}"]`);
+
+        let row = rows[hoverRowIdx];
+        for (let i = 0; i < $colArray.length; i++) {
+          row.children[i].style.backgroundColor = row.children[
+            i
+          ].classList.contains('past')
             ? pastColor
             : itemColor;
-        });
-        ages.forEach((age) => {
-          age.style.backgroundColor = age.classList.contains('past')
+        }
+
+        column.forEach((item) => {
+          item.style.backgroundColor = item.classList.contains('past')
             ? pastColor
             : itemColor;
         });
@@ -120,12 +133,14 @@
           on:click={clickHandler}
           on:mouseover={mouseoverHandler}
           on:mouseout={mouseoutHandler}
+          {rows}
         />
       {:else if $activeTab === 'weekly'}
         <Weekly
           on:click={clickHandler}
           on:mouseover={mouseoverHandler}
           on:mouseout={mouseoutHandler}
+          {rows}
         />
       {/if}
     </div>
@@ -139,6 +154,7 @@
   section {
     padding-top: 6rem;
   }
+
   .container {
     max-width: 100%;
     margin: 0 auto;
