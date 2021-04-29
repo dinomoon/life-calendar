@@ -1,51 +1,17 @@
 <script>
-  import { onMount } from 'svelte';
-
   import {
     userInfo,
     weekNum,
-    weeklyFoldObj,
     rowArray,
     colArray,
     userAge,
+    foldStore,
   } from '../../store';
   import { fade } from 'svelte/transition';
 
   colArray.set(new Array(52));
 
   export let rows = [];
-  let btns = [];
-  let btnIdx = 0;
-
-  onMount(async () => {
-    if (JSON.parse(localStorage.getItem('weekly-fold-obj')) === null) {
-      localStorage.setItem('weekly-fold-obj', JSON.stringify($weeklyFoldObj));
-    }
-
-    const obj = await JSON.parse(localStorage.getItem('weekly-fold-obj'));
-    weeklyFoldObj.set(obj);
-
-    for (const key in obj) {
-      if (key === '1' && obj[key]) {
-        rows.forEach((row, idx) => {
-          if (idx >= +key && idx <= +key + 7) {
-            row.classList.toggle('hidden');
-          }
-        });
-      } else if (key !== '1' && obj[key]) {
-        rows.forEach((row, idx) => {
-          if (idx >= +key && idx <= +key + 8) {
-            row.classList.toggle('hidden');
-          }
-        });
-      }
-      for (let btn of btns) {
-        if (obj[key] && key === btn.dataset.btnId) {
-          btn.children[0].classList.add('fold');
-        }
-      }
-    }
-  });
 
   async function hideHandler(e) {
     let target = e.currentTarget;
@@ -66,11 +32,12 @@
       });
     }
 
-    await weeklyFoldObj.update((obj) => {
-      obj[data] = !obj[data];
+    foldStore.update((obj) => {
+      obj.weekly[data] = !obj.weekly[data];
       return obj;
     });
-    localStorage.setItem('weekly-fold-obj', JSON.stringify($weeklyFoldObj));
+
+    localStorage.setItem('fold-obj', JSON.stringify($foldStore));
     icon.classList.toggle('fold');
   }
 </script>
@@ -116,7 +83,6 @@
               on:click={hideHandler}
               class="fold-button"
               data-btn-id={rowIdx + 1}
-              bind:this={btns[btnIdx++]}
             >
               <i class="fas fa-chevron-down" />
             </button>

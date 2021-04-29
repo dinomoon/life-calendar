@@ -41,6 +41,33 @@ export const week = writable({
   6: '토',
 });
 
+export const foldStore = writable({
+  monthly: {
+    1: false,
+    10: false,
+    20: false,
+    30: false,
+    40: false,
+    50: false,
+    60: false,
+    70: false,
+    80: false,
+    90: false,
+  },
+  weekly: {
+    1: false,
+    10: false,
+    20: false,
+    30: false,
+    40: false,
+    50: false,
+    60: false,
+    70: false,
+    80: false,
+    90: false,
+  },
+});
+
 export const monthlyFoldObj = writable({
   1: false,
   10: false,

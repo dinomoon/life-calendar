@@ -9,12 +9,14 @@
     activeTab,
     loggedIn,
     colArray,
+    foldStore,
   } from '../store';
   import Modal from './Modal.svelte';
   import Annual from '../routes/tabs/Annual.svelte';
   import Monthly from '../routes/tabs/Monthly.svelte';
   import Weekly from '../routes/tabs/Weekly.svelte';
   let calendarGrid;
+  let btns;
   let rows = [];
 
   onMount(() => {
@@ -22,11 +24,43 @@
       push('/');
     }
     calendarGrid = document.querySelector('.calendar--grid');
+    btns = calendarGrid.querySelectorAll('button');
+
+    // fold button 불러오기
+    if ($activeTab !== 'annual') {
+      if (JSON.parse(localStorage.getItem('fold-obj')) === null) {
+        localStorage.setItem('fold-obj', JSON.stringify($foldStore));
+      }
+      foldStore.set(JSON.parse(localStorage.getItem('fold-obj')));
+      const obj = $foldStore[$activeTab];
+
+      for (const key in obj) {
+        if (key === '1' && obj[key]) {
+          rows.forEach((row, idx) => {
+            if (idx >= +key && idx <= +key + 7) {
+              row.classList.toggle('hidden');
+            }
+          });
+        } else if (key !== '1' && obj[key]) {
+          rows.forEach((row, idx) => {
+            if (idx >= +key && idx <= +key + 8) {
+              row.classList.toggle('hidden');
+            }
+          });
+        }
+        for (let btn of btns) {
+          if (obj[key] && key === btn.dataset.btnId) {
+            btn.children[0].classList.add('fold');
+          }
+        }
+      }
+    }
   });
 
   // clickHandler
   const clickHandler = async (e) => {
     const classList = e.target.classList;
+    console.log(classList);
     if (classList.contains('item')) {
       switch ($activeTab) {
         case 'annual':
@@ -50,8 +84,12 @@
       showModal.set(true);
     } else if (classList.contains('backdrop')) {
       showModal.set(false);
+    } else if (classList.contains('fold-button') || classList.contains('fas')) {
+      console.log('object');
     }
   };
+
+  // mouseoverHandler
   function mouseoverHandler(e) {
     let column = null;
     const hoverColor = $colors['hover-item-color'];
@@ -80,6 +118,8 @@
       }
     }
   }
+
+  // mouseoutHandler
   function mouseoutHandler(e) {
     let column = null;
     const pastColor = $colors['past-background-color'];

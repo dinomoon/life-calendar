@@ -1,20 +1,17 @@
 <script>
-  import { onMount } from 'svelte';
   import {
     userInfo,
     thisMonth,
-    monthlyFoldObj,
     rowArray,
     colArray,
     userAge,
+    foldStore,
   } from '../../store';
   import { fade } from 'svelte/transition';
 
   colArray.set(new Array(12));
 
   export let rows = [];
-  let btns = [];
-  let btnIdx = 0;
   let monthName = [
     'JAN',
     'FEB',
@@ -29,36 +26,9 @@
     'NOV',
     'DEC',
   ];
-  onMount(() => {
-    if (JSON.parse(localStorage.getItem('monthly-fold-obj')) === null) {
-      localStorage.setItem('monthly-fold-obj', JSON.stringify($monthlyFoldObj));
-    }
-    const obj = JSON.parse(localStorage.getItem('monthly-fold-obj'));
-    monthlyFoldObj.set(obj);
-    for (const key in obj) {
-      if (key === '1' && obj[key]) {
-        rows.forEach((row, idx) => {
-          if (idx >= +key && idx <= +key + 7) {
-            row.classList.toggle('hidden');
-          }
-        });
-      } else if (key !== '1' && obj[key]) {
-        rows.forEach((row, idx) => {
-          if (idx >= +key && idx <= +key + 8) {
-            row.classList.toggle('hidden');
-          }
-        });
-      }
-      for (let btn of btns) {
-        if (obj[key] && key === btn.dataset.btnId) {
-          btn.children[0].classList.add('fold');
-        }
-      }
-    }
-  });
+
   async function hideHandler(e) {
     let target = e.currentTarget;
-    console.log(target);
     let icon = target.children[0];
     let data = +target.dataset.btnId;
     if (data === 1) {
@@ -74,11 +44,13 @@
         }
       });
     }
-    await monthlyFoldObj.update((obj) => {
-      obj[data] = !obj[data];
+
+    await foldStore.update((obj) => {
+      obj.monthly[data] = !obj.monthly[data];
       return obj;
     });
-    localStorage.setItem('monthly-fold-obj', JSON.stringify($monthlyFoldObj));
+
+    localStorage.setItem('fold-obj', JSON.stringify($foldStore));
     icon.classList.toggle('fold');
   }
 </script>
@@ -127,7 +99,6 @@
               on:click={hideHandler}
               class="fold-button"
               data-btn-id={rowIdx + 1}
-              bind:this={btns[btnIdx++]}
             >
               <i class="fas fa-chevron-down" />
             </button>
