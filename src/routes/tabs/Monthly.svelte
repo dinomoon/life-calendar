@@ -31,19 +31,14 @@
     let target = e.currentTarget;
     let icon = target.children[0];
     let data = +target.dataset.btnId;
-    if (data === 1) {
-      rows.forEach((row, idx) => {
-        if (idx >= data && idx <= data + 7) {
-          row.classList.toggle('hidden');
-        }
-      });
-    } else {
-      rows.forEach((row, idx) => {
-        if (idx >= data && idx <= data + 8) {
-          row.classList.toggle('hidden');
-        }
-      });
-    }
+    let hideNum;
+
+    data === 1 ? (hideNum = 7) : (hideNum = 8);
+    rows.forEach((row, idx) => {
+      if (idx >= data && idx <= data + hideNum) {
+        row.classList.toggle('hidden');
+      }
+    });
 
     await foldStore.update((obj) => {
       obj.monthly[data] = !obj.monthly[data];

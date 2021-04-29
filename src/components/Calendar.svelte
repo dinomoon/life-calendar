@@ -34,20 +34,17 @@
       foldStore.set(JSON.parse(localStorage.getItem('fold-obj')));
       const obj = $foldStore[$activeTab];
 
+      let hideNum;
       for (const key in obj) {
-        if (key === '1' && obj[key]) {
+        key === '1' ? (hideNum = 7) : (hideNum = 8);
+        if (obj[key]) {
           rows.forEach((row, idx) => {
-            if (idx >= +key && idx <= +key + 7) {
-              row.classList.toggle('hidden');
-            }
-          });
-        } else if (key !== '1' && obj[key]) {
-          rows.forEach((row, idx) => {
-            if (idx >= +key && idx <= +key + 8) {
+            if (idx >= +key && idx <= +key + hideNum) {
               row.classList.toggle('hidden');
             }
           });
         }
+
         for (let btn of btns) {
           if (obj[key] && key === btn.dataset.btnId) {
             btn.children[0].classList.add('fold');
@@ -60,7 +57,6 @@
   // clickHandler
   const clickHandler = async (e) => {
     const classList = e.target.classList;
-    console.log(classList);
     if (classList.contains('item')) {
       switch ($activeTab) {
         case 'annual':
@@ -84,8 +80,6 @@
       showModal.set(true);
     } else if (classList.contains('backdrop')) {
       showModal.set(false);
-    } else if (classList.contains('fold-button') || classList.contains('fas')) {
-      console.log('object');
     }
   };
 
