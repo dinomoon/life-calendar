@@ -3,7 +3,6 @@
 
   import {
     userInfo,
-    thisYear,
     weekNum,
     weeklyFoldObj,
     rowArray,
@@ -41,7 +40,7 @@
         });
       }
       for (let btn of btns) {
-        if (obj[key] && key === btn.dataset.btn) {
+        if (obj[key] && key === btn.dataset.btnId) {
           btn.children[0].classList.add('fold');
         }
       }
@@ -51,7 +50,7 @@
   async function hideHandler(e) {
     let target = e.currentTarget;
     let icon = target.children[0];
-    let data = +target.dataset.btn;
+    let data = +target.dataset.btnId;
 
     if (data === 1) {
       rows.forEach((row, idx) => {
@@ -116,7 +115,7 @@
             <button
               on:click={hideHandler}
               class="fold-button"
-              data-btn={rowIdx + 1}
+              data-btn-id={rowIdx + 1}
               bind:this={btns[btnIdx++]}
             >
               <i class="fas fa-chevron-down" />
