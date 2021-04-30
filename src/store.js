@@ -30,6 +30,8 @@ export const showModal = writable(false);
 export const date = writable(time);
 export const thisYear = writable(time.getFullYear());
 export const thisMonth = writable(time.getMonth());
+export const dayNum = writable(time.getDay());
+export const dateNum = writable(time.getDate());
 export const weekNum = writable(null);
 export const week = writable({
   0: '일',

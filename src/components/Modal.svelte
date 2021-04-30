@@ -6,13 +6,16 @@
     userInfo,
     activeTab,
     showModal,
+    dayNum,
+    thisMonth,
+    dateNum,
   } from '../store.js';
   import { fly } from 'svelte/transition';
 
   let value = '';
   let isEmpty;
   let editor;
-  const modalTransition = { y: -50, duration: 400 };
+  const modalTransition = { y: -20, duration: 400 };
 
   class UploadAdapter {
     constructor(loader) {
@@ -95,40 +98,9 @@
 
     value === '' ? (isEmpty = true) : (isEmpty = false);
 
-    ClassicEditor.create(document.querySelector('#editor'), {
-      // cloudServices: {
-      //   tokenUrl: 'https://www.googleapis.com/auth/firebase.database',
-      //   uploadUrl: 'https://www.googleapis.com/auth/firebase.database',
-      // },
-      extraPlugins: [MyCustomUploadAdapterPlugin],
-      toolbar: {
-        items: [
-          'heading',
-          '|',
-          'fontFamily',
-          'fontSize',
-          'fontColor',
-          'fontBackgroundColor',
-          '|',
-          'highlight',
-          'bold',
-          'italic',
-          'bulletedList',
-          'numberedList',
-          '|',
-          'outdent',
-          'indent',
-          'alignment',
-          '|',
-          'imageUpload',
-          'blockQuote',
-          'insertTable',
-          'mediaEmbed',
-          'link',
-          'undo',
-          'redo',
-        ],
-      },
+    BalloonEditor.create(document.querySelector('#editor'), {
+      placeholder:
+        '마크다운을 사용해 작성할 수 있어요! 혹시 모르신다면 도움말을 확인해보세요.',
     })
       .then((newEditor) => {
         editor = newEditor;
@@ -248,7 +220,7 @@
           {$clickedDay.year + 1}년
         </span>
       </header>
-      <textarea id="editor" placeholder="여기에 기록을 할 수 있어요." />
+      <div id="editor" />
     </div>
   </div>
 {:else if $activeTab === 'monthly'}
@@ -265,16 +237,18 @@
             id="month"
             class="prev fas fa-chevron-left"
             on:click={(e) => clickHandler(e, 'prev')}
+            class:hidden={$clickedDay.age === 1 && $clickedDay.month === 1}
           />
           <h2>{$clickedDay.month}월</h2>
           <i
             id="month"
             class="next fas fa-chevron-right"
             on:click={(e) => clickHandler(e, 'next')}
+            class:hidden={$clickedDay.age === 100 && $clickedDay.month === 12}
           />
         </div>
       </header>
-      <textarea id="editor" placeholder="여기에 기록을 할 수 있어요." />
+      <div id="editor" />
     </div>
   </div>
 {:else if $activeTab === 'weekly'}
@@ -291,21 +265,58 @@
             id="week"
             class="prev fas fa-chevron-left"
             on:click={(e) => clickHandler(e, 'prev')}
+            class:hidden={$clickedDay.age === 1 && $clickedDay.week === 1}
           />
           <h2>{$clickedDay.week}주</h2>
           <i
             id="week"
             class="next fas fa-chevron-right"
             on:click={(e) => clickHandler(e, 'next')}
+            class:hidden={$clickedDay.age === 100 && $clickedDay.week === 52}
           />
         </div>
       </header>
-      <textarea id="editor" placeholder="여기에 기록을 할 수 있어요." />
+      <div class="day-wrap">
+        {#each ['일', '월', '화', '수', '목', '금', '토'] as day, idx}
+          <span class="day" class:today={$dayNum === idx}>{day}</span>
+        {/each}
+      </div>
+      <div id="editor" />
     </div>
   </div>
 {/if}
 
 <style>
+  #editor {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  .day-wrap {
+    width: 100%;
+    height: 40px;
+    display: flex;
+    justify-content: space-around;
+    user-select: none;
+    margin-bottom: 1.5rem;
+  }
+
+  .day-wrap .day {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    padding: 10px;
+    cursor: pointer;
+  }
+
+  .day.today {
+    background-color: var(--active-color);
+    border-radius: 50%;
+    color: #fff;
+  }
+
   .backdrop {
     left: 0;
     right: 0;
@@ -337,7 +348,7 @@
     justify-content: space-evenly;
     align-items: baseline;
     padding-bottom: 20px;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     border-bottom: 1px solid var(--border-color);
     user-select: none;
   }
