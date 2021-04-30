@@ -1,41 +1,18 @@
 <script>
-  import {
-    userInfo,
-    weekNum,
-    rowArray,
-    colArray,
-    userAge,
-    foldStore,
-  } from '../../store';
-  import { fade } from 'svelte/transition';
+  import { userInfo, weekNum, rowArray, colArray, userAge } from '../../store';
+
+  import { createEventDispatcher } from 'svelte';
 
   colArray.set(new Array(52));
-
   export let rows = [];
+  const dispatch = createEventDispatcher();
 
-  async function hideHandler(e) {
-    let target = e.currentTarget;
-    let icon = target.children[0];
-    let data = +target.dataset.btnId;
-    let hideNum;
-    data === 1 ? (hideNum = 7) : (hideNum = 8);
-    rows.forEach((row, idx) => {
-      if (idx >= data && idx <= data + hideNum) {
-        row.classList.toggle('hidden');
-      }
-    });
-
-    foldStore.update((obj) => {
-      obj.weekly[data] = !obj.weekly[data];
-      return obj;
-    });
-
-    localStorage.setItem('fold-obj', JSON.stringify($foldStore));
-    icon.classList.toggle('fold');
+  function hideHandler(e) {
+    dispatch('hideHandler', e);
   }
 </script>
 
-<div class="calendar--grid" on:click on:mouseover on:mouseout in:fade>
+<div class="calendar--grid" on:click on:mouseover on:mouseout>
   {#each $rowArray as _, rowIdx}
     <div class="row" bind:this={rows[rowIdx]}>
       {#each $colArray as _, colIdx}

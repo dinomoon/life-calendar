@@ -15,6 +15,9 @@
   import Annual from '../routes/tabs/Annual.svelte';
   import Monthly from '../routes/tabs/Monthly.svelte';
   import Weekly from '../routes/tabs/Weekly.svelte';
+  import { fly } from 'svelte/transition';
+  const transition = { y: -10, duration: 600 };
+
   let calendarGrid;
   let btns;
   let rows = [];
@@ -40,7 +43,7 @@
         if (obj[key]) {
           rows.forEach((row, idx) => {
             if (idx >= +key && idx <= +key + hideNum) {
-              row.classList.toggle('hidden');
+              row.classList.add('disappear');
             }
           });
         }
@@ -150,11 +153,47 @@
       }
     }
   }
+
+  async function hideHandler(e) {
+    let target = e.detail.currentTarget;
+    let icon = target.children[0];
+    let data = +target.dataset.btnId;
+    let hideNum;
+    let hideRows = [];
+
+    data === 1 ? (hideNum = 7) : (hideNum = 8);
+    await rows.forEach((row, idx) => {
+      if (idx >= data && idx <= data + hideNum) {
+        hideRows.push(row);
+      }
+    });
+
+    if (icon.classList.contains('fold')) {
+      hideRows.forEach((row, idx) => {
+        row.classList.remove('disappear');
+        row.classList.add('appear');
+        row.style.animationDelay = `${idx * 0.02}s`;
+      });
+    } else {
+      hideRows.forEach((row, idx) => {
+        row.classList.remove('appear');
+        row.classList.add('disappear');
+      });
+    }
+
+    foldStore.update((obj) => {
+      obj[$activeTab][data] = !obj[$activeTab][data];
+      return obj;
+    });
+
+    localStorage.setItem('fold-obj', JSON.stringify($foldStore));
+    icon.classList.toggle('fold');
+  }
 </script>
 
 <section>
   {#if $userInfo}
-    <div class="container">
+    <div class="container" in:fly={transition}>
       <!-- <div class="time">오늘은 {thisYear}년 {$thisMonth + 1}월 {date.getDate()}일 {$week[date.getDay()]}요일입니다.</div> -->
       {#if $activeTab === 'annual'}
         <Annual
@@ -167,6 +206,7 @@
           on:click={clickHandler}
           on:mouseover={mouseoverHandler}
           on:mouseout={mouseoutHandler}
+          on:hideHandler={hideHandler}
           {rows}
         />
       {:else if $activeTab === 'weekly'}
@@ -174,6 +214,7 @@
           on:click={clickHandler}
           on:mouseover={mouseoverHandler}
           on:mouseout={mouseoutHandler}
+          on:hideHandler={hideHandler}
           {rows}
         />
       {/if}

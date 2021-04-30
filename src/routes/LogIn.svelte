@@ -83,6 +83,9 @@
                 userId.set(res.id);
                 kakaoLoggedIn.set(true);
               },
+              fail: (err) => {
+                console.log(err);
+              },
             });
           },
         });

@@ -11,16 +11,14 @@
   } from '../store';
 
   let birthdayValid = false;
+  let year;
 
-  const submitHandler = async (e) => {
+  const submitHandler = () => {
     birthdayValid = true;
-    const year = +e.target['birthday'].value;
-    // const birthArray = birthday.split('-');
-    // const year = +birthArray[0];
-    // const month = +birthArray[1];
-    // const day = +birthArray[2];
 
-    // birthdayValid = birthday ? true : false;
+    if (year <= $thisYear - 100 || year > $thisYear) {
+      birthdayValid = false;
+    }
 
     if (birthdayValid) {
       loading.set(true);
@@ -33,8 +31,7 @@
         weekly: {},
       };
 
-      await db
-        .collection('users')
+      db.collection('users')
         .add(initialData)
         .then((docRef) => {
           userInfo.set(initialData);
@@ -42,6 +39,9 @@
           push('/annual');
           userAge.set($thisYear - $userInfo.birthday.year + 1);
         });
+    } else {
+      alert('잘못 입력하신 것 같아요. 다시 입력해주세요.');
+      year = '';
     }
   };
 </script>
@@ -53,7 +53,7 @@
     <div class="birth-form-container">
       <h2>태어난 연도를 입력해주세요.😊👀</h2>
       <form on:submit|preventDefault={submitHandler}>
-        <input type="number" id="birthday" />
+        <input type="number" bind:value={year} />
         <button type="submit">시작하기</button>
       </form>
       <div class="birth-img-wrap">

@@ -5,12 +5,12 @@
     rowArray,
     colArray,
     userAge,
-    foldStore,
   } from '../../store';
-  import { fade } from 'svelte/transition';
+
+  import { createEventDispatcher } from 'svelte';
+  const dispatch = createEventDispatcher();
 
   colArray.set(new Array(12));
-
   export let rows = [];
   let monthName = [
     'JAN',
@@ -27,30 +27,12 @@
     'DEC',
   ];
 
-  async function hideHandler(e) {
-    let target = e.currentTarget;
-    let icon = target.children[0];
-    let data = +target.dataset.btnId;
-    let hideNum;
-
-    data === 1 ? (hideNum = 7) : (hideNum = 8);
-    rows.forEach((row, idx) => {
-      if (idx >= data && idx <= data + hideNum) {
-        row.classList.toggle('hidden');
-      }
-    });
-
-    await foldStore.update((obj) => {
-      obj.monthly[data] = !obj.monthly[data];
-      return obj;
-    });
-
-    localStorage.setItem('fold-obj', JSON.stringify($foldStore));
-    icon.classList.toggle('fold');
+  function hideHandler(e) {
+    dispatch('hideHandler', e);
   }
 </script>
 
-<div class="calendar--grid" on:click on:mouseover on:mouseout in:fade>
+<div class="calendar--grid" on:click on:mouseover on:mouseout>
   {#each $rowArray as _, rowIdx}
     <div class="row" bind:this={rows[rowIdx]}>
       {#each $colArray as _, colIdx}

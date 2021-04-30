@@ -1,11 +1,10 @@
 <script>
   import { userInfo, colArray, userAge } from '../../store';
-  import { fade } from 'svelte/transition';
 
   colArray.set(new Array(100));
 </script>
 
-<div class="calendar--grid" on:click on:mouseover on:mouseout in:fade>
+<div class="calendar--grid" on:click on:mouseover on:mouseout>
   {#each $colArray as _, colIdx}
     <div
       class="item"
