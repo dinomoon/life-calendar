@@ -1,7 +1,8 @@
 @import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css);
 
 :root {
-  --border-color: #dee2e6;
+  --border-color: #dee2e6; /* gray3 */
+  --gray-2: #f1f3f5;
   --past-background-color: rgba(0, 0, 0, 0.1);
   --current-item-color: #f5df4d;
   --vh-past-color: rgba(0, 0, 0, 0.4);
@@ -91,12 +92,12 @@ label {
 }
 
 .current-text {
-  color: var(--active-color);
-  font-weight: 800;
+  color: var(--active-color) !important;
+  font-weight: 800 !important;
 }
 
 .text-bold {
-  font-weight: 800;
+  font-weight: 800 !important;
 }
 
 .past {
@@ -171,11 +172,22 @@ label {
 }
 
 /* fold animation */
-/* animation */
 @keyframes Appear {
   0% {
     opacity: 0;
     transform: translateY(-24px);
+  }
+
+  60% {
+    transform: translateY(20px);
+  }
+
+  75% {
+    transform: translateY(-10px);
+  }
+
+  90% {
+    transform: translateY(5px);
   }
 
   100% {
@@ -185,7 +197,7 @@ label {
 }
 
 .row.appear {
-  animation: Appear 0.2s;
+  animation: Appear 0.5s;
 }
 
 .row.disappear {

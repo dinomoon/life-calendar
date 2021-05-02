@@ -10,6 +10,8 @@
     loggedIn,
     colArray,
     foldStore,
+    weekObj,
+    dayNum,
   } from '../store';
   import Modal from './Modal.svelte';
   import Annual from '../routes/tabs/Annual.svelte';
@@ -17,6 +19,7 @@
   import Weekly from '../routes/tabs/Weekly.svelte';
   import { fly } from 'svelte/transition';
   const transition = { y: -10, duration: 600 };
+  const FOLD_OBJ = 'fold-obj';
 
   let calendarGrid;
   let btns;
@@ -31,10 +34,10 @@
 
     // fold button 불러오기
     if ($activeTab !== 'annual') {
-      if (JSON.parse(localStorage.getItem('fold-obj')) === null) {
-        localStorage.setItem('fold-obj', JSON.stringify($foldStore));
+      if (JSON.parse(localStorage.getItem(FOLD_OBJ)) === null) {
+        localStorage.setItem(FOLD_OBJ, JSON.stringify($foldStore));
       }
-      foldStore.set(JSON.parse(localStorage.getItem('fold-obj')));
+      foldStore.set(JSON.parse(localStorage.getItem(FOLD_OBJ)));
       const obj = $foldStore[$activeTab];
 
       let hideNum;
@@ -67,14 +70,15 @@
           break;
         case 'monthly':
           clickedDay.set({
-            month: +e.target.dataset.col + 1,
             age: +e.target.dataset.row + 1,
+            month: +e.target.dataset.col + 1,
           });
           break;
         case 'weekly':
           clickedDay.set({
-            week: +e.target.dataset.col + 1,
             age: +e.target.dataset.row + 1,
+            week: +e.target.dataset.col + 1,
+            day: $weekObj[$dayNum],
           });
           break;
         default:
@@ -90,11 +94,12 @@
   function mouseoverHandler(e) {
     let column = null;
     const hoverColor = $colors['hover-item-color'];
-    const currentHoverColor = $colors['current-hover-item-color'];
+    const currentHoverItemColor = $colors['current-hover-item-color'];
+    const currentHoverTextColor = $colors['current-hover-text-color'];
     const target = e.target;
     if (target.classList.contains('item')) {
       if ($activeTab === 'annual') {
-        target.style.backgroundColor = currentHoverColor;
+        target.style.backgroundColor = currentHoverItemColor;
         target.style.color = $colors['item-background-color'];
         let age = target.textContent - $userInfo.birthday.year + 1;
         target.textContent = age;
@@ -103,7 +108,14 @@
         const hoverColIdx = target.dataset.col;
         column = calendarGrid.querySelectorAll(`[data-col="${hoverColIdx}"]`);
 
+        let idx;
+        column[0].children.length === 1 ? (idx = 0) : (idx = 1);
+        // column[0].children[idx].style.color = currentHoverTextColor;
+        column[0].children[idx].style.fontWeight = '800';
+
         let row = rows[hoverRowIdx];
+        // row.children[0].children[0].style.color = currentHoverTextColor;
+        row.children[0].children[0].style.fontWeight = '800';
         for (let i = 0; i < $colArray.length; i++) {
           row.children[i].style.backgroundColor = hoverColor;
         }
@@ -111,7 +123,7 @@
         column.forEach((item) => {
           item.style.backgroundColor = hoverColor;
         });
-        target.style.backgroundColor = currentHoverColor;
+        target.style.backgroundColor = currentHoverItemColor;
       }
     }
   }
@@ -135,8 +147,14 @@
         const hoverColIdx = target.dataset.col;
 
         column = calendarGrid.querySelectorAll(`[data-col="${hoverColIdx}"]`);
+        let idx;
+        column[0].children.length === 1 ? (idx = 0) : (idx = 1);
+        column[0].children[idx].style.color = '#000';
+        column[0].children[idx].style.fontWeight = '400';
 
         let row = rows[hoverRowIdx];
+        row.children[0].children[0].style.color = '#000';
+        row.children[0].children[0].style.fontWeight = '400';
         for (let i = 0; i < $colArray.length; i++) {
           row.children[i].style.backgroundColor = row.children[
             i
@@ -186,7 +204,7 @@
       return obj;
     });
 
-    localStorage.setItem('fold-obj', JSON.stringify($foldStore));
+    localStorage.setItem(FOLD_OBJ, JSON.stringify($foldStore));
     icon.classList.toggle('fold');
   }
 </script>

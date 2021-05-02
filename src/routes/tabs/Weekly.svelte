@@ -1,5 +1,12 @@
 <script>
-  import { userInfo, weekNum, rowArray, colArray, userAge } from '../../store';
+  import {
+    userInfo,
+    weekNum,
+    rowArray,
+    colArray,
+    userAge,
+    dayArray,
+  } from '../../store';
 
   import { createEventDispatcher } from 'svelte';
 
@@ -18,26 +25,13 @@
       {#each $colArray as _, colIdx}
         <div
           class="item"
-          class:past={rowIdx < $userAge}
+          class:past={rowIdx + 1 < $userAge ||
+            (rowIdx + 1 === $userAge && colIdx < $weekNum)}
           class:current={rowIdx + 1 === $userAge && colIdx + 1 === $weekNum}
-          class:vertical-past={rowIdx < $userAge && colIdx + 1 === $weekNum}
-          class:vertical-future={rowIdx + 1 > $userAge &&
-            (colIdx + 1) % 52 === $weekNum}
-          class:horizontal-past={rowIdx + 1 === $userAge && colIdx < $weekNum}
-          class:horizontal-future={rowIdx + 1 === $userAge &&
-            colIdx + 1 > $weekNum}
-          class:circle={$userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`] !==
-            undefined &&
-            $userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`].length !== 0}
           data-row={rowIdx}
           data-col={colIdx}
         >
-          {#if rowIdx === 0 && colIdx < 52}
-            <span
-              class="top-item cursor-default"
-              class:current-text={$weekNum === colIdx + 1}>{colIdx + 1}</span
-            >
-          {/if}
+          <!-- age -->
           {#if colIdx === 0}
             <span
               class="left-item cursor-default"
@@ -47,6 +41,8 @@
               {rowIdx + 1}
             </span>
           {/if}
+          <!-- // age -->
+
           <!-- fold button -->
           {#if (rowIdx === 0 || (rowIdx + 1) % 10 === 0) && colIdx === 51 && rowIdx !== 99}
             <button
@@ -58,6 +54,15 @@
             </button>
           {/if}
           <!-- // fold button -->
+
+          <!-- week -->
+          {#if rowIdx === 0 && colIdx < 52}
+            <span
+              class="top-item cursor-default"
+              class:current-text={$weekNum === colIdx + 1}>{colIdx + 1}</span
+            >
+          {/if}
+          <!-- // week -->
         </div>
       {/each}
     </div>
@@ -68,20 +73,20 @@
   .row {
     display: inline-grid;
     grid-template-columns: repeat(52, 21px);
-    gap: 3px;
+    gap: 2px;
   }
 
   .calendar--grid {
     grid-template-rows: repeat(100, 21px);
-    gap: 3px;
+    gap: 2px;
   }
 
-  .circle::before {
+  /* .circle::before {
     right: 3px;
     top: 3px;
     width: 5px;
     height: 5px;
-  }
+  } */
 
   .item {
     border-radius: 1px;
@@ -90,7 +95,7 @@
   .top-item,
   .left-item {
     position: absolute;
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .top-item {

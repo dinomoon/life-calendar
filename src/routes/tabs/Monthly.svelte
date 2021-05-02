@@ -52,13 +52,6 @@
           data-row={rowIdx}
           data-col={colIdx}
         >
-          <!-- month -->
-          {#if rowIdx === 0 && colIdx < 12}
-            <span class="month-name" class:current-text={$thisMonth === colIdx}
-              >{monthName[colIdx]}</span
-            >
-          {/if}
-          <!-- // month -->
           <!-- age -->
           {#if colIdx === 0}
             <span
@@ -70,6 +63,7 @@
             </span>
           {/if}
           <!-- // age -->
+
           <!-- fold button -->
           {#if (rowIdx === 0 || (rowIdx + 1) % 10 === 0) && colIdx === 11 && rowIdx !== 99}
             <button
@@ -79,8 +73,16 @@
             >
               <i class="fas fa-chevron-down" />
             </button>
-            <!-- // fold button -->
           {/if}
+          <!-- // fold button -->
+
+          <!-- month -->
+          {#if rowIdx === 0 && colIdx < 12}
+            <span class="month-name" class:current-text={$thisMonth === colIdx}
+              >{monthName[colIdx]}</span
+            >
+          {/if}
+          <!-- // month -->
         </div>
       {/each}
     </div>
@@ -93,18 +95,22 @@
     grid-template-columns: repeat(12, 60px);
     gap: 4px;
   }
+
   .calendar--grid {
     grid-template-rows: repeat(100, 30px);
     gap: 4px;
   }
+
   .circle::before {
     width: 6px;
     height: 6px;
   }
+
   .item .age {
     position: absolute;
     right: 130%;
   }
+
   .month-name {
     position: absolute;
     left: 50%;

@@ -9,102 +9,25 @@
     dayNum,
     thisMonth,
     dateNum,
+    dayArray,
   } from '../store.js';
   import { fly } from 'svelte/transition';
 
   let value = '';
   let isEmpty;
   let editor;
+  let days = [];
   const modalTransition = { y: -20, duration: 400 };
-
-  class UploadAdapter {
-    constructor(loader) {
-      this.loader = loader;
-    }
-
-    upload() {
-      return this.loader.file.then(
-        (file) =>
-          new Promise((resolve, reject) => {
-            this._initRequest();
-            this._initListeners(resolve, reject, file);
-            this._sendRequest(file);
-          }),
-      );
-    }
-    _initRequest() {
-      const xhr = (this.xhr = new XMLHttpRequest());
-      xhr.open(
-        'POST',
-        'https://firebasestorage.googleapis.com/v0/b/life-calendar-ce63c.appspot.com/o/images',
-        true,
-      );
-
-      xhr.responseType = 'json';
-    }
-
-    _initListeners(resolve, reject, file) {
-      const xhr = this.xhr;
-      const loader = this.loader;
-      const genericErrorText = '파일을 업로드 할 수 없습니다.';
-
-      xhr.addEventListener('error', () => {
-        reject(genericErrorText);
-      });
-      xhr.addEventListener('abort', () => reject());
-      xhr.addEventListener('load', () => {
-        const response = xhr.response;
-        if (!response || response.error) {
-          return reject(
-            response && response.error
-              ? response.error.message
-              : genericErrorText,
-          );
-        }
-
-        resolve({
-          default: response.url, //업로드된 파일 주소
-        });
-      });
-    }
-
-    _sendRequest(file) {
-      const data = new FormData();
-      data.append('upload', file);
-      this.xhr.send(data);
-    }
-  }
-
-  function MyCustomUploadAdapterPlugin(editor) {
-    editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
-      return new UploadAdapter(loader);
-    };
-  }
+  const placeholder =
+    '마크다운을 사용해 작성할 수 있어요! 혹시 모르신다면 도움말을 확인해보세요.';
 
   onMount(() => {
-    switch ($activeTab) {
-      case 'annual':
-        value = $userInfo.annual[$clickedDay.year] || '';
-        break;
-      case 'monthly':
-        value =
-          $userInfo.monthly[`${$clickedDay.age} ${$clickedDay.month}`] || '';
-        break;
-      case 'weekly':
-        value =
-          $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`] || '';
-        break;
-    }
-
-    value === '' ? (isEmpty = true) : (isEmpty = false);
-
     BalloonEditor.create(document.querySelector('#editor'), {
-      placeholder:
-        '마크다운을 사용해 작성할 수 있어요! 혹시 모르신다면 도움말을 확인해보세요.',
+      placeholder,
     })
       .then((newEditor) => {
         editor = newEditor;
-        editor.setData(value);
+        getData();
       })
       .catch((error) => {
         console.error(error);
@@ -115,6 +38,7 @@
     saveData();
   });
 
+  // clickHandler
   const clickHandler = async (e, dir) => {
     const date = e.target.id;
     const lastMonthOrWeek = date === 'month' ? 12 : 52;
@@ -124,6 +48,7 @@
     if (dir === 'prev') {
       $clickedDay[date] === 1
         ? clickedDay.set({
+            ...$clickedDay,
             age: $clickedDay.age - 1,
             [date]: lastMonthOrWeek,
           })
@@ -131,24 +56,58 @@
     } else if (dir === 'next') {
       $clickedDay[date] === lastMonthOrWeek
         ? clickedDay.set({
+            ...$clickedDay,
             age: $clickedDay.age + 1,
             [date]: 1,
           })
         : clickedDay.set({ ...$clickedDay, [date]: $clickedDay[date] + 1 });
     }
-
-    // 값 가져오기
-    if ($activeTab === 'annual') {
-      value = $userInfo[$activeTab][$clickedDay[date]] || '';
-    } else {
-      value =
-        $userInfo[$activeTab][`${$clickedDay.age} ${$clickedDay[date]}`] || '';
-    }
-
-    value === '' ? (isEmpty = true) : (isEmpty = false);
-    editor.setData(value);
+    getData();
   };
 
+  // keydownHandler
+  function keydownHandler(event) {
+    event.keyCode === 27 && showModal.set(false);
+  }
+
+  // dayClickHandler
+  function dayClickHandler(e) {
+    saveData();
+    const target = e.target;
+    if (target.classList.contains('day')) {
+      days.forEach((day) => {
+        day.classList.remove('today');
+      });
+      target.classList.add('today');
+      clickedDay.set({ ...$clickedDay, day: target.textContent });
+      getData();
+    }
+  }
+
+  // getData
+  function getData() {
+    switch ($activeTab) {
+      case 'annual':
+        value = $userInfo.annual[$clickedDay.year] || '';
+        break;
+      case 'monthly':
+        value =
+          $userInfo.monthly[`${$clickedDay.age} ${$clickedDay.month}`] || '';
+        break;
+      case 'weekly':
+        $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`] === undefined
+          ? (value = '')
+          : (value =
+              $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][
+                $clickedDay.day
+              ] || '');
+        break;
+    }
+    value === '' ? (isEmpty = true) : (isEmpty = false);
+    editor.setData(value);
+  }
+
+  // saveData
   function saveData() {
     if (editor.getData() !== '' || !isEmpty) {
       switch ($activeTab) {
@@ -182,7 +141,9 @@
             .set(
               {
                 weekly: {
-                  [`${$clickedDay.age} ${$clickedDay.week}`]: editor.getData(),
+                  [`${$clickedDay.age} ${$clickedDay.week}`]: {
+                    [$clickedDay.day]: editor.getData(),
+                  },
                 },
               },
               { merge: true },
@@ -191,13 +152,9 @@
       }
     }
   }
-
-  function handleKeydown(event) {
-    event.keyCode === 27 && showModal.set(false);
-  }
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window on:keydown={keydownHandler} />
 {#if $activeTab === 'annual'}
   <div class="backdrop" on:click|self>
     <div class="modal" in:fly={modalTransition}>
@@ -276,9 +233,11 @@
           />
         </div>
       </header>
-      <div class="day-wrap">
-        {#each ['일', '월', '화', '수', '목', '금', '토'] as day, idx}
-          <span class="day" class:today={$dayNum === idx}>{day}</span>
+      <div class="day-wrap" on:click={dayClickHandler}>
+        {#each $dayArray as day, idx}
+          <span class="day" class:today={$dayNum === idx} bind:this={days[idx]}
+            >{day}</span
+          >
         {/each}
       </div>
       <div id="editor" />
@@ -349,7 +308,7 @@
     align-items: baseline;
     padding-bottom: 20px;
     margin-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--gray-2);
     user-select: none;
   }
 

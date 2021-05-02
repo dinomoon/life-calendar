@@ -4,6 +4,7 @@ const time = new Date();
 export const colors = writable({
   'past-background-color': 'rgba(0,0,0,0.1)',
   'current-hover-item-color': 'rgba(0,0,0,0.4)',
+  'current-hover-text-color': '#ff922b',
   'hover-item-color': 'rgba(0,0,0,0.2)',
   'background-color': '#fdf9f1',
   'item-background-color': '#FFFEFC',
@@ -20,12 +21,7 @@ export const userId = writable(null);
 export const userInfo = writable(null);
 export const userDocId = writable(null);
 export const userAge = writable(null);
-export const clickedDay = writable({
-  year: null,
-  month: null,
-  week: null,
-  age: null,
-});
+export const clickedDay = writable(null);
 export const showModal = writable(false);
 export const date = writable(time);
 export const thisYear = writable(time.getFullYear());
@@ -33,7 +29,7 @@ export const thisMonth = writable(time.getMonth());
 export const dayNum = writable(time.getDay());
 export const dateNum = writable(time.getDate());
 export const weekNum = writable(null);
-export const week = writable({
+export const weekObj = writable({
   0: '일',
   1: '월',
   2: '화',
@@ -42,6 +38,7 @@ export const week = writable({
   5: '금',
   6: '토',
 });
+export const dayArray = writable(['일', '월', '화', '수', '목', '금', '토']);
 
 export const foldStore = writable({
   monthly: {
