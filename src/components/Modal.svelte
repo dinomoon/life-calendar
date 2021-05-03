@@ -7,16 +7,14 @@
     activeTab,
     showModal,
     dayNum,
-    thisMonth,
-    dateNum,
     dayArray,
   } from '../store.js';
   import { fly } from 'svelte/transition';
 
   let value = '';
-  let isEmpty;
   let editor;
   let days = [];
+  const userRef = db.collection('users').doc($userDocId);
   const modalTransition = { y: -20, duration: 400 };
   const placeholder =
     '마크다운을 사용해 작성할 수 있어요! 혹시 모르신다면 도움말을 확인해보세요.';
@@ -103,13 +101,11 @@
               ] || '');
         break;
     }
-    value === '' ? (isEmpty = true) : (isEmpty = false);
     editor.setData(value);
   }
 
   // saveData
   function saveData() {
-    if (editor.getData() !== '' || !isEmpty) {
       switch ($activeTab) {
         case 'annual':
           db.collection('users')
@@ -136,6 +132,30 @@
             );
           break;
         case 'weekly':
+          let greenCount = 0;
+          if ($userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`] !== undefined) {
+            if (editor.getData() === '') {
+              $dayArray.forEach(day => {
+                if ($userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][day] !== '' && $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][day] !== undefined) {
+                  greenCount++;
+                }
+              })
+              if ($userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][$clickedDay.day] !== '' && $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][$clickedDay.day] !== undefined) {
+                  greenCount--;
+              }
+            } else {
+              $dayArray.forEach(day => {
+                if ($userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][day] !== '' && $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][day] !== undefined) {
+                  greenCount++;
+                }
+              })
+              if ($userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][$clickedDay.day] === '' || $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][$clickedDay.day] === undefined) {
+                  greenCount++;
+              }
+            }
+          } else if (editor.getData() !== ''){
+            greenCount++;
+          }
           db.collection('users')
             .doc($userDocId)
             .set(
@@ -143,6 +163,7 @@
                 weekly: {
                   [`${$clickedDay.age} ${$clickedDay.week}`]: {
                     [$clickedDay.day]: editor.getData(),
+                    greenCount
                   },
                 },
               },
@@ -151,7 +172,6 @@
           break;
       }
     }
-  }
 </script>
 
 <svelte:window on:keydown={keydownHandler} />

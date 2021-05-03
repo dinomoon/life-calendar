@@ -160,7 +160,6 @@ label {
 
 .item.current {
   background-color: var(--current-item-color) !important;
-  border-color: #fff;
 }
 
 .vertical-past:hover,
@@ -203,4 +202,35 @@ label {
 .row.disappear {
   display: none !important;
   opacity: 0;
+}
+
+/* grass color */
+.item.green1 {
+  /* open color lime3 */
+  background-color: #c0eb75 !important;
+}
+
+.item.green2 {
+  /* open color lime4 */
+  background-color: #a9e34b !important;
+}
+
+.item.green3 {
+  background-color: #94d82d !important;
+}
+
+.item.green4 {
+  background-color: #82c91e !important;
+}
+
+.item.green5 {
+  background-color: #74b816 !important;
+}
+
+.item.green6 {
+  background-color: #66a80f !important;
+}
+
+.item.green7 {
+  background-color: #5c940d !important;
 }
