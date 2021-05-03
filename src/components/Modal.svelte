@@ -8,13 +8,14 @@
     showModal,
     dayNum,
     dayArray,
+    weekObj,
   } from '../store.js';
   import { fly } from 'svelte/transition';
 
   let value = '';
+  let isEmpty;
   let editor;
-  let days = [];
-  const userRef = db.collection('users').doc($userDocId);
+  let currentDay = $weekObj[$dayNum];
   const modalTransition = { y: -20, duration: 400 };
   const placeholder =
     '마크다운을 사용해 작성할 수 있어요! 혹시 모르신다면 도움말을 확인해보세요.';
@@ -36,7 +37,7 @@
     saveData();
   });
 
-  // clickHandler
+  // clickHandler - annual, month, week - prev, next
   const clickHandler = async (e, dir) => {
     const date = e.target.id;
     const lastMonthOrWeek = date === 'month' ? 12 : 52;
@@ -73,13 +74,42 @@
     saveData();
     const target = e.target;
     if (target.classList.contains('day')) {
-      days.forEach((day) => {
-        day.classList.remove('today');
-      });
-      target.classList.add('today');
+      currentDay = target.textContent;
       clickedDay.set({ ...$clickedDay, day: target.textContent });
       getData();
     }
+  }
+
+  // dayArrowClickHandler
+  function dayArrowClickHandler(dir) {
+    saveData();
+    let currentIdx = $dayArray.indexOf(currentDay);
+
+    if (dir === 'prev') {
+      if (currentDay === '일' && $clickedDay.week === 1) {
+        clickedDay.set({...$clickedDay, age: $clickedDay.age - 1, week: 52})
+      } else if (currentDay === '일') {
+        clickedDay.set({...$clickedDay, week: $clickedDay.week - 1})
+      }
+      currentIdx--;
+      if (currentIdx < 0) {
+        currentIdx = 6;
+      }
+    } else if (dir === 'next') {
+      if (currentDay === '토' && $clickedDay.week === 52) {
+        clickedDay.set({...$clickedDay, age: $clickedDay.age + 1, week: 1})
+      } else if (currentDay === '토') {
+        clickedDay.set({...$clickedDay, week: $clickedDay.week + 1})
+      }
+      
+      currentIdx++;
+      if (currentIdx > 6) {
+        currentIdx = 0;
+      }
+    }
+    currentDay = $dayArray[currentIdx];
+    clickedDay.set({...$clickedDay, day: currentDay})
+    getData();
   }
 
   // getData
@@ -101,12 +131,16 @@
               ] || '');
         break;
     }
+
+    value === '' ? isEmpty = true : isEmpty = false;
     editor.setData(value);
+    editor.focus();
   }
 
   // saveData
   function saveData() {
-      switch ($activeTab) {
+      if (editor.getData() !== '' || !isEmpty) {
+        switch ($activeTab) {
         case 'annual':
           db.collection('users')
             .doc($userDocId)
@@ -133,8 +167,10 @@
           break;
         case 'weekly':
           let greenCount = 0;
+          const value = editor.getData();
+
           if ($userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`] !== undefined) {
-            if (editor.getData() === '') {
+            if (value === '') {
               $dayArray.forEach(day => {
                 if ($userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][day] !== '' && $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][day] !== undefined) {
                   greenCount++;
@@ -153,23 +189,26 @@
                   greenCount++;
               }
             }
-          } else if (editor.getData() !== ''){
+          } else if (value !== ''){
             greenCount++;
           }
-          db.collection('users')
+          if (greenCount !== 0 || !isEmpty) {
+            db.collection('users')
             .doc($userDocId)
             .set(
               {
                 weekly: {
                   [`${$clickedDay.age} ${$clickedDay.week}`]: {
-                    [$clickedDay.day]: editor.getData(),
+                    [$clickedDay.day]: value,
                     greenCount
                   },
                 },
               },
               { merge: true },
             );
+          }
           break;
+      }
       }
     }
 </script>
@@ -254,11 +293,21 @@
         </div>
       </header>
       <div class="day-wrap" on:click={dayClickHandler}>
+        <i
+          class="prev fas fa-chevron-left"
+          on:click={(e) => dayArrowClickHandler('prev')}
+          class:hidden={$clickedDay.age === 1 && $clickedDay.week === 1 && $clickedDay.day === '일'}
+        />
         {#each $dayArray as day, idx}
-          <span class="day" class:today={$dayNum === idx} bind:this={days[idx]}
+          <span class="day" class:today={currentDay === day}
             >{day}</span
           >
         {/each}
+        <i
+          class="next fas fa-chevron-right"
+          on:click={(e) => dayArrowClickHandler('next')}
+          class:hidden={$clickedDay.age === 100 && $clickedDay.week === 52 && $clickedDay.day === '토'}
+        />
       </div>
       <div id="editor" />
     </div>
@@ -276,7 +325,7 @@
     width: 100%;
     height: 40px;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     user-select: none;
     margin-bottom: 1.5rem;
   }
@@ -360,7 +409,7 @@
     display: inline-block;
     font-size: 20px;
     padding: 10px;
-    color: rgba(0, 0, 0, 0.2);
+    color: rgba(0, 0, 0, 0.1);
     cursor: pointer;
   }
 
