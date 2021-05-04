@@ -309,6 +309,10 @@
           class:hidden={$clickedDay.age === 100 && $clickedDay.week === 52 && $clickedDay.day === '토'}
         />
       </div>
+      <div class="hash-tag__wrapper">
+        <input type="text" class="hasg-tag__input" placeholder="태그를 입력할 수 있어요.">
+        <div class="tag-container"></div>
+      </div>
       <div id="editor" />
     </div>
   </div>
@@ -409,5 +413,22 @@
 
   :global(.ck-editor__editable_inline ol, .ck-editor__editable_inline ul) {
     padding-left: 2rem;
+  }
+
+  .hash-tag__wrapper {
+    width: calc(50vw - 160px);
+  }
+
+  .hasg-tag__input {
+    width: 100%;
+    outline: none;
+    cursor: pointer;
+    background-color: #fff;
+    border: 1px solid #efefef;
+    padding: 0.8em 0.6em;
+  }
+
+  .hasg-tag__input:hover {
+    background-color: #efefef;
   }
 </style>
