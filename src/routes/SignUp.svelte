@@ -56,7 +56,7 @@
         errors.passwordConfirm = '';
       }
 
-      if (fields.password.length !== 0 && fields.passwordConfirm.length !== 0) {
+      if (fields.password.length >= 6) {
         if (fields.password === fields.passwordConfirm) {
           errors.password = '';
           errors.passwordConfirm = '';
@@ -95,10 +95,18 @@
 
         switch (errorCode) {
           case 'auth/email-already-in-use':
-            alert('이미 사용중인 이메일입니다. 😢')
+            Swal.fire({
+                text: '이미 사용중인 이메일입니다. 😢',
+                icon: 'error',
+                confirmButtonText: '확인'
+              })
             break;
           default:
-            alert('다른 이메일 또는 비밀번호를 사용해주세요.')
+            Swal.fire({
+              text: '다른 이메일 또는 비밀번호를 사용해주세요.',
+              icon: 'error',
+              confirmButtonText: '확인'
+            })
             return;
         }
         console.log(errorMessage);

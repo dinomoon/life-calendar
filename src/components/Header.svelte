@@ -8,9 +8,11 @@
     kakaoLoggedIn,
     activeTab,
     userInfo,
+    showHelpModal,
   } from '../store';
+import HelpModal from './HelpModal.svelte';
 
-  export let links;
+  export let rightTabs;
   let borderBottom = false;
   let obj = {
     로그인: 'login',
@@ -46,19 +48,26 @@
     }
   };
 
-  function clickHandler() {
+  function homeClickHandler() {
     if ($loggedIn) {
       push('/annual');
     } else {
       push('/');
     }
   }
+
+  function helpModalToggle() {
+    showHelpModal.update(showModal => {
+      showModal = !showModal;
+      return showModal;
+    });
+  }
 </script>
 
 <header class:loggedIn={$loggedIn} class:borderBottom>
   <div class="container">
     <h1>
-      <a href="/#/" on:click|preventDefault={clickHandler}>Life Calendar</a>
+      <a href="/#/" on:click|preventDefault={homeClickHandler}>Life Calendar</a>
     </h1>
     {#if $loggedIn && $userInfo}
       <nav>
@@ -76,18 +85,22 @@
       </nav>
     {/if}
     <nav>
-      <ul class="sign-tabs">
-        {#each links as link}
-          {#if link === '로그아웃'}
+      <ul class="right-tabs">
+        {#each rightTabs as tab}
+          {#if tab === '로그아웃'}
             <li on:click={logoutHandler}>
-              <button class="logout-btn" type="button">{link}</button>
+              <button class="logout-btn" type="button">{tab}</button>
+            </li>
+          {:else if tab === '도움말'}
+            <li on:click={helpModalToggle}>
+              <button type="button">{tab}</button>
             </li>
           {:else}
             <li>
               <a
-                href="/#/{obj[link]}"
-                class:signButton={link === '로그인' || link === '회원가입'}
-                >{link}</a
+                href="/#/{obj[tab]}"
+                class:signButton={tab === '로그인' || tab === '회원가입'}
+                >{tab}</a
               >
             </li>
           {/if}
@@ -96,6 +109,7 @@
     </nav>
   </div>
 </header>
+<HelpModal on:click={helpModalToggle} />
 
 <style>
   .activeTab {
@@ -139,7 +153,7 @@
     flex: 1;
   }
 
-  header.loggedIn .sign-tabs {
+  header.loggedIn .right-tabs {
     justify-content: flex-end;
   }
 

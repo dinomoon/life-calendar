@@ -53,7 +53,7 @@
     <div class="birth-form-container">
       <h2>태어난 연도를 입력해주세요.😊👀</h2>
       <form on:submit|preventDefault={submitHandler}>
-        <input type="number" bind:value={year} />
+        <input type="number" bind:value={year} placeholder="ex) 2000" />
         <button type="submit">시작하기</button>
       </form>
       <div class="birth-img-wrap">

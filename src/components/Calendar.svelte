@@ -5,7 +5,7 @@
     userInfo,
     colors,
     clickedDay,
-    showModal,
+    showItemModal,
     activeTab,
     loggedIn,
     colArray,
@@ -13,7 +13,7 @@
     weekObj,
     dayNum,
   } from '../store';
-  import Modal from './Modal.svelte';
+  import ItemModal from './ItemModal.svelte';
   import Annual from '../routes/tabs/Annual.svelte';
   import Monthly from '../routes/tabs/Monthly.svelte';
   import Weekly from '../routes/tabs/Weekly.svelte';
@@ -26,6 +26,8 @@
   let rows = [];
 
   onMount(() => {
+    window.scrollTo(0, 0);
+
     if ($loggedIn === false) {
       push('/');
     }
@@ -60,8 +62,8 @@
     }
   });
 
-  // clickHandler
-  const clickHandler = async (e) => {
+  // itemClickHandler
+  const itemClickHandler = async (e) => {
     const classList = e.target.classList;
     if (classList.contains('item')) {
       switch ($activeTab) {
@@ -84,9 +86,9 @@
         default:
           return;
       }
-      showModal.set(true);
+      showItemModal.set(true);
     } else if (classList.contains('backdrop')) {
-      showModal.set(false);
+      showItemModal.set(false);
     }
   };
 
@@ -215,13 +217,13 @@
       <!-- <div class="time">오늘은 {thisYear}년 {$thisMonth + 1}월 {date.getDate()}일 {$week[date.getDay()]}요일입니다.</div> -->
       {#if $activeTab === 'annual'}
         <Annual
-          on:click={clickHandler}
+          on:click={itemClickHandler}
           on:mouseover={mouseoverHandler}
           on:mouseout={mouseoutHandler}
         />
       {:else if $activeTab === 'monthly'}
         <Monthly
-          on:click={clickHandler}
+          on:click={itemClickHandler}
           on:mouseover={mouseoverHandler}
           on:mouseout={mouseoutHandler}
           on:hideHandler={hideHandler}
@@ -229,7 +231,7 @@
         />
       {:else if $activeTab === 'weekly'}
         <Weekly
-          on:click={clickHandler}
+          on:click={itemClickHandler}
           on:mouseover={mouseoverHandler}
           on:mouseout={mouseoutHandler}
           on:hideHandler={hideHandler}
@@ -238,8 +240,8 @@
       {/if}
     </div>
   {/if}
-  {#if $showModal}
-    <Modal on:click={clickHandler} />
+  {#if $showItemModal}
+    <ItemModal on:click={itemClickHandler} />
   {/if}
 </section>
 

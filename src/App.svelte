@@ -19,7 +19,7 @@
     thisYear,
   } from './store';
 
-  let links = [];
+  let rightTabs = [];
 
   $: if ($userDocId) {
     db.collection('users')
@@ -72,7 +72,7 @@
   }
 
   $: if ($loggedIn) {
-    links = ['도움말', '로그아웃'];
+    rightTabs = ['도움말', '로그아웃'];
     switch ($location) {
       case '/annual':
         activeTab.set('annual');
@@ -89,13 +89,13 @@
   } else {
     switch ($location) {
       case '/':
-        links = ['로그인'];
+        rightTabs = ['로그인'];
         break;
       case '/signup':
-        links = ['로그인'];
+        rightTabs = ['로그인'];
         break;
       case '/login':
-        links = ['회원가입'];
+        rightTabs = ['회원가입'];
         break;
       default:
         break;
@@ -103,7 +103,7 @@
   }
 </script>
 
-<Header {links} />
+<Header {rightTabs} />
 <Main>
   <Router {routes} />
 </Main>

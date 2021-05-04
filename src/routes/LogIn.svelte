@@ -43,16 +43,32 @@
 
           switch (errorCode) {
             case 'auth/invalid-email':
-              alert('아이디 또는 비밀번호를 확인해주세요.');
+              Swal.fire({
+                text: '이메일 또는 비밀번호를 확인해주세요.',
+                icon: 'error',
+                confirmButtonText: '확인'
+              })
               break;
             case 'auth/user-disabled':
-              alert('아이디 또는 비밀번호를 확인해주세요.');
+              Swal.fire({
+                text: '이메일 또는 비밀번호를 확인해주세요.',
+                icon: 'error',
+                confirmButtonText: '확인'
+              })
               break;
             case 'auth/user-not-found':
-              alert('이메일을 확인해주세요.');
+              Swal.fire({
+                text: '입력하신 이메일이 존재하지 않습니다.',
+                icon: 'error',
+                confirmButtonText: '확인'
+              })
               break;
             case 'auth/wrong-password':
-              alert('비밀번호를 확인해주세요.');
+              Swal.fire({
+                text: '비밀번호가 올바르지 않습니다.',
+                icon: 'error',
+                confirmButtonText: '확인'
+              })
               break;
             default:
               return;

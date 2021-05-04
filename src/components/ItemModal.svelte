@@ -5,7 +5,7 @@
     userDocId,
     userInfo,
     activeTab,
-    showModal,
+    showItemModal,
     dayNum,
     dayArray,
     weekObj,
@@ -66,7 +66,7 @@
 
   // keydownHandler
   function keydownHandler(event) {
-    event.keyCode === 27 && showModal.set(false);
+    event.keyCode === 27 && showItemModal.set(false);
   }
 
   // dayClickHandler
@@ -295,17 +295,17 @@
       <div class="day-wrap" on:click={dayClickHandler}>
         <i
           class="prev fas fa-chevron-left"
-          on:click={(e) => dayArrowClickHandler('prev')}
+          on:click={() => dayArrowClickHandler('prev')}
           class:hidden={$clickedDay.age === 1 && $clickedDay.week === 1 && $clickedDay.day === '일'}
         />
-        {#each $dayArray as day, idx}
+        {#each $dayArray as day}
           <span class="day" class:today={currentDay === day}
             >{day}</span
           >
         {/each}
         <i
           class="next fas fa-chevron-right"
-          on:click={(e) => dayArrowClickHandler('next')}
+          on:click={() => dayArrowClickHandler('next')}
           class:hidden={$clickedDay.age === 100 && $clickedDay.week === 52 && $clickedDay.day === '토'}
         />
       </div>
@@ -339,35 +339,16 @@
     cursor: pointer;
   }
 
-  .day.today {
-    background-color: var(--active-color);
+  .day:hover {
+    background-color: #ff8787;
     border-radius: 50%;
     color: #fff;
   }
 
-  .backdrop {
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    position: fixed;
-    background-color: rgba(0, 0, 0, 0.4);
-    z-index: 100;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .modal {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 50vw;
-    height: 80vh;
-    padding: 40px 80px 60px;
-    background-color: #fff;
-    border-radius: 4px;
-    overflow-y: auto;
+  .day.today {
+    background-color: var(--active-color);
+    border-radius: 50%;
+    color: #fff;
   }
 
   header {
@@ -413,9 +394,13 @@
     cursor: pointer;
   }
 
+  #year.prev, #year.next {
+    color: rgba(0, 0, 0, 0.2)
+  }
+
   .prev:hover,
   .next:hover {
-    color: rgba(0, 0, 0, 0.6);
+    color: rgba(0, 0, 0, 0.6) !important;
   }
 
   :global(.ck-editor__editable_inline) {
