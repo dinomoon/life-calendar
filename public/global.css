@@ -52,12 +52,7 @@ select,
 textarea {
   font-family: inherit;
   font-size: inherit;
-  -webkit-padding: 0.4em 0;
-  padding: 0.4em;
-  margin: 0 0 0.5em 0;
   border: 1px solid var(--past-background-color);
-  background-color: #fffefc;
-  border-radius: 2px;
 }
 
 button {
@@ -65,7 +60,7 @@ button {
 }
 
 input::placeholder {
-  color: #adb5bd;
+  color: #9b9b9b;
 }
 
 label {
@@ -194,6 +189,68 @@ label {
   overflow-y: auto;
 }
 
+.modal-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: baseline;
+  padding-bottom: 20px;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--gray-2);
+  user-select: none;
+}
+
+.modal-header h2 {
+  font-weight: normal;
+}
+
+.modal-header .left,
+.modal-header .right {
+  flex: 1;
+}
+
+.modal-header .right {
+  display: flex;
+  align-items: center;
+}
+
+.modal-header .left {
+  font-size: 20px;
+}
+
+.modal-header .right h2 {
+  font-size: 24px;
+  flex: 1;
+}
+
+.prev,
+.next {
+  display: inline-block;
+  font-size: 20px;
+  padding: 10px;
+  color: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+#year.prev,
+#year.next {
+  color: rgba(0, 0, 0, 0.2);
+}
+
+.prev:hover,
+.next:hover {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.ck-editor__editable_inline {
+  width: calc(50vw - 160px);
+}
+
+.ck-editor__editable_inline ol,
+.ck-editor__editable_inline ul {
+  padding-left: 2rem;
+}
+
 /* fold animation */
 @keyframes Appear {
   0% {
@@ -257,4 +314,54 @@ label {
 
 .item.green7 {
   background-color: #5c940d !important;
+}
+
+/* tag */
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  width: calc(50vw - 160px);
+  padding-top: 6px;
+  padding-left: 6px;
+  border: 1px solid #efefef;
+  user-select: none;
+}
+
+.tag {
+  color: #fff;
+  background-color: #ff8787;
+  padding-left: 10px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.tag-remove {
+  padding: 5px 10px;
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.tag-input-container {
+  flex: 1;
+  margin-left: 5px;
+  margin-bottom: 5px;
+}
+
+.tag-input {
+  color: #9b9b9b;
+  width: 100%;
+  padding: 5px 0;
+  outline: none;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  margin: 0;
+}
+
+.tag-container:hover {
+  background-color: #efefef;
 }

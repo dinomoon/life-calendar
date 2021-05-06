@@ -9,6 +9,7 @@ export const colors = writable({
   'background-color': '#fdf9f1',
   'item-background-color': '#FFFEFC',
 });
+export const modalTransition = writable({ y: -20, duration: 400 });
 export const loading = writable(false);
 export const loggedIn = writable(false);
 export const firebaseLoggedIn = writable(false);
@@ -67,3 +68,5 @@ export const foldStore = writable({
     90: false,
   },
 });
+
+export const tagArray = writable([]);

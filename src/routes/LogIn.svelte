@@ -253,6 +253,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-bottom: 0.5em;
   }
 
   .social-login button i {

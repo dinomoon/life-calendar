@@ -10,9 +10,8 @@
       class="item"
       class:past={colIdx + 1 < $userAge}
       class:current={colIdx + 1 === $userAge}
-      class:circle={$userInfo.annual[$userInfo.birthday.year + colIdx] !==
-        undefined &&
-        $userInfo.annual[$userInfo.birthday.year + colIdx].length !== 0}
+      class:circle={$userInfo.annual[$userInfo.birthday.year + colIdx] != null
+        && $userInfo.annual[$userInfo.birthday.year + colIdx].length !== 0}
       data-year={$userInfo.birthday.year + colIdx}
     >
       {$userInfo.birthday.year + colIdx}

@@ -21,16 +21,16 @@
           class:past={rowIdx + 1 < $userAge ||
             (rowIdx + 1 === $userAge && colIdx < $weekNum)}
           class:current={rowIdx + 1 === $userAge && colIdx + 1 === $weekNum}
-          class:green1={$userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`] !== undefined && $userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`].greenCount === 1}
-          class:green2={$userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`] !== undefined && $userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`].greenCount === 2}
-          class:green3={$userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`] !== undefined && $userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`].greenCount === 3}
-          class:green4={$userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`] !== undefined && $userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`].greenCount === 4}
-          class:green5={$userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`] !== undefined && $userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`].greenCount === 5}
-          class:green6={$userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`] !== undefined && $userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`].greenCount === 6}
-          class:green7={$userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`] !== undefined && $userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`].greenCount === 7}
+          class:green1={$userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`] != null && $userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`].greenCount === 1}
+          class:green2={$userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`] != null && $userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`].greenCount === 2}
+          class:green3={$userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`] != null && $userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`].greenCount === 3}
+          class:green4={$userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`] != null && $userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`].greenCount === 4}
+          class:green5={$userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`] != null && $userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`].greenCount === 5}
+          class:green6={$userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`] != null && $userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`].greenCount === 6}
+          class:green7={$userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`] != null && $userInfo.weekly[`${rowIdx + 1} ${colIdx + 1}`].greenCount === 7}
           data-row={rowIdx}
           data-col={colIdx}
-          >
+        >
           <!-- age -->
           {#if colIdx === 0}
             <span

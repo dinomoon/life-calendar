@@ -102,4 +102,10 @@
   .birth-img-wrap .birthday-img {
     margin-top: 10rem;
   }
+
+  button {
+    background-color: #fff;
+    padding: 0 10px;
+    cursor: pointer;
+  }
 </style>

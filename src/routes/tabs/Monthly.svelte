@@ -46,9 +46,8 @@
           class:horizontal-past={rowIdx + 1 === $userAge && colIdx < $thisMonth}
           class:horizontal-future={rowIdx + 1 === $userAge &&
             colIdx > $thisMonth}
-          class:circle={$userInfo.monthly[`${rowIdx + 1} ${colIdx + 1}`] !==
-            undefined &&
-            $userInfo.monthly[`${rowIdx + 1} ${colIdx + 1}`].length !== 0}
+          class:circle={$userInfo.monthly[`${rowIdx + 1} ${colIdx + 1}`] != null
+            && $userInfo.monthly[`${rowIdx + 1} ${colIdx + 1}`].length !== 0}
           data-row={rowIdx}
           data-col={colIdx}
         >
