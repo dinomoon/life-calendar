@@ -7,6 +7,11 @@
     if ($loggedIn === false) {
       push('/');
     }
+
+    // 시작 주 찾기
+    console.log(moment().year(2021).month(7).startOf('isoWeek').isoWeek());
+    console.log(moment().year(2021).month(5).startOf('month').isoWeek());
+    // console.log(moment().year(2021).month(7).startOf('month'));
   });
 
   // keydownHandler
@@ -19,56 +24,87 @@
 {#if $showHelpModal}
   <div class="backdrop" on:click|self>
     <div class="modal help">
-      <h2 class="title">마크다운 사용법</h2>
-      <section>
-        <h3 class="sub-title">제목</h3>
-        <p class="desc">3단계로 제목을 표현할 수 있습니다.</p>
+      <article class="tag-article">
+        <h2 class="title">태그 사용법</h2>
+        <p class="desc">태그명을 쓰고 <span class="underline">한 칸 띄고</span> 시간을 적어주세요.</p>
         <div class="code-wrap">
           <code>
-            <div># 제목1</div>
-            <div>## 제목2</div>
-            <div>### 제목3</div>
+            <div>독서 1:20 -> 독서 1시간 20분</div>
+            <div>운동 :20 -> 운동 20분</div>
+            <div>공부 4 -> 공부 4시간</div>
           </code>
         </div>
-      </section>
-      <section>
-        <h3 class="sub-title">목록</h3>
-        <p class="desc">순서가 없는 목록과 순서가 있는 목록으로 표현할 수 있습니다.</p>
-        <div class="code-wrap">
-          <code>
-            <div>1. 리스트 아이템1</div>
-            <div>2. 리스트 아이템2</div>
-            <div class="padding-left">1. 리스트 아이템2-1</div>
-            <div class="padding-left">2. 리스트 아이템2-2</div>
-          </code>
-        </div>
-        <div class="code-wrap">
-          <code>
-            <div>- 리스트 아이템1</div>
-            <div>- 리스트 아이템2</div>
-          </code>
-        </div>
-      </section>
-      <section>
-        <h3 class="sub-title">인용문</h3>
-        <p class="desc">남의 말이나 글에서 직접 또는 간접으로 따온 문장(네이버 국어 사전)</p>
-        <div class="code-wrap">
-          <code>
-            <div>> 인용문</div>
-          </code>
-        </div>
-      </section>
+      </article>
+      <article class="markdown-article">
+        <h2 class="title">마크다운 사용법</h2>
+        <section>
+          <h3 class="sub-title">제목</h3>
+          <p class="desc">3단계로 제목을 표현할 수 있습니다.</p>
+          <div class="code-wrap">
+            <code>
+              <div># 제목1</div>
+              <div>## 제목2</div>
+              <div>### 제목3</div>
+            </code>
+          </div>
+        </section>
+        <section>
+          <h3 class="sub-title">목록</h3>
+          <p class="desc">순서가 없는 목록과 순서가 있는 목록으로 표현할 수 있습니다.</p>
+          <div class="code-wrap">
+            <code>
+              <div>1. 리스트 아이템1</div>
+              <div>2. 리스트 아이템2</div>
+              <div class="padding-left">1. 리스트 아이템2-1</div>
+              <div class="padding-left">2. 리스트 아이템2-2</div>
+            </code>
+          </div>
+          <div class="code-wrap">
+            <code>
+              <div>- 리스트 아이템1</div>
+              <div>- 리스트 아이템2</div>
+            </code>
+          </div>
+        </section>
+        <section>
+          <h3 class="sub-title">인용문</h3>
+          <p class="desc">남의 말이나 글에서 직접 또는 간접으로 따온 문장(네이버 국어 사전)</p>
+          <div class="code-wrap">
+            <code>
+              <div>> 인용문</div>
+            </code>
+          </div>
+        </section>
+      </article>
     </div>
   </div>
 {/if}
 
 <style>
-  .modal.help {
-    padding: 60px 80px;
+  article {
+    margin-bottom: 3rem;
+    padding-bottom: 1rem;
   }
 
   section {
     margin-bottom: 3rem;
+  }
+
+  .underline {
+    text-decoration: underline;
+  }
+
+  .tag-article {
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .markdown-article {
+    margin: 0;
+    padding: 0;
+  }
+  
+  .modal.help {
+    padding: 60px 80px;
   }
 
   .title {

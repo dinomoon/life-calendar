@@ -40,8 +40,8 @@ export const weekObj = writable({
   5: '금',
   6: '토',
 });
-export const dayArray = writable(['일', '월', '화', '수', '목', '금', '토']);
-
+export const dayArray = writable(['월', '화', '수', '목', '금', '토', '일']);
+export const clickedYearWeekPeriod = writable(null);
 export const foldStore = writable({
   monthly: {
     1: false,
@@ -68,5 +68,3 @@ export const foldStore = writable({
     90: false,
   },
 });
-
-export const tagArray = writable([]);

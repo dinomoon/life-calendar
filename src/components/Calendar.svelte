@@ -72,12 +72,14 @@
           break;
         case 'monthly':
           clickedDay.set({
+            year: +e.target.dataset.row + $userInfo.birthday.year,
             age: +e.target.dataset.row + 1,
             month: +e.target.dataset.col + 1,
           });
           break;
         case 'weekly':
           clickedDay.set({
+            year: +e.target.dataset.row + $userInfo.birthday.year,
             age: +e.target.dataset.row + 1,
             week: +e.target.dataset.col + 1,
             day: $weekObj[$dayNum],
@@ -87,8 +89,10 @@
           return;
       }
       showItemModal.set(true);
+      document.body.classList.add('showModal');
     } else if (classList.contains('backdrop')) {
       showItemModal.set(false);
+      document.body.classList.remove('showModal');
     }
   };
 
@@ -112,12 +116,8 @@
 
         let idx;
         column[0].children.length === 1 ? (idx = 0) : (idx = 1);
-        // column[0].children[idx].style.color = currentHoverTextColor;
-        column[0].children[idx].style.fontWeight = '800';
 
         let row = rows[hoverRowIdx];
-        // row.children[0].children[0].style.color = currentHoverTextColor;
-        row.children[0].children[0].style.fontWeight = '800';
         for (let i = 0; i < $colArray.length; i++) {
           row.children[i].style.backgroundColor = hoverColor;
         }
@@ -151,12 +151,8 @@
         column = calendarGrid.querySelectorAll(`[data-col="${hoverColIdx}"]`);
         let idx;
         column[0].children.length === 1 ? (idx = 0) : (idx = 1);
-        column[0].children[idx].style.color = '#000';
-        column[0].children[idx].style.fontWeight = '400';
 
         let row = rows[hoverRowIdx];
-        row.children[0].children[0].style.color = '#000';
-        row.children[0].children[0].style.fontWeight = '400';
         for (let i = 0; i < $colArray.length; i++) {
           row.children[i].style.backgroundColor = row.children[
             i
@@ -214,7 +210,6 @@
 <section>
   {#if $userInfo}
     <div class="container" in:fly={transition}>
-      <!-- <div class="time">오늘은 {thisYear}년 {$thisMonth + 1}월 {date.getDate()}일 {$week[date.getDay()]}요일입니다.</div> -->
       {#if $activeTab === 'annual'}
         <Annual
           on:click={itemClickHandler}

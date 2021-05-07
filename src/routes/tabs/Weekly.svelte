@@ -1,5 +1,5 @@
 <script>
-  import { weekNum, rowArray, colArray, userAge, userInfo, dayArray } from '../../store';
+  import { weekNum, rowArray, colArray, userAge, userInfo } from '../../store';
 
   import { createEventDispatcher } from 'svelte';
 

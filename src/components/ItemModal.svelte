@@ -9,7 +9,6 @@
     dayNum,
     dayArray,
     weekObj,
-    tagArray,
   } from '../store.js';
 
   import AnnualModal from './AnnualModal.svelte';
@@ -20,6 +19,8 @@
   let editor;
   let currentDay = $weekObj[$dayNum];
   let tags = [];
+  const FIRST_DAY_OF_WEEK = '월';
+  const LAST_DAY_OF_WEEK = '일';
   const placeholder =
     '마크다운을 사용해 작성할 수 있어요! 혹시 모르신다면 도움말을 확인해보세요.';
 
@@ -91,9 +92,9 @@
     let currentIdx = $dayArray.indexOf(currentDay);
 
     if (dir === 'prev') {
-      if (currentDay === '일' && $clickedDay.week === 1) {
+      if (currentDay === FIRST_DAY_OF_WEEK && $clickedDay.week === 1) {
         clickedDay.set({...$clickedDay, age: $clickedDay.age - 1, week: 52})
-      } else if (currentDay === '일') {
+      } else if (currentDay === FIRST_DAY_OF_WEEK) {
         clickedDay.set({...$clickedDay, week: $clickedDay.week - 1})
       }
       
@@ -102,9 +103,9 @@
         currentIdx = 6;
       }
     } else if (dir === 'next') {
-      if (currentDay === '토' && $clickedDay.week === 52) {
+      if (currentDay === LAST_DAY_OF_WEEK && $clickedDay.week === 52) {
         clickedDay.set({...$clickedDay, age: $clickedDay.age + 1, week: 1})
-      } else if (currentDay === '토') {
+      } else if (currentDay === LAST_DAY_OF_WEEK) {
         clickedDay.set({...$clickedDay, week: $clickedDay.week + 1})
       }
       
@@ -217,38 +218,20 @@
 
   // tagSubmitHandler
   function tagSubmitHandler(e) {
-    const keyCode = e.detail.keyCode;
-    const value = e.detail.tagInputValue;
-    // enter keyCode 13
-    if (keyCode === 13 && value !== '') {
-      tags = [...tags, value];
-      tagsUpdateToDB();
+    const value = e.detail.value;
+    const time = e.detail.minResult;
+    const newTag = {
+      id: tags.length,
+      value,
+      time,
     }
+    tags = [...tags, newTag];
   }
 
   // tagRemoveHandler
   function tagRemoveHandler(e) {
-    const id = e.detail.currentTarget.dataset.id;
-    tags = tags.filter((tag, idx) => idx != id);
-    tagsUpdateToDB();
-  }
-
-  // tagsUpdateToDB
-  function tagsUpdateToDB() {
-    db.collection('users')
-      .doc($userDocId)
-      .set(
-        {
-          weekly: {
-            [`${$clickedDay.age} ${$clickedDay.week}`]: {
-              [$clickedDay.day]: {
-                tags
-              }
-            },
-          },
-        },
-        { merge: true },
-      );
+    const id = e.detail;
+    tags = tags.filter((tag) => tag.id != id);
   }
 </script>
 

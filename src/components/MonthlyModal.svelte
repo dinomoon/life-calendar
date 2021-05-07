@@ -10,15 +10,19 @@
       dir,
     })
   }
+
+  $: year = moment().year($clickedDay.year);
+  $: startWeek = year.month($clickedDay.month - 1).startOf('isoMonth').isoWeek();
+  $: nextStartWeek = year.month($clickedDay.month).startOf('isoMonth').isoWeek();
+  $: endWeek = nextStartWeek - 1;
 </script>
 
 <div class="backdrop" on:click|self>
   <div class="modal" in:fly={$modalTransition}>
     <header class="modal-header">
-      <h2 class="age left">
-        {$userInfo.birthday.year +
-          $clickedDay.age -
-          1}년&nbsp;({$clickedDay.age})
+      <h2 class="left">
+        {$userInfo.birthday.year + $clickedDay.age - 1}년
+        <span class="age">({$clickedDay.age})</span>
       </h2>
       <div class="right">
         <i
@@ -34,6 +38,13 @@
         />
       </div>
     </header>
+    {startWeek}주 ~ {endWeek}주
     <div id="editor" />
   </div>
 </div>
+
+<style>
+  .left .age {
+    font-size: 14px;
+  }
+</style>

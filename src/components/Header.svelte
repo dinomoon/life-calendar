@@ -10,7 +10,7 @@
     userInfo,
     showHelpModal,
   } from '../store';
-import HelpModal from './HelpModal.svelte';
+  import HelpModal from './HelpModal.svelte';
 
   export let rightTabs;
   let borderBottom = false;
@@ -57,6 +57,12 @@ import HelpModal from './HelpModal.svelte';
   }
 
   function helpModalToggle() {
+    if ($showHelpModal) {
+      document.body.classList.remove('showModal')
+    } else {
+      document.body.classList.add('showModal')
+    }
+
     showHelpModal.update(showModal => {
       showModal = !showModal;
       return showModal;

@@ -1,10 +1,9 @@
 <script>
-  import { date, weekNum } from '../store';
+  import { weekNum } from '../store';
   import { onMount } from 'svelte';
-  import { weekNumber } from '../../public/weekNum.js';
 
   onMount(() => {
-    weekNum.set(weekNumber($date));
+    weekNum.set(moment().isoWeek());
   });
 </script>
 

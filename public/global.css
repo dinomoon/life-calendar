@@ -32,6 +32,9 @@ body {
     sans-serif;
   background-color: var(--background-color);
 }
+body.showModal {
+  overflow-y: hidden;
+}
 
 a {
   text-decoration: none;
@@ -221,6 +224,26 @@ label {
 .modal-header .right h2 {
   font-size: 24px;
   flex: 1;
+}
+
+h2.left,
+.right h2 {
+  position: relative;
+}
+
+.left .age,
+.right .date-period {
+  position: absolute;
+  bottom: 2px;
+  margin-left: 5px;
+}
+
+.left .age {
+  font-size: 14px;
+}
+
+.right .date-period {
+  font-size: 12px;
 }
 
 .prev,
