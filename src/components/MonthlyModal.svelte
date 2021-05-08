@@ -12,9 +12,28 @@
   }
 
   $: year = moment().year($clickedDay.year);
-  $: startWeek = year.month($clickedDay.month - 1).startOf('isoMonth').isoWeek();
-  $: nextStartWeek = year.month($clickedDay.month).startOf('isoMonth').isoWeek();
-  $: endWeek = nextStartWeek - 1;
+  $: month = year.month($clickedDay.month - 1);
+  $: monthStartDay = month.startOf('month').isoWeekday();
+  $: monthEndDay = month.endOf('month').isoWeekday();
+  let startWeek;
+  let endWeek;
+
+  $: if (monthStartDay < 5) {
+    // 월화수일 때
+    startWeek = month.startOf('month').isoWeek();
+  } else {
+    startWeek = month.startOf('month').isoWeek() + 1;
+  }
+
+  $: if (monthEndDay < 4) {
+    endWeek = month.endOf('month').isoWeek() - 1;
+  } else {
+    endWeek = month.endOf('month').isoWeek();
+  }
+
+  $: if ($clickedDay.month === 1 && startWeek > monthEndDay) {
+    startWeek = 1;
+  }
 </script>
 
 <div class="backdrop" on:click|self>
@@ -38,7 +57,7 @@
         />
       </div>
     </header>
-    {startWeek}주 ~ {endWeek}주
+    {startWeek} - {endWeek}
     <div id="editor" />
   </div>
 </div>

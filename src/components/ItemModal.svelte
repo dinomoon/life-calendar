@@ -53,6 +53,7 @@
       $clickedDay[date] === 1
         ? clickedDay.set({
             ...$clickedDay,
+            year: $clickedDay.year - 1,
             age: $clickedDay.age - 1,
             [date]: lastMonthOrWeek,
           })
@@ -61,6 +62,7 @@
       $clickedDay[date] === lastMonthOrWeek
         ? clickedDay.set({
             ...$clickedDay,
+            year: $clickedDay.year + 1,
             age: $clickedDay.age + 1,
             [date]: 1,
           })

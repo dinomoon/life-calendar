@@ -8,10 +8,7 @@
       push('/');
     }
 
-    // 시작 주 찾기
-    console.log(moment().year(2021).month(7).startOf('isoWeek').isoWeek());
-    console.log(moment().year(2021).month(5).startOf('month').isoWeek());
-    // console.log(moment().year(2021).month(7).startOf('month'));
+    console.log(moment().year(2021).isoWeek(54).startOf('isoWeek'))
   });
 
   // keydownHandler

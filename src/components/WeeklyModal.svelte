@@ -7,10 +7,13 @@
   export let currentDay;
   export let tags = [];
   let tagInputValue = '';
-  $: year = moment().year($clickedDay.year);
-  $: month = year.isoWeek($clickedDay.week).month();
-  $: startDate = year.month(month).startOf('isoWeek').date();
-  $: endDate = year.month(month).endOf('isoWeek').date();
+
+  $: startOfWeek = moment().year($clickedDay.year).isoWeek($clickedDay.week).startOf('isoWeek');
+  $: endOfWeek = moment().year($clickedDay.year).isoWeek($clickedDay.week).endOf('isoWeek');
+  $: startMonth = startOfWeek.month() + 1;
+  $: startDate = startOfWeek.date();
+  $: endMonth = endOfWeek.month() + 1;
+  $: endDate = endOfWeek.date();
 
   function clickHandler(date, dir) {
     dispatch('clickHandler', {
@@ -96,17 +99,7 @@
         <h2>
           {$clickedDay.week}주
           <span class="date-period">
-            {month + 1}/{startDate}
-            ~
-            {#if startDate > endDate}
-              {#if month + 2 === 13}
-                1/{endDate}
-              {:else}
-                {month + 2}/{endDate}
-              {/if}
-            {:else}
-              {month + 1}/{endDate}
-            {/if}
+            {startMonth}/{startDate} ~ {endMonth}/{endDate}
           </span>
         </h2>
         <i
