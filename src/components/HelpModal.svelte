@@ -7,8 +7,6 @@
     if ($loggedIn === false) {
       push('/');
     }
-
-    console.log(moment().year(2021).isoWeek(54).startOf('isoWeek'))
   });
 
   // keydownHandler
@@ -21,17 +19,6 @@
 {#if $showHelpModal}
   <div class="backdrop" on:click|self>
     <div class="modal help">
-      <article class="tag-article">
-        <h2 class="title">태그 사용법</h2>
-        <p class="desc">태그명을 쓰고 <span class="underline">한 칸 띄고</span> 시간을 적어주세요.</p>
-        <div class="code-wrap">
-          <code>
-            <div>독서 1:20 -> 독서 1시간 20분</div>
-            <div>운동 :20 -> 운동 20분</div>
-            <div>공부 4 -> 공부 4시간</div>
-          </code>
-        </div>
-      </article>
       <article class="markdown-article">
         <h2 class="title">마크다운 사용법</h2>
         <section>
@@ -85,14 +72,6 @@
 
   section {
     margin-bottom: 3rem;
-  }
-
-  .underline {
-    text-decoration: underline;
-  }
-
-  .tag-article {
-    border-bottom: 1px solid var(--border-color);
   }
 
   .markdown-article {

@@ -352,12 +352,10 @@ h2.left,
 
 .tag {
   color: #fff;
-  background-color: #ff8787;
   padding-left: 10px;
   margin-right: 5px;
   margin-bottom: 5px;
   border-radius: 4px;
-  cursor: pointer;
 }
 
 .tag-remove {

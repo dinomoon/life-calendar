@@ -1,12 +1,17 @@
 <script>
-  import { userInfo, clickedDay, modalTransition, dayArray } from "../store";
+  import { userInfo, clickedDay, modalTransition, dayArray, lastColorIdx } from "../store";
   import { fly } from 'svelte/transition';
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
   
   export let currentDay;
+  export let allTags = [];
   export let tags = [];
   let tagInputValue = '';
+  let showAllTags = false;
+  let tagMouseEnter = false;
+  const tagColors = ['#ff8787', '#f783ac', '#da77f2', '#9775fa', '#748ffc', '#4dabf7', '#3bc9db', '#38d9a9', '#69db7c', '#a9e34b', '#ffd43b', '#ffa94d'];
+  const COLOR_COUNT = tagColors.length;
 
   $: startOfWeek = moment().year($clickedDay.year).isoWeek($clickedDay.week).startOf('isoWeek');
   $: endOfWeek = moment().year($clickedDay.year).isoWeek($clickedDay.week).endOf('isoWeek');
@@ -30,58 +35,52 @@
     dispatch('dayArrowClickHandler', dir)
   }
 
-  function tagSubmitHandler(e) {
-    const keyCode = e.keyCode;
-    if (keyCode === 13 && tagInputValue !== '') {
-      const text = tagInputValue.split(" ")[0];
-      const time = tagInputValue.split(" ")[1];
-      let timeArray;
-      let hour;
-      let min;
-      let value;
-      let minResult;
-
-      if (time !== undefined) {
-        timeArray = time.split(':');
-
-        if (time.indexOf(':') === -1) {
-          // 숫자만 있는 경우 (: 이 없는 경우) (시간만 있는)
-          hour = +time;
-          min = 0;
-          hour === 0 ? minResult = null : minResult = hour * 60;
-        } else {
-          // : 이 있는 경우 (시간 + 분 또는 분만 있는)
-          hour = +timeArray[0];
-          min = +timeArray[1];
-          minResult = hour * 60 + min;
-        }
-
-        if (hour !== 0 && min === 0) {
-          value = `${text} ${hour}시간`;
-        } else if (hour === 0 && min !== 0) {
-          value = `${text} ${min}분`;
-        } else if (hour !== 0 && min !== 0) {
-          value = `${text} ${hour}시간 ${min}분`;
-        }
-      } else {
-        value = text;
-        minResult = 0;
-      }
-      
-      dispatch('tagSubmitHandler', {
-        value, minResult
-      })
-      tagInputValue = '';
+  function randomColor() {
+    let randomIdx;
+    randomIdx = Math.floor(Math.random() * COLOR_COUNT);
+    // 직전에 추가한 태그의 색상과 다르게 만들기
+    while ($lastColorIdx === randomIdx) {
+      randomIdx = Math.floor(Math.random() * COLOR_COUNT);
     }
+    lastColorIdx.set(randomIdx);
+    return tagColors[randomIdx];
   }
 
-  function tagRemoveHandler(id) {
-    dispatch('tagRemoveHandler', id)
+  function tagSubmitHandler(e) {
+    const keyCode = e.keyCode;
+    if (keyCode === 13) {
+      if (tagInputValue.trim() !== '') {
+        const color = randomColor();
+        
+        dispatch('tagSubmitHandler', {
+          tagInputValue,
+          color
+        })
+        tagInputValue = '';
+      } else {
+        tagInputValue = '';
+      }
+    }
+  }
+  
+  function tagRemoveHandler(value, type) {
+    dispatch('tagRemoveHandler', {
+      value,
+      type
+    })
+  }
+
+  function tagClickHandler(e) {
+    if (e.target.dataset.type === 'tag') {
+      showAllTags = true;
+    } else {
+      showAllTags = false;
+    }
   }
 </script>
 
 <div class="backdrop" on:click|self>
-  <div class="modal" in:fly={$modalTransition}>
+  <div class="modal" in:fly={$modalTransition} on:click={(e) => tagClickHandler(e)}>
     <header class="modal-header">
       <h2 class="left">
         {$userInfo.birthday.year + $clickedDay.age - 1}년
@@ -127,23 +126,50 @@
         class:hidden={$clickedDay.age === 100 && $clickedDay.week === 52 && $clickedDay.day === '토'}
       />
     </div>
-    <div class="tag-container">
-      {#each tags as tag (tag.id)}
-        <div class="tag">
-          <span>{tag.value}</span>
-          <button class="tag-remove" on:click={() => tagRemoveHandler(tag.id)}>
-            <i class="fas fa-times"></i>
+    <div
+      class="tag-container"
+      data-type='tag'
+    >
+      {#each tags as tag}
+        <div class="tag" style="background-color: {tag.color}">
+          <span data-type='tag'>{tag.value}</span>
+          <button data-type='tag' class="tag-remove" on:click={() => tagRemoveHandler(tag.value, 'onlyThis')}>
+            <i data-type='tag' class="fas fa-times"></i>
           </button>
         </div>
       {/each}
       <div class="tag-input-container">
         <input
+          data-type='tag'
           type="text"
           class="tag-input"
-          placeholder="도움말에서 태그 입력 방식을 확인할 수 있어요."
+          placeholder="태그를 추가해보세요."
           on:keydown={(e) => {tagSubmitHandler(e)}} bind:value={tagInputValue}
         >
       </div>
+    </div>
+    {#if showAllTags && allTags.length !== 0}
+      <div
+        class="all-tags-container tag-container"
+        data-type='tag'
+        on:click={(e) => {console.log(e.target)}}
+      >
+        {#each allTags as tag}
+          <div data-type='tag' class="tag" style="background-color: {tag.color}">
+            <span data-type='tag'>{tag.value}</span>
+            <button data-type='tag' class="tag-remove" on:click={() => tagRemoveHandler(tag.value, 'all')}>
+              <i data-type='tag' class="fas fa-times"></i>
+            </button>
+          </div>
+        {/each}
+      </div>
+    {/if}
+    <div class="select-container">
+      <select>
+        <option value="자기계발">
+          자기계발
+        </option>
+      </select>
     </div>
     <div id="editor" />
   </div>

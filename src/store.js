@@ -68,3 +68,6 @@ export const foldStore = writable({
     90: false,
   },
 });
+
+// modal Color
+export const lastColorIdx = writable(null);

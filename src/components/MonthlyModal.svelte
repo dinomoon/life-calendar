@@ -1,8 +1,27 @@
 <script>
   import { userInfo, clickedDay, modalTransition } from "../store";
   import { fly } from 'svelte/transition';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   const dispatch = createEventDispatcher();
+
+  onMount(() => {
+    const labels = ['운동', '독서', '공부', '영화'];
+    const data = {
+      labels: labels,
+      datasets: [{
+        label: 'My First dataset',
+        data: [1, 10, 5, 2],
+        backgroundColor: ['red', 'orange', 'gold', 'skyblue']
+      }]
+    };
+
+    const config = {
+      type: 'line',
+      data: data,
+    };
+
+    var myChart = new Chart(document.getElementById('myChart'), config);
+  })
 
   function clickHandler(date, dir) {
     dispatch('clickHandler', {
@@ -49,7 +68,12 @@
           on:click={() => clickHandler('month', 'prev')}
           class:hidden={$clickedDay.age === 1 && $clickedDay.month === 1}
         />
-        <h2>{$clickedDay.month}월</h2>
+        <h2>
+          {$clickedDay.month}월
+          <span class="date-period">
+            {startWeek}주 ~ {endWeek}주
+          </span>
+        </h2>
         <i
           class="next fas fa-chevron-right"
           on:click={() => clickHandler('month', 'next')}
@@ -57,7 +81,9 @@
         />
       </div>
     </header>
-    {startWeek} - {endWeek}
+    <div>
+      <canvas id="myChart"></canvas>
+    </div>
     <div id="editor" />
   </div>
 </div>

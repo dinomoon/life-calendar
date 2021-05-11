@@ -18,6 +18,7 @@
   let value = '';
   let editor;
   let currentDay = $weekObj[$dayNum];
+  let allTags = [];
   let tags = [];
   const FIRST_DAY_OF_WEEK = '월';
   const LAST_DAY_OF_WEEK = '일';
@@ -141,6 +142,7 @@
           value = $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][$clickedDay.day].value || '';
           tags = $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][$clickedDay.day].tags || [];
         }
+        allTags = $userInfo.weekly.allTags || [];
         break;
     }
 
@@ -203,6 +205,7 @@
           .set(
             {
               weekly: {
+                allTags,
                 [`${$clickedDay.age} ${$clickedDay.week}`]: {
                   [$clickedDay.day]: {
                     tags,
@@ -220,20 +223,50 @@
 
   // tagSubmitHandler
   function tagSubmitHandler(e) {
-    const value = e.detail.value;
-    const time = e.detail.minResult;
+    const value = e.detail.tagInputValue;
+    const color = e.detail.color;
     const newTag = {
-      id: tags.length,
       value,
-      time,
+      color,
     }
     tags = [...tags, newTag];
+    allTags = [...allTags, newTag];
+    tagsUpdateToDB();
   }
 
   // tagRemoveHandler
   function tagRemoveHandler(e) {
-    const id = e.detail;
-    tags = tags.filter((tag) => tag.id != id);
+    const value = e.detail.value;
+    const type = e.detail.type;
+
+    if (type === 'onlyThis') {
+      tags = tags.filter((tag) => tag.value != value);
+    }
+    
+    if (type === 'all') {
+      tags = tags.filter((tag) => tag.value != value);
+      allTags = allTags.filter(tag => tag.value != value);
+    }
+    
+    tagsUpdateToDB();
+  }
+
+  function tagsUpdateToDB() {
+    db.collection('users')
+      .doc($userDocId)
+      .set(
+        {
+          weekly: {
+            allTags,
+            [`${$clickedDay.age} ${$clickedDay.week}`]: {
+              [$clickedDay.day]: {
+                tags,
+              },
+            },
+          },
+        },
+        { merge: true },
+      );
   }
 </script>
 
@@ -251,6 +284,7 @@
     on:tagSubmitHandler={tagSubmitHandler}
     on:tagRemoveHandler={tagRemoveHandler}
     {currentDay}
+    {allTags}
     {tags}
   />
 {/if}
