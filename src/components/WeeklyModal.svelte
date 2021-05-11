@@ -47,19 +47,16 @@
   }
 
   function tagSubmitHandler(e) {
-    const keyCode = e.keyCode;
-    if (keyCode === 13) {
-      if (tagInputValue.trim() !== '') {
-        const color = randomColor();
-        
-        dispatch('tagSubmitHandler', {
-          tagInputValue,
-          color
-        })
-        tagInputValue = '';
-      } else {
-        tagInputValue = '';
-      }
+    if (tagInputValue.trim() !== '') {
+      const color = randomColor();
+      
+      dispatch('tagSubmitHandler', {
+        tagInputValue,
+        color
+      })
+      tagInputValue = '';
+    } else {
+      tagInputValue = '';
     }
   }
   
@@ -75,6 +72,19 @@
       showAllTags = true;
     } else {
       showAllTags = false;
+    }
+  }
+
+  function allTagsClickHandler(e) {
+    if (e.target.classList.contains('tag-value')) {
+      const color = e.target.parentNode.style.backgroundColor;
+      const value = e.target.textContent;
+      const clickedTag = {
+        color,
+        value
+      }
+
+      dispatch('allTagsClickHandler', clickedTag)
     }
   }
 </script>
@@ -132,31 +142,33 @@
     >
       {#each tags as tag}
         <div class="tag" style="background-color: {tag.color}">
-          <span data-type='tag'>{tag.value}</span>
+          <span class="tag-value" data-type='tag'>{tag.value}</span>
           <button data-type='tag' class="tag-remove" on:click={() => tagRemoveHandler(tag.value, 'onlyThis')}>
             <i data-type='tag' class="fas fa-times"></i>
           </button>
         </div>
       {/each}
       <div class="tag-input-container">
-        <input
+        <form on:submit|preventDefault={tagSubmitHandler}>
+          <input
           data-type='tag'
           type="text"
           class="tag-input"
           placeholder="태그를 추가해보세요."
-          on:keydown={(e) => {tagSubmitHandler(e)}} bind:value={tagInputValue}
+          bind:value={tagInputValue}
         >
+        </form>
       </div>
     </div>
     {#if showAllTags && allTags.length !== 0}
       <div
         class="all-tags-container tag-container"
         data-type='tag'
-        on:click={(e) => {console.log(e.target)}}
+        on:click={(e) => allTagsClickHandler(e)}
       >
         {#each allTags as tag}
           <div data-type='tag' class="tag" style="background-color: {tag.color}">
-            <span data-type='tag'>{tag.value}</span>
+            <span class="tag-value" data-type='tag'>{tag.value}</span>
             <button data-type='tag' class="tag-remove" on:click={() => tagRemoveHandler(tag.value, 'all')}>
               <i data-type='tag' class="fas fa-times"></i>
             </button>

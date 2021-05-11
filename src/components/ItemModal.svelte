@@ -240,6 +240,7 @@
     const type = e.detail.type;
 
     if (type === 'onlyThis') {
+      console.log(tags)
       tags = tags.filter((tag) => tag.value != value);
     }
     
@@ -268,6 +269,19 @@
         { merge: true },
       );
   }
+
+  function allTagsClickHandler(e) {
+    let exist = false;
+    tags.forEach(tag => {
+      if (tag.value === e.detail.value) {
+        exist = true;
+      }
+    })
+
+    if (!exist) {
+      tags = [...tags, e.detail];
+    }
+  }
 </script>
 
 <svelte:window on:keydown={keydownHandler} />
@@ -283,6 +297,7 @@
     on:dayArrowClickHandler={dayArrowClickHandler}
     on:tagSubmitHandler={tagSubmitHandler}
     on:tagRemoveHandler={tagRemoveHandler}
+    on:allTagsClickHandler={allTagsClickHandler}
     {currentDay}
     {allTags}
     {tags}

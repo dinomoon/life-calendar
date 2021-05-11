@@ -350,12 +350,26 @@ h2.left,
   user-select: none;
 }
 
+.all-tags-container .tag {
+  cursor: pointer;
+}
+
 .tag {
+  display: flex;
   color: #fff;
-  padding-left: 10px;
   margin-right: 5px;
   margin-bottom: 5px;
   border-radius: 4px;
+}
+
+.tag .tag-value {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.all-tags-container .tag-value:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .tag-remove {
@@ -366,6 +380,10 @@ h2.left,
   cursor: pointer;
 }
 
+.tag-remove:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
 .tag-input-container {
   flex: 1;
   margin-left: 5px;
@@ -374,7 +392,7 @@ h2.left,
 
 .tag-input {
   color: #9b9b9b;
-  width: 100%;
+  min-width: 100%;
   padding: 5px 0;
   outline: none;
   cursor: pointer;
