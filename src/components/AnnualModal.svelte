@@ -31,7 +31,7 @@
         {$clickedDay.year + 1}년
       </span>
     </header>
-    <div id="editor" />
+    <div id="editor" spellcheck="false" />
   </div>
 </div>
 

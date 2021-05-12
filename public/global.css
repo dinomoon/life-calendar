@@ -265,8 +265,10 @@ h2.left,
   color: rgba(0, 0, 0, 0.6) !important;
 }
 
+/* CKEditor */
 .ck-editor__editable_inline {
   width: calc(50vw - 160px);
+  padding: 0 !important;
 }
 
 .ck-editor__editable_inline ol,

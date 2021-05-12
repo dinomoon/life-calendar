@@ -176,14 +176,10 @@
         {/each}
       </div>
     {/if}
-    <div class="select-container">
-      <select>
-        <option value="자기계발">
-          자기계발
-        </option>
-      </select>
+    <div class="table-container">
+      <h2>그래프로 확인하고 싶은 항목들</h2>
     </div>
-    <div id="editor" />
+    <div id="editor" spellcheck="false" />
   </div>
 </div>
 

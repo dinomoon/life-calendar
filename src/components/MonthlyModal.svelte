@@ -84,7 +84,7 @@
     <div>
       <canvas id="myChart"></canvas>
     </div>
-    <div id="editor" />
+    <div id="editor" spellcheck="false" />
   </div>
 </div>
 
