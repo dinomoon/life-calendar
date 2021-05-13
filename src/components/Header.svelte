@@ -9,6 +9,7 @@
     activeTab,
     userInfo,
     showHelpModal,
+    selectedTag
   } from '../store';
   import HelpModal from './HelpModal.svelte';
 
@@ -22,6 +23,8 @@
     월간: 'monthly',
     주간: 'weekly',
   };
+  let selected;
+  $: selectedTag.set(selected);
 
   const logoutHandler = async () => {
     if ($firebaseLoggedIn) {
@@ -92,6 +95,14 @@
     {/if}
     <nav>
       <ul class="right-tabs">
+        {#if $activeTab === 'weekly'}
+          <select bind:value={selected}>
+            <option>모든 태그</option>
+            {#each $userInfo.weekly.allTags as tag}
+              <option>{tag.value}</option>
+            {/each}
+          </select>
+        {/if}
         {#each rightTabs as tab}
           {#if tab === '로그아웃'}
             <li on:click={logoutHandler}>

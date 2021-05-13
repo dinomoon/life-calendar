@@ -9,7 +9,6 @@
   export let tags = [];
   let tagInputValue = '';
   let showAllTags = false;
-  let tagMouseEnter = false;
   const tagColors = ['#ff8787', '#f783ac', '#da77f2', '#9775fa', '#748ffc', '#4dabf7', '#3bc9db', '#38d9a9', '#69db7c', '#a9e34b', '#ffd43b', '#ffa94d'];
   const COLOR_COUNT = tagColors.length;
 
@@ -178,6 +177,32 @@
     {/if}
     <div class="table-container">
       <h2>그래프로 확인하고 싶은 항목들</h2>
+      <table border="1">
+        <thead>
+          <tr>
+            <td>분류</td>
+            <td>항목명</td>
+            <td>
+              <select name="" id="">
+                <option value="">개수</option>
+                <option value="">시간</option>
+              </select>
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <select>
+                <option value="운동">운동</option>
+                <option value="독서">독서</option>
+              </select>
+            </td>
+            <td>푸쉬업</td>
+            <td><input type="text"></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <div id="editor" spellcheck="false" />
   </div>
