@@ -205,13 +205,11 @@
           .set(
             {
               weekly: {
-                allTags,
                 [`${$clickedDay.age} ${$clickedDay.week}`]: {
                   [$clickedDay.day]: {
-                    tags,
                     value,
                   },
-                  greenCount
+                  greenCount: {all: greenCount}
                 },
               },
             },
@@ -231,7 +229,7 @@
     }
     tags = [...tags, newTag];
     allTags = [...allTags, newTag];
-    tagsUpdateToDB();
+    tagsUpdateToDB('add', value);
   }
 
   // tagRemoveHandler
@@ -240,7 +238,6 @@
     const type = e.detail.type;
 
     if (type === 'onlyThis') {
-      console.log(tags)
       tags = tags.filter((tag) => tag.value != value);
     }
     
@@ -249,10 +246,22 @@
       allTags = allTags.filter(tag => tag.value != value);
     }
     
-    tagsUpdateToDB();
+    tagsUpdateToDB('remove', value);
   }
 
-  function tagsUpdateToDB() {
+  function tagsUpdateToDB(type, value) {
+    const weekDB = $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`];
+    let tagCount = 0;
+    $dayArray.forEach(day => {
+      if (weekDB[day] != null && weekDB[day].tags != null) {
+        weekDB[day].tags.forEach(tag => {
+          if (tag.value === value) {
+            tagCount++;
+          }
+        })
+      }
+    })
+    type === 'add' ? tagCount++  : tagCount--;
     db.collection('users')
       .doc($userDocId)
       .set(
@@ -263,6 +272,7 @@
               [$clickedDay.day]: {
                 tags,
               },
+              greenCount: {[value]: tagCount}
             },
           },
         },
@@ -271,6 +281,7 @@
   }
 
   function allTagsClickHandler(e) {
+    const value = e.detail.value;
     let exist = false;
     tags.forEach(tag => {
       if (tag.value === e.detail.value) {
@@ -280,6 +291,7 @@
 
     if (!exist) {
       tags = [...tags, e.detail];
+      tagsUpdateToDB('add', value);
     }
   }
 </script>

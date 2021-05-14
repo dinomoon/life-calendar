@@ -72,4 +72,4 @@ export const foldStore = writable({
 // modal Color
 export const lastColorIdx = writable(null);
 // selected Tag
-export const selectedTag = writable(null);
+export const selectedTag = writable('all');

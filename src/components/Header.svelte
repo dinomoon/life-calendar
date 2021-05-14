@@ -97,9 +97,9 @@
       <ul class="right-tabs">
         {#if $activeTab === 'weekly'}
           <select bind:value={selected}>
-            <option>모든 태그</option>
+            <option value="all">모든 태그</option>
             {#each $userInfo.weekly.allTags as tag}
-              <option>{tag.value}</option>
+              <option value={tag.value}>{tag.value}</option>
             {/each}
           </select>
         {/if}
@@ -234,5 +234,13 @@
     font-size: 18px;
     cursor: pointer;
     padding: 6px 20px;
+  }
+
+  select {
+    padding: 6px;
+    background-color: transparent;
+    outline: none;
+    font-size: 18px;
+    border-color: rgba(0, 0, 0, 0.2);
   }
 </style>

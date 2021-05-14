@@ -38,14 +38,8 @@
       {#each $colArray as _, colIdx}
         <div
           class="item"
-          class:past={rowIdx < $userAge}
+          class:past={rowIdx + 1 < $userAge || rowIdx + 1 === $userAge && colIdx < $thisMonth}
           class:current={rowIdx + 1 === $userAge && colIdx === $thisMonth}
-          class:vertical-past={rowIdx < $userAge && colIdx === $thisMonth}
-          class:vertical-future={rowIdx + 1 > $userAge &&
-            colIdx % 12 === $thisMonth}
-          class:horizontal-past={rowIdx + 1 === $userAge && colIdx < $thisMonth}
-          class:horizontal-future={rowIdx + 1 === $userAge &&
-            colIdx > $thisMonth}
           class:circle={$userInfo.monthly[`${rowIdx + 1} ${colIdx + 1}`] != null
             && $userInfo.monthly[`${rowIdx + 1} ${colIdx + 1}`].length !== 0}
           data-row={rowIdx}

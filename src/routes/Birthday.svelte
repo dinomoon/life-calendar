@@ -28,7 +28,9 @@
         birthday: { year },
         annual: {},
         monthly: {},
-        weekly: {},
+        weekly: {
+          allTags: [],
+        },
       };
 
       db.collection('users')
