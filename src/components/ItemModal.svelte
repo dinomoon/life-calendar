@@ -253,7 +253,7 @@
     const weekDB = $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`];
     let tagCount = 0;
     $dayArray.forEach(day => {
-      if (weekDB[day] != null && weekDB[day].tags != null) {
+      if (weekDB != null && weekDB[day] != null && weekDB[day].tags != null) {
         weekDB[day].tags.forEach(tag => {
           if (tag.value === value) {
             tagCount++;

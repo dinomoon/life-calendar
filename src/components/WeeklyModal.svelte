@@ -177,38 +177,35 @@
     {/if}
     <div class="table-container">
       <h2>그래프로 확인하고 싶은 항목들</h2>
-      <table border="1">
-        <thead>
-          <tr>
-            <td>분류</td>
-            <td>항목명</td>
-            <td>
-              <select name="" id="">
-                <option value="">개수</option>
-                <option value="">시간</option>
-              </select>
-            </td>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <select>
-                <option value="운동">운동</option>
-                <option value="독서">독서</option>
-              </select>
-            </td>
-            <td>푸쉬업</td>
-            <td><input type="text"></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-grid">
+        <span class="col-add">추가</span>
+        <span>추가</span>
+        <span>분류</span>
+        <span>항목명</span>
+      </div>
     </div>
     <div id="editor" spellcheck="false" />
   </div>
 </div>
 
 <style>
+  .table-container {
+    text-align: left;
+  }
+
+  .table-container h2 {
+    font-size: 18px;
+  }
+
+  .table-grid {
+    display: grid;
+    grid-auto-columns: 90%;
+  }
+
+  .table-grid .col-add {
+    grid-column: 2;
+  }
+
   .day-wrap {
     width: 100%;
     height: 40px;

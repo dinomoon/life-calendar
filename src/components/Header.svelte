@@ -237,10 +237,25 @@
   }
 
   select {
-    padding: 6px;
+    width: 120px;
+    text-overflow: ellipsis;
+    padding: 6px 10px;
     background-color: transparent;
     outline: none;
     font-size: 18px;
     border-color: rgba(0, 0, 0, 0.2);
+    -webkit-appearance: none;  /* 네이티브 외형 감추기 */
+    -moz-appearance: none;
+    appearance: none;
+    background: url('/img/arrow_down.png') no-repeat right 50%;
+    background-size: 30px; /* 화살표 크기 */
+  }
+
+  select:hover {
+    border-color: #aaa;
+  }
+
+  select option {
+    text-overflow: ellipsis;
   }
 </style>
