@@ -1,5 +1,5 @@
 <script>
-  import { userInfo, clickedDay, modalTransition, dayArray, lastColorIdx } from "../store";
+  import { userInfo, clickedDay, modalTransition, dayArray, lastColorIdx, selectedCategories } from "../store";
   import { fly } from 'svelte/transition';
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
@@ -7,8 +7,16 @@
   export let currentDay;
   export let allTags = [];
   export let tags = [];
+  export let categories = [];
+  export let categoryItems = [];
   let tagInputValue = '';
   let showAllTags = false;
+  let categoryAdding = false;
+  let categoryItemAdding = false;
+  let categoryValue;
+  let categoryItemValue;
+  let selectedCategory;
+  let selectedCategoryItem;
   const tagColors = ['#ff8787', '#f783ac', '#da77f2', '#9775fa', '#748ffc', '#4dabf7', '#3bc9db', '#38d9a9', '#69db7c', '#a9e34b', '#ffd43b', '#ffa94d'];
   const COLOR_COUNT = tagColors.length;
 
@@ -86,6 +94,56 @@
       dispatch('allTagsClickHandler', clickedTag)
     }
   }
+
+  function tdMouseOver(e) {
+    const addBtn = e.currentTarget.children[1];
+    addBtn.classList.remove('hidden');
+  }
+
+  function tdMouseOut(e) {
+    const addBtn = e.currentTarget.children[1];
+    addBtn.classList.add('hidden');
+  }
+  
+  function categoryAddClickHandler() {
+    categoryAdding = true;
+  }
+
+  function categoryItemAddClickHandler() {
+    categoryItemAdding = true;
+  }
+
+  function categorySubmit() {
+    if (categoryValue === '' || categoryValue == null) {
+      alert('빈 칸은 입력할 수 없습니다.');
+    } else {
+      dispatch('categorySubmitHandler', {
+        category: categoryValue,
+        items: [],
+      })
+      categoryAdding = false;
+      categoryValue = '';
+    }
+  }
+
+  function categoryItemSubmit() {
+    if (categoryItemValue === '' || categoryItemValue == null) {
+      alert('빈 칸은 입력할 수 없습니다.');
+    } else {
+      dispatch('categoryItemSubmitHandler', {
+        selectedCategory,
+        categoryItemValue
+      })
+      categoryItemAdding = false;
+      categoryItemValue = '';
+    }
+  }
+
+  $: categories.filter((obj) => {
+    if (obj.category === selectedCategory) {
+      categoryItems = obj.items;
+    }
+  });
 </script>
 
 <div class="backdrop" on:click|self>
@@ -176,12 +234,72 @@
       </div>
     {/if}
     <div class="table-container">
-      <h2>그래프로 확인하고 싶은 항목들</h2>
-      <div class="table-grid">
-        <span class="col-add">추가</span>
-        <span>추가</span>
-        <span>분류</span>
-        <span>항목명</span>
+      <h2 class="table-title">그래프로 확인하고 싶은 항목들</h2>
+      <div class="table">
+        <span class="col-add">
+          <i class="far fa-plus-square"></i>
+        </span>
+        <span class="row-add">
+          <i class="far fa-plus-square"></i>
+        </span>
+        <table>
+          <thead class="thead">
+            <tr>
+              <td on:mouseover={(e) => tdMouseOver(e)} on:mouseout={(e) => tdMouseOut(e)}>
+                <span>분류</span>
+                <button on:click={() => categoryAddClickHandler()} class="hidden add-btn">+</button>
+              </td>
+              <td on:mouseover={(e) => tdMouseOver(e)} on:mouseout={(e) => tdMouseOut(e)}>
+                <span>항목명</span>
+                <button on:click={() => categoryItemAddClickHandler()} class="hidden add-btn">+</button>
+              </td>
+              <td>
+                <select>
+                  <option selected disabled>추가사항</option>
+                  <option value="count">개수</option>
+                  <option value="time">시간</option>
+                </select>
+              </td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                {#if categoryAdding || categories == false}
+                  <form
+                    on:submit|preventDefault={() => {categorySubmit()}}
+                  >
+                    <input type="text" bind:value={categoryValue}>
+                  </form>
+                {:else}
+                  <select class="category-select" bind:value={selectedCategory}>
+                    {#each categories as obj}
+                      <option value={obj.category}>{obj.category}</option>
+                    {/each}
+                  </select>
+                {/if}
+              </td>
+              <td>
+                {#if categoryItemAdding || categoryItems == false}
+                  <form
+                    on:submit|preventDefault={() => {categoryItemSubmit()}}
+                  >
+                    <input type="text" bind:value={categoryItemValue}>
+                  </form>
+                {:else}
+                  <select class="category-select" bind:value={selectedCategoryItem}>
+                    {#each categoryItems as categoryItem}
+                      <option value={categoryItem}>{categoryItem}</option>
+                    {/each}
+                  </select>
+                {/if}
+              </td>
+              <td>
+                <input type="text">
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     <div id="editor" spellcheck="false" />
@@ -191,19 +309,90 @@
 <style>
   .table-container {
     text-align: left;
+    padding-bottom: 2rem;
+    margin-top: 1rem;
+    border-bottom: 1px solid var(--gray-2);
   }
 
-  .table-container h2 {
+  .table-container .table-title {
+    position: relative;
+    display: inline-block;
     font-size: 18px;
+    margin-bottom: 1rem;
+    font-weight: normal;
+    z-index: 1;
   }
 
-  .table-grid {
+  .table-container .table-title:before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 12px;
+    position: absolute;
+    left: -1px;
+    bottom: 0;
+    background: lightpink;
+    z-index: -1;
+  }
+
+  .table {
     display: grid;
-    grid-auto-columns: 90%;
+    grid-template-columns: auto 1fr;
+    row-gap: 12px;
+    column-gap: 16px;
   }
 
-  .table-grid .col-add {
+  .table .col-add {
     grid-column: 2;
+  }
+
+  .table .row-add {
+    grid-row: 2;
+  }
+  
+  .table i {
+    font-size: 18px;
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.2);
+  }
+
+  .table i:hover {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .thead .add-btn {
+    padding: 0 7px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  .thead .add-btn:hover {
+    background-color: lightpink;
+    color: #fff;
+    border-radius: 50%;
+  }
+
+  table {
+    grid-row: 2;
+    border-collapse: collapse;
+  }
+
+  table td {
+    vertical-align: top;
+    display: inline-block;
+    width: 100px;
+    margin-right: 10px;
+  }
+
+  table select, input {
+    width: 100%;
+    height: 30px;
+  }
+
+  table input {
+    text-align: right;
+    padding-right: 5px;
   }
 
   .day-wrap {

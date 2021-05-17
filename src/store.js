@@ -73,3 +73,4 @@ export const foldStore = writable({
 export const lastColorIdx = writable(null);
 // selected Tag
 export const selectedTag = writable('all');
+export const selectedCategories = writable([]);

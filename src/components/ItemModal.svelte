@@ -9,6 +9,7 @@
     dayNum,
     dayArray,
     weekObj,
+    selectedCategories
   } from '../store.js';
 
   import AnnualModal from './AnnualModal.svelte';
@@ -20,6 +21,8 @@
   let currentDay = $weekObj[$dayNum];
   let allTags = [];
   let tags = [];
+  let categories = [];
+  let categoryItems = [];
   const FIRST_DAY_OF_WEEK = '월';
   const LAST_DAY_OF_WEEK = '일';
   const placeholder =
@@ -143,6 +146,14 @@
           tags = $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][$clickedDay.day].tags || [];
         }
         allTags = $userInfo.weekly.allTags || [];
+        categories = $userInfo.weekly.categories || [];
+
+        if (categories == false) {
+          categoryItems = [];
+        } else {
+          categoryItems = categories[0].items;
+        }
+
         break;
     }
 
@@ -294,6 +305,44 @@
       tagsUpdateToDB('add', value);
     }
   }
+
+  function categorySubmitHandler(e) {
+    const newCategory = e.detail;
+    categories = [...categories, newCategory];
+
+    categoryUpdateToDB();
+  }
+
+  function categoryItemSubmitHandler(e) {
+    const selectedCategory = e.detail.selectedCategory;
+    const newCategoryItem = e.detail.categoryItemValue;
+    let selectedCategoryIdx;
+
+    categories.filter((obj, idx) => {
+      if (obj.category === selectedCategory) {
+        selectedCategoryIdx = idx;
+        categoryItems = obj.items;
+      }
+    });
+
+    categoryItems = [...categoryItems, newCategoryItem];
+    categories[selectedCategoryIdx].items = categoryItems;
+
+    categoryUpdateToDB();
+  }
+
+  function categoryUpdateToDB() {
+    db.collection('users')
+      .doc($userDocId)
+      .set(
+        {
+          weekly: {
+            categories,
+          },
+        },
+        { merge: true },
+      );
+  }
 </script>
 
 <svelte:window on:keydown={keydownHandler} />
@@ -310,9 +359,13 @@
     on:tagSubmitHandler={tagSubmitHandler}
     on:tagRemoveHandler={tagRemoveHandler}
     on:allTagsClickHandler={allTagsClickHandler}
+    on:categorySubmitHandler={categorySubmitHandler}
+    on:categoryItemSubmitHandler={categoryItemSubmitHandler}
     {currentDay}
     {allTags}
     {tags}
+    {categories}
+    {categoryItems}
   />
 {/if}
 

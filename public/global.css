@@ -70,6 +70,14 @@ label {
   margin-bottom: 8px;
 }
 
+select {
+  text-overflow: ellipsis;
+}
+
+.hidden {
+  display: none;
+}
+
 /* Calendar */
 .calendar--grid {
   display: inline-grid;
@@ -348,7 +356,6 @@ h2.left,
   width: calc(50vw - 160px);
   padding-top: 6px;
   padding-left: 6px;
-  margin-bottom: 1rem;
   border: 1px solid #efefef;
   user-select: none;
 }

@@ -5,22 +5,47 @@
   const dispatch = createEventDispatcher();
 
   onMount(() => {
-    const labels = ['운동', '독서', '공부', '영화'];
+    let labelsObj = new Object;
+    for (let i = startWeek; i <= endWeek; i++) {
+      if ($userInfo.weekly[`${$clickedDay.age} ${i}`] != null) {
+        const tags = $userInfo.weekly[`${$clickedDay.age} ${i}`].greenCount;
+        const keys = Object.keys(tags);
+        keys.forEach(key => {
+          if (labelsObj[key] === undefined) {
+            labelsObj[key] = 1;
+          } else if (labelsObj[key] == 0) {
+            labelsObj[key] = 0;
+          } else {
+            labelsObj[key]++;
+          }
+        })
+      }
+    }
+    let labelsArray = Object.keys(labelsObj);
+    labelsArray = labelsArray.filter(label => label != 'all');
+
+    let dataArray = [];
+    labelsArray.forEach(label => {
+      dataArray.push(labelsObj[label])
+    })
+
+    console.log(dataArray)
+    
     const data = {
-      labels: labels,
+      labels: labelsArray,
       datasets: [{
         label: 'My First dataset',
-        data: [1, 10, 5, 2],
+        data: dataArray,
         backgroundColor: ['red', 'orange', 'gold', 'skyblue']
       }]
     };
 
     const config = {
-      type: 'line',
+      type: 'bar',
       data: data,
     };
 
-    var myChart = new Chart(document.getElementById('myChart'), config);
+    new Chart(document.getElementById('myChart'), config);
   })
 
   function clickHandler(date, dir) {

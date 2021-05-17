@@ -30,6 +30,7 @@
         monthly: {},
         weekly: {
           allTags: [],
+          categories: [],
         },
       };
 

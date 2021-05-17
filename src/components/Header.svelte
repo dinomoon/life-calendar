@@ -1,5 +1,5 @@
 <script>
-  import { push } from 'svelte-spa-router';
+  import { location, push } from 'svelte-spa-router';
 
   import {
     loggedIn,
@@ -95,7 +95,7 @@
     {/if}
     <nav>
       <ul class="right-tabs">
-        {#if $activeTab === 'weekly'}
+        {#if $location === '/weekly' && $loggedIn}
           <select bind:value={selected}>
             <option value="all">모든 태그</option>
             {#each $userInfo.weekly.allTags as tag}
@@ -238,7 +238,6 @@
 
   select {
     width: 120px;
-    text-overflow: ellipsis;
     padding: 6px 10px;
     background-color: transparent;
     outline: none;
@@ -247,15 +246,11 @@
     -webkit-appearance: none;  /* 네이티브 외형 감추기 */
     -moz-appearance: none;
     appearance: none;
-    background: url('/img/arrow_down.png') no-repeat right 50%;
+    background: url('/img/arrow_down.png') no-repeat 105% 50%;
     background-size: 30px; /* 화살표 크기 */
   }
 
   select:hover {
     border-color: #aaa;
-  }
-
-  select option {
-    text-overflow: ellipsis;
   }
 </style>
