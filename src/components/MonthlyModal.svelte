@@ -4,49 +4,74 @@
   import { createEventDispatcher, onMount } from 'svelte';
   const dispatch = createEventDispatcher();
 
+  const backgroundColors = [
+    '#ffc9c9',
+    '#ffd8a8',
+    '#ffec99',
+    'rgba(75, 192, 192, 0.2)',
+    'rgba(54, 162, 235, 0.2)',
+    'rgba(153, 102, 255, 0.2)',
+    'rgba(201, 203, 207, 0.2)'
+  ];
+
+  const borderColors = [
+    '#fa5252',
+    '#fd7e14',
+    '#fab005',
+    'rgb(75, 192, 192)',
+    'rgb(54, 162, 235)',
+    'rgb(153, 102, 255)',
+    'rgb(201, 203, 207)'
+  ];
+
   onMount(() => {
-    let labelsObj = new Object;
+    makeTagPie();
+  })
+
+  function makeTagPie() {
+    let tagObj = new Object;
+    let tagCounts = [];
+    let labels = [];
     for (let i = startWeek; i <= endWeek; i++) {
       if ($userInfo.weekly[`${$clickedDay.age} ${i}`] != null) {
-        const tags = $userInfo.weekly[`${$clickedDay.age} ${i}`].greenCount;
-        const keys = Object.keys(tags);
-        keys.forEach(key => {
-          if (labelsObj[key] === undefined) {
-            labelsObj[key] = 1;
-          } else if (labelsObj[key] == 0) {
-            labelsObj[key] = 0;
-          } else {
-            labelsObj[key]++;
+        let tags = $userInfo.weekly[`${$clickedDay.age} ${i}`].greenCount;
+        let tagsArray = Object.entries(tags);
+        tagsArray.forEach(tagArray => {
+          let tagName = tagArray[0];
+          let tagCount = tagArray[1];
+          if (tagName !== 'all' && tagCount !== 0) {
+            tagObj[tagName] === undefined
+              ? tagObj[tagName] = tagCount
+              : tagObj[tagName] += tagCount;
           }
         })
       }
     }
-    let labelsArray = Object.keys(labelsObj);
-    labelsArray = labelsArray.filter(label => label != 'all');
 
-    let dataArray = [];
-    labelsArray.forEach(label => {
-      dataArray.push(labelsObj[label])
-    })
+    labels = Object.keys(tagObj);
+    for (let key in tagObj) {
+      tagCounts.push(tagObj[key]);
+    }
 
-    console.log(dataArray)
-    
     const data = {
-      labels: labelsArray,
+      labels,
       datasets: [{
-        label: 'My First dataset',
-        data: dataArray,
-        backgroundColor: ['red', 'orange', 'gold', 'skyblue']
+        label: 'tag',
+        data: tagCounts,
+        backgroundColor: backgroundColors,
       }]
     };
 
     const config = {
-      type: 'bar',
+      type: 'pie',
       data: data,
+      options: {
+        responsive: false
+      }
     };
 
-    new Chart(document.getElementById('myChart'), config);
-  })
+    new Chart(document.getElementById('tagChart'), config);
+  }
 
   function clickHandler(date, dir) {
     dispatch('clickHandler', {
@@ -106,9 +131,15 @@
         />
       </div>
     </header>
-    <div>
-      <canvas id="myChart"></canvas>
+    <div class="checkbox-container">
+      <input id="all" type="checkbox">
+      <label for="all">all</label>
+      <input id="tag" type="checkbox">
+      <label for="tag">태그</label>
+      <input id="운동" type="checkbox">
+      <label for="운동">운동</label>
     </div>
+    <canvas id="tagChart" width="300" height="300"></canvas>
     <div id="editor" spellcheck="false" />
   </div>
 </div>
@@ -116,5 +147,19 @@
 <style>
   .left .age {
     font-size: 14px;
+  }
+
+  .checkbox-container label {
+    font-size: 18px;
+    display: inline-block;
+    cursor: pointer;
+    user-select: none;
+    margin-right: 10px;
+  }
+
+  .checkbox-container input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
   }
 </style>

@@ -73,4 +73,6 @@ export const foldStore = writable({
 export const lastColorIdx = writable(null);
 // selected Tag
 export const selectedTag = writable('all');
-export const selectedCategories = writable([]);
+export const selectedCategories = writable([
+  { category: '독서', item: '푸쉬업', count: 0 },
+]);

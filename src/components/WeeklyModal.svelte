@@ -97,12 +97,12 @@
 
   function tdMouseOver(e) {
     const addBtn = e.currentTarget.children[1];
-    addBtn.classList.remove('hidden');
+    addBtn != null && addBtn.classList.remove('hidden');
   }
 
   function tdMouseOut(e) {
     const addBtn = e.currentTarget.children[1];
-    addBtn.classList.add('hidden');
+    addBtn != null && addBtn.classList.add('hidden');
   }
   
   function categoryAddClickHandler() {
@@ -144,6 +144,8 @@
       categoryItems = obj.items;
     }
   });
+
+  $: console.log($selectedCategories)
 </script>
 
 <div class="backdrop" on:click|self>
@@ -242,62 +244,71 @@
         <span class="row-add">
           <i class="far fa-plus-square"></i>
         </span>
+        <!-- table -->
         <table>
+          <!-- thead -->
           <thead class="thead">
             <tr>
               <td on:mouseover={(e) => tdMouseOver(e)} on:mouseout={(e) => tdMouseOut(e)}>
-                <span>분류</span>
-                <button on:click={() => categoryAddClickHandler()} class="hidden add-btn">+</button>
-              </td>
-              <td on:mouseover={(e) => tdMouseOver(e)} on:mouseout={(e) => tdMouseOut(e)}>
-                <span>항목명</span>
-                <button on:click={() => categoryItemAddClickHandler()} class="hidden add-btn">+</button>
-              </td>
-              <td>
-                <select>
-                  <option selected disabled>추가사항</option>
-                  <option value="count">개수</option>
-                  <option value="time">시간</option>
-                </select>
-              </td>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                {#if categoryAdding || categories == false}
+                {#if categoryAdding}
                   <form
                     on:submit|preventDefault={() => {categorySubmit()}}
                   >
                     <input type="text" bind:value={categoryValue}>
                   </form>
                 {:else}
-                  <select class="category-select" bind:value={selectedCategory}>
-                    {#each categories as obj}
-                      <option value={obj.category}>{obj.category}</option>
-                    {/each}
-                  </select>
+                  <span>분류</span>
+                  <button on:click={() => categoryAddClickHandler()} class="hidden add-btn">+</button>
                 {/if}
               </td>
-              <td>
-                {#if categoryItemAdding || categoryItems == false}
+              <td on:mouseover={(e) => tdMouseOver(e)} on:mouseout={(e) => tdMouseOut(e)}>
+                {#if categoryItemAdding}
                   <form
                     on:submit|preventDefault={() => {categoryItemSubmit()}}
                   >
                     <input type="text" bind:value={categoryItemValue}>
                   </form>
                 {:else}
-                  <select class="category-select" bind:value={selectedCategoryItem}>
+                  <span>항목명</span>
+                  <button on:click={() => categoryItemAddClickHandler()} class="hidden add-btn">+</button>
+                {/if}
+              </td>
+              <td>
+                <span>추가사항</span>
+              </td>
+            </tr>
+          </thead>
+          <!-- tbody -->
+          <tbody>
+            {#each $selectedCategories as category}
+              <tr>
+                <td>
+                  <select class="category-select" bind:value={category.category}>
+                    {#each categories as obj}
+                      {#if obj.category === category.category}
+                        <option selected value={obj.category}>{obj.category}</option>
+                      {:else}
+                        <option value={obj.category}>{obj.category}</option>
+                      {/if}
+                    {/each}
+                  </select>
+                </td>
+                <td>
+                  <select class="category-select" bind:value={category.item}>
                     {#each categoryItems as categoryItem}
                       <option value={categoryItem}>{categoryItem}</option>
                     {/each}
                   </select>
-                {/if}
-              </td>
-              <td>
-                <input type="text">
-              </td>
-            </tr>
+                </td>
+                <td>
+                  <select name="" id="">
+                    <option value="">개수</option>
+                    <option value="">시간</option>
+                  </select>
+                  <input type="text">
+                </td>
+              </tr>
+            {/each}
           </tbody>
         </table>
       </div>

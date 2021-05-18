@@ -146,7 +146,7 @@
           tags = $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][$clickedDay.day].tags || [];
         }
         allTags = $userInfo.weekly.allTags || [];
-        categories = $userInfo.weekly.categories || [];
+        categories = $userInfo.weekly.categories || [{category: '운동', items: ['푸쉬업', '턱걸이']}];
 
         if (categories == false) {
           categoryItems = [];
@@ -273,6 +273,10 @@
       }
     })
     type === 'add' ? tagCount++  : tagCount--;
+    if (tagCount === -1) {
+      tagCount = 0;
+    }
+    
     db.collection('users')
       .doc($userDocId)
       .set(
