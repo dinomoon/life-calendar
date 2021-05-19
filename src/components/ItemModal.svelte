@@ -135,25 +135,22 @@
         value = $userInfo.monthly[`${$clickedDay.age} ${$clickedDay.month}`] || '';
         break;
       case 'weekly':
+        const initSelectCategory = { category: '운동', item: '푸쉬업', detail: {type: 'count', value: 0} };
         if ($userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`] == null) {
           value = '';
           tags = [];
+          selectedCategories.set([initSelectCategory])
         } else if ($userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][$clickedDay.day] == null) {
           value = '';
           tags = [];
+          selectedCategories.set([initSelectCategory])
         } else {
           value = $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][$clickedDay.day].value || '';
           tags = $userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][$clickedDay.day].tags || [];
+          selectedCategories.set($userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][$clickedDay.day].selectedCategories);
         }
-        allTags = $userInfo.weekly.allTags || [];
-        categories = $userInfo.weekly.categories || [{category: '운동', items: ['푸쉬업', '턱걸이']}];
-
-        if (categories == false) {
-          categoryItems = [];
-        } else {
-          categoryItems = categories[0].items;
-        }
-
+        allTags = $userInfo.weekly.allTags;
+        categories = $userInfo.weekly.categories;
         break;
     }
 
@@ -219,6 +216,7 @@
                 [`${$clickedDay.age} ${$clickedDay.week}`]: {
                   [$clickedDay.day]: {
                     value,
+                    selectedCategories: $selectedCategories,
                   },
                   greenCount: {all: greenCount}
                 },
@@ -369,7 +367,6 @@
     {allTags}
     {tags}
     {categories}
-    {categoryItems}
   />
 {/if}
 

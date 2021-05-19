@@ -30,7 +30,7 @@
         monthly: {},
         weekly: {
           allTags: [],
-          categories: [],
+          categories: [{category: '운동', items: ['푸쉬업', '턱걸이']}]
         },
       };
 

@@ -74,5 +74,5 @@ export const lastColorIdx = writable(null);
 // selected Tag
 export const selectedTag = writable('all');
 export const selectedCategories = writable([
-  { category: '독서', item: '푸쉬업', count: 0 },
+  { category: '운동', item: '푸쉬업', detail: { type: 'count', value: 0 } },
 ]);

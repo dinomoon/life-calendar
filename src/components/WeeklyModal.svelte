@@ -8,15 +8,14 @@
   export let allTags = [];
   export let tags = [];
   export let categories = [];
-  export let categoryItems = [];
+  // export let categoryItems = [];
   let tagInputValue = '';
   let showAllTags = false;
   let categoryAdding = false;
   let categoryItemAdding = false;
   let categoryValue;
   let categoryItemValue;
-  let selectedCategory;
-  let selectedCategoryItem;
+  let detailInputValue = [];
   const tagColors = ['#ff8787', '#f783ac', '#da77f2', '#9775fa', '#748ffc', '#4dabf7', '#3bc9db', '#38d9a9', '#69db7c', '#a9e34b', '#ffd43b', '#ffa94d'];
   const COLOR_COUNT = tagColors.length;
 
@@ -126,7 +125,7 @@
     }
   }
 
-  function categoryItemSubmit() {
+  function categoryItemSubmit(selectedCategory) {
     if (categoryItemValue === '' || categoryItemValue == null) {
       alert('빈 칸은 입력할 수 없습니다.');
     } else {
@@ -139,17 +138,42 @@
     }
   }
 
-  $: categories.filter((obj) => {
-    if (obj.category === selectedCategory) {
-      categoryItems = obj.items;
-    }
-  });
+  function rowAddClickHandler() {
+    const lastSelected = $selectedCategories[$selectedCategories.length - 1];
+    const lastCategory = lastSelected.category;
+    const lastDetailType = lastSelected.detail.type;
+    const lastItem = lastSelected.item;
+    selectedCategories.update((sc) => {
+      return [...sc, {category: lastCategory, item: lastItem, detail: {type: lastDetailType, value: 0}}]
+    })
+  }
+
+  function handleSelectChange(idx) {
+    const category = document.querySelector(`#categorySelect${idx}`).value;
+    let item;
+    categories.forEach((categoryObj) => {
+      if (categoryObj.category === category) {
+        item = categoryObj.items[0];
+      }
+    })
+    $selectedCategories.forEach(sc => {
+      if (sc.category === category) {
+        sc.item = item;
+      }
+    })
+  }
+
+  function handleSelectBlur() {
+    return;
+  }
 
   $: console.log($selectedCategories)
+  $: console.log(detailInputValue)
 </script>
 
 <div class="backdrop" on:click|self>
   <div class="modal" in:fly={$modalTransition} on:click={(e) => tagClickHandler(e)}>
+    <!-- header -->
     <header class="modal-header">
       <h2 class="left">
         {$userInfo.birthday.year + $clickedDay.age - 1}년
@@ -178,6 +202,8 @@
         />
       </div>
     </header>
+    <!-- // header -->
+    <!-- day-wrap -->
     <div class="day-wrap" on:click={dayClickHandler}>
       <i
         class="prev fas fa-chevron-left"
@@ -195,6 +221,8 @@
         class:hidden={$clickedDay.age === 100 && $clickedDay.week === 52 && $clickedDay.day === '토'}
       />
     </div>
+    <!-- // day-wrap -->
+    <!-- tag-container -->
     <div
       class="tag-container"
       data-type='tag'
@@ -219,6 +247,7 @@
         </form>
       </div>
     </div>
+    <!-- // tag-container -->
     {#if showAllTags && allTags.length !== 0}
       <div
         class="all-tags-container tag-container"
@@ -235,13 +264,14 @@
         {/each}
       </div>
     {/if}
+    <!-- table-container -->
     <div class="table-container">
       <h2 class="table-title">그래프로 확인하고 싶은 항목들</h2>
       <div class="table">
         <span class="col-add">
           <i class="far fa-plus-square"></i>
         </span>
-        <span class="row-add">
+        <span class="row-add" on:click={() => rowAddClickHandler()}>
           <i class="far fa-plus-square"></i>
         </span>
         <!-- table -->
@@ -262,57 +292,72 @@
                 {/if}
               </td>
               <td on:mouseover={(e) => tdMouseOver(e)} on:mouseout={(e) => tdMouseOut(e)}>
-                {#if categoryItemAdding}
-                  <form
-                    on:submit|preventDefault={() => {categoryItemSubmit()}}
-                  >
-                    <input type="text" bind:value={categoryItemValue}>
-                  </form>
-                {:else}
-                  <span>항목명</span>
-                  <button on:click={() => categoryItemAddClickHandler()} class="hidden add-btn">+</button>
-                {/if}
+                <span>항목명</span>
+                <button on:click={() => categoryItemAddClickHandler()} class="hidden add-btn">+</button>
               </td>
               <td>
                 <span>추가사항</span>
               </td>
             </tr>
           </thead>
+          <!-- // thead -->
           <!-- tbody -->
           <tbody>
-            {#each $selectedCategories as category}
+            {#each $selectedCategories as selectedCateObj, idx}
               <tr>
                 <td>
-                  <select class="category-select" bind:value={category.category}>
+                  <select
+                    id="categorySelect{idx}"
+                    bind:value={selectedCateObj.category}
+                    on:change={() => handleSelectChange(idx)}
+                    on:blur={() => handleSelectBlur()}
+                  >
                     {#each categories as obj}
-                      {#if obj.category === category.category}
-                        <option selected value={obj.category}>{obj.category}</option>
-                      {:else}
-                        <option value={obj.category}>{obj.category}</option>
-                      {/if}
+                      <option value={obj.category}>{obj.category}</option>
                     {/each}
                   </select>
                 </td>
                 <td>
-                  <select class="category-select" bind:value={category.item}>
-                    {#each categoryItems as categoryItem}
-                      <option value={categoryItem}>{categoryItem}</option>
-                    {/each}
-                  </select>
+                  {#if categoryItemAdding && $selectedCategories.length - 1 === idx}
+                    <form
+                      on:submit|preventDefault={() => {categoryItemSubmit(selectedCateObj.category)}}
+                    >
+                      <input type="text" bind:value={categoryItemValue}>
+                    </form>
+                  {:else}
+                    <select
+                      bind:value={selectedCateObj.item}
+                    >
+                      {#each categories as obj, idx}
+                        {#if obj.category === selectedCateObj.category}
+                          {#each categories[idx].items as item}
+                            <option value={item}>{item}</option>
+                          {/each}
+                        {/if}
+                      {/each}
+                    </select>
+                  {/if}
                 </td>
                 <td>
-                  <select name="" id="">
-                    <option value="">개수</option>
-                    <option value="">시간</option>
+                  <select
+                    bind:value={selectedCateObj.detail.type}
+                  >
+                    <option value="count">개수</option>
+                    <option value="time">시간</option>
                   </select>
-                  <input type="text">
+                  <input
+                    type="text"
+                    bind:value={selectedCateObj.detail.value}
+                  >
                 </td>
               </tr>
             {/each}
           </tbody>
+          <!-- // tbody -->
         </table>
       </div>
     </div>
+    <!-- // table-container -->
     <div id="editor" spellcheck="false" />
   </div>
 </div>
@@ -355,10 +400,12 @@
 
   .table .col-add {
     grid-column: 2;
+    margin-left: 10px;
   }
 
   .table .row-add {
     grid-row: 2;
+    margin-top: 10px;
   }
   
   .table i {
@@ -386,7 +433,8 @@
 
   table {
     grid-row: 2;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 10px;
   }
 
   table td {
