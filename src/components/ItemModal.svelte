@@ -25,8 +25,7 @@
   let categoryItems = [];
   const FIRST_DAY_OF_WEEK = '월';
   const LAST_DAY_OF_WEEK = '일';
-  const placeholder =
-    '마크다운을 사용해 작성할 수 있어요! 혹시 모르신다면 도움말을 확인해보세요.';
+  const placeholder = '마크다운을 사용해 작성할 수 있어요! 혹시 모르신다면 도움말을 확인해보세요.';
 
   onMount(() => {
     BalloonEditor.create(document.querySelector('#editor'), {
@@ -208,6 +207,7 @@
         } else if (value !== null){
           greenCount++;
         }
+
         db.collection('users')
           .doc($userDocId)
           .set(
@@ -218,7 +218,8 @@
                     value,
                     selectedCategories: $selectedCategories,
                   },
-                  greenCount: {all: greenCount}
+                  greenCount: {all: greenCount},
+                  // weekSelectedCategories,
                 },
               },
             },
@@ -327,7 +328,11 @@
       }
     });
 
-    categoryItems = [...categoryItems, newCategoryItem];
+    if (categoryItems[0] === '텅') {
+      categoryItems = [newCategoryItem];
+    } else {
+      categoryItems = [...categoryItems, newCategoryItem];
+    }
     categories[selectedCategoryIdx].items = categoryItems;
 
     categoryUpdateToDB();

@@ -84,7 +84,22 @@
   }
 
   .title {
+    position: relative;
+    display: inline-block;
     margin-bottom: 2rem;
+    z-index: 1;
+  }
+
+  .title:before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 14px;
+    position: absolute;
+    left: -1px;
+    bottom: 0;
+    background: #ffe100;
+    z-index: -1;
   }
 
   .sub-title {

@@ -113,13 +113,16 @@
   }
 
   function categorySubmit() {
-    if (categoryValue === '' || categoryValue == null) {
+    if (categoryValue.trim() === '' || categoryValue == null) {
       alert('빈 칸은 입력할 수 없습니다.');
     } else {
       dispatch('categorySubmitHandler', {
         category: categoryValue,
-        items: [],
+        items: ['텅'],
       })
+
+      $selectedCategories[$selectedCategories.length - 1].category = categoryValue;
+
       categoryAdding = false;
       categoryValue = '';
     }
@@ -133,31 +136,42 @@
         selectedCategory,
         categoryItemValue
       })
+
+      $selectedCategories[$selectedCategories.length - 1].item = categoryItemValue;
+
       categoryItemAdding = false;
       categoryItemValue = '';
     }
   }
 
   function rowAddClickHandler() {
-    const lastSelected = $selectedCategories[$selectedCategories.length - 1];
-    const lastCategory = lastSelected.category;
-    const lastDetailType = lastSelected.detail.type;
-    const lastItem = lastSelected.item;
+    let newSCObj;
+
+    if ($selectedCategories.length === 0) {
+      newSCObj = { category: '운동', item: '푸쉬업', detail: {type: 'count', value: 0} };
+    } else {
+      const lastSelected = $selectedCategories[$selectedCategories.length - 1];
+      const lastCategory = lastSelected.category;
+      const lastDetailType = lastSelected.detail.type;
+      const lastItem = lastSelected.item;
+      newSCObj = {category: lastCategory, item: lastItem, detail: {type: lastDetailType, value: 0}};
+    }
+
     selectedCategories.update((sc) => {
-      return [...sc, {category: lastCategory, item: lastItem, detail: {type: lastDetailType, value: 0}}]
+      return [...sc, newSCObj]
     })
   }
 
   function handleSelectChange(idx) {
-    const category = document.querySelector(`#categorySelect${idx}`).value;
+    const selectedCate = document.querySelector(`#categorySelect${idx}`).value;
     let item;
     categories.forEach((categoryObj) => {
-      if (categoryObj.category === category) {
+      if (categoryObj.category === selectedCate) {
         item = categoryObj.items[0];
       }
     })
     $selectedCategories.forEach(sc => {
-      if (sc.category === category) {
+      if (sc.category === selectedCate) {
         sc.item = item;
       }
     })
@@ -167,8 +181,18 @@
     return;
   }
 
-  $: console.log($selectedCategories)
-  $: console.log(detailInputValue)
+  let showTable = true;
+  function showTableToggle() {
+    showTable = !showTable;
+  }
+
+  function handleTrDelete(idx) {
+    const filteredSC = $selectedCategories.filter((sc, scIdx) => {
+      return scIdx != idx;
+    })
+
+    selectedCategories.set(filteredSC);
+  }
 </script>
 
 <div class="backdrop" on:click|self>
@@ -266,96 +290,108 @@
     {/if}
     <!-- table-container -->
     <div class="table-container">
-      <h2 class="table-title">그래프로 확인하고 싶은 항목들</h2>
-      <div class="table">
-        <span class="col-add">
-          <i class="far fa-plus-square"></i>
-        </span>
-        <span class="row-add" on:click={() => rowAddClickHandler()}>
-          <i class="far fa-plus-square"></i>
-        </span>
-        <!-- table -->
-        <table>
-          <!-- thead -->
-          <thead class="thead">
-            <tr>
-              <td on:mouseover={(e) => tdMouseOver(e)} on:mouseout={(e) => tdMouseOut(e)}>
-                {#if categoryAdding}
-                  <form
-                    on:submit|preventDefault={() => {categorySubmit()}}
-                  >
-                    <input type="text" bind:value={categoryValue}>
-                  </form>
-                {:else}
+      <h2 class="table-title">
+        <i class="far fa-chart-bar" on:click={() => showTableToggle()}></i>
+      </h2>
+      {#if showTable}
+        <div class="table">
+          <span class="col-add">
+            <i class="far fa-plus-square"></i>
+          </span>
+          <span class="row-add" on:click={() => rowAddClickHandler()}>
+            <i class="far fa-plus-square"></i>
+          </span>
+          <!-- table -->
+          <table>
+            <!-- thead -->
+            <thead class="thead">
+              <tr>
+                <td on:mouseover={(e) => tdMouseOver(e)} on:mouseout={(e) => tdMouseOut(e)}>
                   <span>분류</span>
                   <button on:click={() => categoryAddClickHandler()} class="hidden add-btn">+</button>
-                {/if}
-              </td>
-              <td on:mouseover={(e) => tdMouseOver(e)} on:mouseout={(e) => tdMouseOut(e)}>
-                <span>항목명</span>
-                <button on:click={() => categoryItemAddClickHandler()} class="hidden add-btn">+</button>
-              </td>
-              <td>
-                <span>추가사항</span>
-              </td>
-            </tr>
-          </thead>
-          <!-- // thead -->
-          <!-- tbody -->
-          <tbody>
-            {#each $selectedCategories as selectedCateObj, idx}
-              <tr>
-                <td>
-                  <select
-                    id="categorySelect{idx}"
-                    bind:value={selectedCateObj.category}
-                    on:change={() => handleSelectChange(idx)}
-                    on:blur={() => handleSelectBlur()}
-                  >
-                    {#each categories as obj}
-                      <option value={obj.category}>{obj.category}</option>
-                    {/each}
-                  </select>
+                </td>
+                <td on:mouseover={(e) => tdMouseOver(e)} on:mouseout={(e) => tdMouseOut(e)}>
+                  <span>항목명</span>
+                  <button on:click={() => categoryItemAddClickHandler()} class="hidden add-btn">+</button>
                 </td>
                 <td>
-                  {#if categoryItemAdding && $selectedCategories.length - 1 === idx}
-                    <form
-                      on:submit|preventDefault={() => {categoryItemSubmit(selectedCateObj.category)}}
-                    >
-                      <input type="text" bind:value={categoryItemValue}>
-                    </form>
-                  {:else}
-                    <select
-                      bind:value={selectedCateObj.item}
-                    >
-                      {#each categories as obj, idx}
-                        {#if obj.category === selectedCateObj.category}
-                          {#each categories[idx].items as item}
-                            <option value={item}>{item}</option>
-                          {/each}
-                        {/if}
-                      {/each}
-                    </select>
-                  {/if}
-                </td>
-                <td>
-                  <select
-                    bind:value={selectedCateObj.detail.type}
-                  >
-                    <option value="count">개수</option>
-                    <option value="time">시간</option>
-                  </select>
-                  <input
-                    type="text"
-                    bind:value={selectedCateObj.detail.value}
-                  >
+                  <span>추가사항</span>
                 </td>
               </tr>
-            {/each}
-          </tbody>
-          <!-- // tbody -->
-        </table>
-      </div>
+            </thead>
+            <!-- // thead -->
+            <!-- tbody -->
+            <tbody>
+              {#each $selectedCategories as selectedCateObj, idx}
+                <tr>
+                  <td>
+                    {#if categoryAdding && $selectedCategories.length - 1 === idx}
+                      <form
+                        on:submit|preventDefault={() => {categorySubmit()}}
+                      >
+                        <input type="text" bind:value={categoryValue}>
+                      </form>
+                    {:else}
+                      <select
+                        id="categorySelect{idx}"
+                        bind:value={$selectedCategories[idx].category}
+                        on:change={() => handleSelectChange(idx)}
+                        on:blur={() => handleSelectBlur()}
+                      >
+                        {#each categories as obj}
+                          <option value={obj.category}>{obj.category}</option>
+                        {/each}
+                      </select>
+                    {/if}
+                  </td>
+                  <td>
+                    {#if categoryItemAdding && $selectedCategories.length - 1 === idx}
+                      <form
+                        on:submit|preventDefault={() => {categoryItemSubmit(selectedCateObj.category)}}
+                      >
+                        <input type="text" bind:value={categoryItemValue}>
+                      </form>
+                    {:else}
+                      <select
+                        bind:value={selectedCateObj.item}
+                      >
+                        {#each categories as obj, idx}
+                          {#if obj.category === selectedCateObj.category}
+                            {#each categories[idx].items as item}
+                              <option value={item}>{item}</option>
+                            {/each}
+                          {/if}
+                        {/each}
+                      </select>
+                    {/if}
+                  </td>
+                  <td>
+                    <select
+                      bind:value={selectedCateObj.detail.type}
+                      class="detail-type"
+                    >
+                      <option value="count">개수</option>
+                      <option value="time">시간</option>
+                    </select>
+                    <input
+                      type="text"
+                      bind:value={selectedCateObj.detail.value}
+                    >
+                  </td>
+                  <td>
+                    <i
+                      on:click={() => handleTrDelete(idx)}
+                      class="far fa-minus-square"
+                    >
+                    </i>
+                  </td>
+                </tr>
+              {/each}
+            </tbody>
+            <!-- // tbody -->
+          </table>
+        </div>
+      {/if}
     </div>
     <!-- // table-container -->
     <div id="editor" spellcheck="false" />
@@ -365,30 +401,21 @@
 <style>
   .table-container {
     text-align: left;
-    padding-bottom: 2rem;
-    margin-top: 1rem;
+    padding: 0.6rem 0;
     border-bottom: 1px solid var(--gray-2);
   }
 
   .table-container .table-title {
-    position: relative;
-    display: inline-block;
-    font-size: 18px;
-    margin-bottom: 1rem;
-    font-weight: normal;
-    z-index: 1;
+    text-align: right;
   }
 
-  .table-container .table-title:before {
-    content: '';
-    display: block;
-    width: 100%;
-    height: 12px;
-    position: absolute;
-    left: -1px;
-    bottom: 0;
-    background: lightpink;
-    z-index: -1;
+  .table-container .table-title i {
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.2);
+  }
+
+  .table-container .table-title i:hover {
+    color: rgba(0, 0, 0, 0.6);
   }
 
   .table {
@@ -396,6 +423,7 @@
     grid-template-columns: auto 1fr;
     row-gap: 12px;
     column-gap: 16px;
+    padding-bottom: 1rem;
   }
 
   .table .col-add {
@@ -435,6 +463,7 @@
     grid-row: 2;
     border-collapse: separate;
     border-spacing: 10px;
+    user-select: none;
   }
 
   table td {
@@ -452,6 +481,10 @@
   table input {
     text-align: right;
     padding-right: 5px;
+  }
+
+  table .detail-type {
+    margin-bottom: 3px;
   }
 
   .day-wrap {

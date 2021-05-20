@@ -1,5 +1,5 @@
 <script>
-  import { userInfo, clickedDay, modalTransition } from "../store";
+  import { userInfo, clickedDay, modalTransition, dayArray } from "../store";
   import { fly } from 'svelte/transition';
   import { createEventDispatcher, onMount } from 'svelte';
   const dispatch = createEventDispatcher();
@@ -26,7 +26,63 @@
 
   onMount(() => {
     makeTagPie();
+    makeCategoryChart();
   })
+
+  let monthSelectedCate = [];
+
+  function makeCategoryChart() {
+    let datasets = [];
+    for (let i = startWeek; i <= endWeek; i++) {
+      if ($userInfo.weekly[`${$clickedDay.age} ${i}`] != null) {
+        $dayArray.forEach(day => {
+          if ($userInfo.weekly[`${$clickedDay.age} ${i}`][day] != null) {
+            const sc = $userInfo.weekly[`${$clickedDay.age} ${i}`][day].selectedCategories;
+            sc.forEach(c => {
+              if (monthSelectedCate.indexOf(c.category) === -1) {
+                monthSelectedCate = [...monthSelectedCate, c.category];
+              }
+            })
+          }
+        })
+      }
+    }
+
+    console.log(monthSelectedCate)
+
+    const data = {
+      labels: $dayArray,
+      datasets: [{
+        label: '푸쉬업',
+        data: [1,2,3,4,5,6,7],
+        backgroundColor: 'orange',
+      },
+      {
+        label: '턱걸이',
+        data: [1,2,3,4,5,6,7],
+        backgroundColor: 'gold',
+      }]
+    };
+
+    const config = {
+      type: 'bar',
+      data,
+      options: {
+        responsive: false,
+        plugins: {
+          title: {
+            display: true,
+            text: '18주',
+          }
+        }
+      }
+    };
+
+    new Chart(document.getElementById('chart1'), config);
+    new Chart(document.getElementById('chart2'), config);
+    new Chart(document.getElementById('chart3'), config);
+    new Chart(document.getElementById('chart4'), config);
+  }
 
   function makeTagPie() {
     let tagObj = new Object;
@@ -136,10 +192,19 @@
       <label for="all">all</label>
       <input id="tag" type="checkbox">
       <label for="tag">태그</label>
-      <input id="운동" type="checkbox">
-      <label for="운동">운동</label>
+      {#each monthSelectedCate as cate}
+        <input id={cate} type="checkbox">
+        <label for={cate}>{cate}</label>
+      {/each}
     </div>
     <canvas id="tagChart" width="300" height="300"></canvas>
+    <br>
+    <div class="canvas-container">
+      <canvas id="chart1"></canvas>
+      <canvas id="chart2"></canvas>
+      <canvas id="chart3"></canvas>
+      <canvas id="chart4"></canvas>
+    </div>
     <div id="editor" spellcheck="false" />
   </div>
 </div>
@@ -161,5 +226,15 @@
     width: 16px;
     height: 16px;
     cursor: pointer;
+  }
+
+  canvas {
+    display: inline-block !important;
+    width: calc(30vw - 120px) !important;
+  }
+
+  #tagChart {
+    width: 300px !important;
+    height: 300px !important;
   }
 </style>
