@@ -76,3 +76,29 @@ export const selectedTag = writable('all');
 export const selectedCategories = writable([
   { category: '운동', item: '푸쉬업', detail: { type: 'count', value: 0 } },
 ]);
+export const startWeek = writable(null);
+export const endWeek = writable(null);
+export const categories = writable([
+  { category: '운동', items: ['푸쉬업', '턱걸이'] },
+]);
+
+export const backgroundColors = writable([
+  '#ffc9c9',
+  '#ffd8a8',
+  '#ffec99',
+  '#b2f2bb',
+  '#a5d8ff',
+  '#bac8ff',
+  '#d0bfff',
+]);
+
+export const borderColors = writable([
+  '#fa5252',
+  '#fd7e14',
+  '#fab005',
+  'rgb(75, 192, 192)',
+  'rgb(54, 162, 235)',
+  'rgb(153, 102, 255)',
+  'rgb(201, 203, 207)',
+]);
+export const tagCounts = writable([]);

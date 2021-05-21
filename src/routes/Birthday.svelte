@@ -39,8 +39,8 @@
         .then((docRef) => {
           userInfo.set(initialData);
           userDocId.set(docRef.id);
-          push('/annual');
           userAge.set($thisYear - $userInfo.birthday.year + 1);
+          push('/annual');
         });
     } else {
       alert('잘못 입력하신 것 같아요. 다시 입력해주세요.');

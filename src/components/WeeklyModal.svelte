@@ -1,21 +1,26 @@
 <script>
-  import { userInfo, clickedDay, modalTransition, dayArray, lastColorIdx, selectedCategories } from "../store";
+  import { 
+    userInfo,
+    clickedDay,
+    modalTransition,
+    dayArray,
+    lastColorIdx,
+    selectedCategories,
+    categories,
+  } from "../store";
   import { fly } from 'svelte/transition';
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
-  
+
   export let currentDay;
   export let allTags = [];
   export let tags = [];
-  export let categories = [];
-  // export let categoryItems = [];
   let tagInputValue = '';
   let showAllTags = false;
   let categoryAdding = false;
   let categoryItemAdding = false;
   let categoryValue;
   let categoryItemValue;
-  let detailInputValue = [];
   const tagColors = ['#ff8787', '#f783ac', '#da77f2', '#9775fa', '#748ffc', '#4dabf7', '#3bc9db', '#38d9a9', '#69db7c', '#a9e34b', '#ffd43b', '#ffa94d'];
   const COLOR_COUNT = tagColors.length;
 
@@ -165,7 +170,7 @@
   function handleSelectChange(idx) {
     const selectedCate = document.querySelector(`#categorySelect${idx}`).value;
     let item;
-    categories.forEach((categoryObj) => {
+    $categories.forEach((categoryObj) => {
       if (categoryObj.category === selectedCate) {
         item = categoryObj.items[0];
       }
@@ -338,7 +343,7 @@
                         on:change={() => handleSelectChange(idx)}
                         on:blur={() => handleSelectBlur()}
                       >
-                        {#each categories as obj}
+                        {#each $categories as obj}
                           <option value={obj.category}>{obj.category}</option>
                         {/each}
                       </select>
@@ -355,9 +360,9 @@
                       <select
                         bind:value={selectedCateObj.item}
                       >
-                        {#each categories as obj, idx}
+                        {#each $categories as obj, idx}
                           {#if obj.category === selectedCateObj.category}
-                            {#each categories[idx].items as item}
+                            {#each $categories[idx].items as item}
                               <option value={item}>{item}</option>
                             {/each}
                           {/if}
@@ -434,6 +439,7 @@
   .table .row-add {
     grid-row: 2;
     margin-top: 10px;
+    height: 30px;
   }
   
   .table i {

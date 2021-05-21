@@ -58,14 +58,14 @@
               break;
             case 'auth/user-not-found':
               Swal.fire({
-                text: '입력하신 이메일이 존재하지 않습니다.',
+                text: '이메일 또는 비밀번호를 확인해주세요.',
                 icon: 'error',
                 confirmButtonText: '확인'
               })
               break;
             case 'auth/wrong-password':
               Swal.fire({
-                text: '비밀번호가 올바르지 않습니다.',
+                text: '이메일 또는 비밀번호를 확인해주세요.',
                 icon: 'error',
                 confirmButtonText: '확인'
               })

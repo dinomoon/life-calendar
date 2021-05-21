@@ -9,7 +9,8 @@
     dayNum,
     dayArray,
     weekObj,
-    selectedCategories
+    selectedCategories,
+    categories,
   } from '../store.js';
 
   import AnnualModal from './AnnualModal.svelte';
@@ -21,11 +22,12 @@
   let currentDay = $weekObj[$dayNum];
   let allTags = [];
   let tags = [];
-  let categories = [];
   let categoryItems = [];
   const FIRST_DAY_OF_WEEK = '월';
   const LAST_DAY_OF_WEEK = '일';
   const placeholder = '마크다운을 사용해 작성할 수 있어요! 혹시 모르신다면 도움말을 확인해보세요.';
+
+  getData('init');
 
   onMount(() => {
     BalloonEditor.create(document.querySelector('#editor'), {
@@ -125,7 +127,7 @@
   }
 
   // getData
-  function getData() {
+  function getData(type) {
     switch ($activeTab) {
       case 'annual':
         value = $userInfo.annual[$clickedDay.year] || '';
@@ -149,12 +151,15 @@
           selectedCategories.set($userInfo.weekly[`${$clickedDay.age} ${$clickedDay.week}`][$clickedDay.day].selectedCategories);
         }
         allTags = $userInfo.weekly.allTags;
-        categories = $userInfo.weekly.categories;
         break;
-    }
+      }
+      
+    categories.set($userInfo.weekly.categories);
 
-    editor.setData(value);
-    editor.focus();
+    if (type != 'init') {
+      editor.setData(value);
+      editor.focus();
+    }
   }
 
   // saveData
@@ -232,13 +237,34 @@
   // tagSubmitHandler
   function tagSubmitHandler(e) {
     const value = e.detail.tagInputValue;
-    const color = e.detail.color;
-    const newTag = {
-      value,
-      color,
+    let color = e.detail.color;
+    let tagsExist = false;
+    let allTagsExist = false;
+
+    tags.forEach(tag => {
+      if (tag.value === value) {
+        tagsExist = true;
+      }
+    })
+
+    allTags.forEach(tag => {
+      if (tag.value === value) {
+        allTagsExist = true;
+        color = tag.color;
+      }
+    })
+
+    let newTag = { value, color }
+
+    if (tagsExist && allTagsExist) {
+      return;
+    } else if (!tagsExist && allTagsExist) {
+      tags = [...tags, newTag];
+    } else if (!tagsExist && !allTagsExist) {
+      tags = [...tags, newTag];
+      allTags = [...allTags, newTag];
     }
-    tags = [...tags, newTag];
-    allTags = [...allTags, newTag];
+    
     tagsUpdateToDB('add', value);
   }
 
@@ -311,7 +337,9 @@
 
   function categorySubmitHandler(e) {
     const newCategory = e.detail;
-    categories = [...categories, newCategory];
+    categories.update((cate) => {
+      return [...cate, newCategory];
+    })
 
     categoryUpdateToDB();
   }
@@ -321,7 +349,7 @@
     const newCategoryItem = e.detail.categoryItemValue;
     let selectedCategoryIdx;
 
-    categories.filter((obj, idx) => {
+    $categories.filter((obj, idx) => {
       if (obj.category === selectedCategory) {
         selectedCategoryIdx = idx;
         categoryItems = obj.items;
@@ -333,18 +361,19 @@
     } else {
       categoryItems = [...categoryItems, newCategoryItem];
     }
-    categories[selectedCategoryIdx].items = categoryItems;
+    $categories[selectedCategoryIdx].items = categoryItems;
 
     categoryUpdateToDB();
   }
 
   function categoryUpdateToDB() {
+    const copiedCategories = $categories;
     db.collection('users')
       .doc($userDocId)
       .set(
         {
           weekly: {
-            categories,
+            categories: copiedCategories,
           },
         },
         { merge: true },
@@ -354,9 +383,15 @@
 
 <svelte:window on:keydown={keydownHandler} />
 {#if $activeTab === 'annual'}
-  <AnnualModal on:click on:clickHandler={clickHandler} />
+  <AnnualModal
+    on:click
+    on:clickHandler={clickHandler}
+  />
 {:else if $activeTab === 'monthly'}
-  <MonthlyModal on:click on:clickHandler={clickHandler} />
+  <MonthlyModal
+    on:click
+    on:clickHandler={clickHandler}
+  />
 {:else if $activeTab === 'weekly'}
   <WeeklyModal
     on:click
@@ -371,7 +406,6 @@
     {currentDay}
     {allTags}
     {tags}
-    {categories}
   />
 {/if}
 
