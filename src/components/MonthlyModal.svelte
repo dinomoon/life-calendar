@@ -15,13 +15,16 @@
   import { createEventDispatcher, onMount } from 'svelte';
 
   const dispatch = createEventDispatcher();
+  const CANVAS_WIDTH = "22vw";
+  const CANVAS_HEIGHT = "11vw";
   let tagPieChart;
   let categoryChart = [];
   let fromStartToEndWeek = [];
   let tagChecked = false;
   let checkedArray = [];
-  $categories.forEach(cate => {
-    checkedArray = [...checkedArray, {category: cate.category, checked: false}];
+  $categories.forEach(obj => {
+    checkedArray = [...checkedArray, {category: obj.category, checked: false}];
+    categoryChart[obj.category] = new Array(5).fill(0);
   })
 
   onMount(() => {
@@ -116,54 +119,59 @@
 
   // makeCategoryChart
   function makeCategoryChart() {
-    let datasets, text, config, dayDB;
-    $categories.forEach(obj => {
-      fromStartToEndWeek.forEach((week) => {
-        datasets = [];
-        obj.items.forEach((item, idx) => {
-          datasets = [...datasets, {label: item, data: new Array(7).fill(0), backgroundColor: $backgroundColors[idx]}]
-        })
-        text = week + '주';
-        if ($userInfo.weekly[`${$clickedDay.age} ${week}`] != null) {
-          $dayArray.forEach((day, idx) => {
-            dayDB = $userInfo.weekly[`${$clickedDay.age} ${week}`][day];
-            if (dayDB != null) {
-              dayDB.selectedCategories.forEach(sc => {
-                if (sc.detail.value != 0) {
-                  datasets.forEach((dataset) => {
-                    if (dataset.label === sc.item && obj.category === sc.category && dataset.label != '텅') {
-                      dataset.data[idx] = sc.detail.value;
-                    }
-                  })
-                }
-              })
-            }
+    let datasets, text, config, dayDB, chart;
+      $categories.forEach(obj => {
+        fromStartToEndWeek.forEach((week, weekIdx) => {
+          datasets = [];
+          obj.items.forEach((item, idx) => {
+            datasets = [...datasets, {label: item, data: new Array(7).fill(0), backgroundColor: $backgroundColors[idx]}]
           })
-        }
-
-        config = {
-          type: 'bar',
-          data: {
-            labels: $dayArray,
-            datasets,
-          },
-          options: {
-            responsive: false,
-            plugins: {
-              title: {
-                display: true,
-                text,
+          text = week + '주';
+          if ($userInfo.weekly[`${$clickedDay.age} ${week}`] != null) {
+            $dayArray.forEach((day, idx) => {
+              dayDB = $userInfo.weekly[`${$clickedDay.age} ${week}`][day];
+              if (dayDB != null) {
+                dayDB.selectedCategories.forEach(sc => {
+                  if (sc.detail.value != 0) {
+                    datasets.forEach((dataset) => {
+                      if (dataset.label === sc.item && obj.category === sc.category && dataset.label != '텅') {
+                        dataset.data[idx] = sc.detail.value;
+                      }
+                    })
+                  }
+                })
               }
+            })
+          }
+
+          config = {
+            type: 'bar',
+            data: {
+              labels: $dayArray,
+              datasets,
+            },
+            options: {
+              responsive: false,
+              plugins: {
+                title: {
+                  display: true,
+                  text,
+                }
+              },
             }
           }
-        }
-        // if (categoryChart[idx] != null) {
-        //   categoryChart[idx].destroy();
-        // }
-        // categoryChart[idx] = 
-        new Chart(document.getElementById(`${obj.category}chart${week}`), config);
+          
+          if (categoryChart[obj.category][weekIdx] != 0) {
+            categoryChart[obj.category][weekIdx].data.datasets = datasets;
+            categoryChart[obj.category][weekIdx].options.plugins.title.text = text;
+            categoryChart[obj.category][weekIdx].update()
+          } else {
+            chart = new Chart(document.getElementById(`${obj.category}chart${week}`), config);
+            categoryChart[obj.category][weekIdx] = chart;
+          }
+        })
+        console.log(categoryChart)
       })
-    })
   }
 
   // clickHandler
@@ -178,6 +186,9 @@
   }
 
   function handleClickAll(e) {
+    getStartAndEndWeek();
+    makeTagPie();
+    makeCategoryChart();
     const checked = e.target.checked;
     tagChecked = checked;
     checkedArray.forEach(obj => {
@@ -267,20 +278,24 @@
       </div>
       <!-- // checkbox-container -->
       <canvas id="tagChart" class:hidden={!tagChecked}></canvas>
-      <!-- canvas-container -->
-      <div class="canvas-container">
+      <!-- category-container -->
+      <div class="categories-container">
         {#each $categories as cateObj, idx}
-          {#each fromStartToEndWeek as week}
-            <canvas
-              id="{cateObj.category}chart{week}"
-              class:hidden={!checkedArray[idx].checked}
-              class="category"
-            >
-            </canvas>
-          {/each}
+          <div class="category-container" class:p-2={checkedArray[idx].checked} class:border-top={checkedArray[idx].checked}>
+            <h2 class:hidden={!checkedArray[idx].checked}>{cateObj.category}</h2>
+            {#each fromStartToEndWeek as week}
+              <canvas
+                id="{cateObj.category}chart{week}"
+                class:hidden={!checkedArray[idx].checked}
+                class="category"
+                style="width: {CANVAS_WIDTH}; height: {CANVAS_HEIGHT};"
+              >
+              </canvas>
+            {/each}
+          </div>
         {/each}
       </div>
-      <!-- // canvas-container -->
+      <!-- // category-container -->
     </div>
     <div id="editor" spellcheck="false" />
   </div>
@@ -288,21 +303,35 @@
 </div>
 
 <style>
+  .p-2 {
+    padding: 2rem 0;
+  }
+
+  .border-top {
+    border-top: 1px solid var(--gray-2);
+  }
+
   .left .age {
     font-size: 14px;
   }
 
   .chart-container {
-    padding: 2rem 0 3rem;
     border-bottom: 1px solid var(--gray-2);
   }
 
-  canvas {
-    width: calc(30vw - 120px) !important;
+  .checkbox-container {
+    padding-bottom: 1rem;
   }
 
-  canvas.category {
-    display: inline-block !important;
+  .category-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 1rem;
+    justify-items: center;
+  }
+
+  .category-container h2 {
+    grid-column: 1/3;
   }
 
   canvas.category.hidden {
@@ -310,8 +339,6 @@
   }
 
   #tagChart {
-    width: 300px !important;
-    height: 300px !important;
     margin: 0 auto;
   }
 

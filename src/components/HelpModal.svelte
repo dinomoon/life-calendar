@@ -1,7 +1,8 @@
 <script>
   import { onMount } from 'svelte';
   import { push } from 'svelte-spa-router';
-  import { loggedIn, showHelpModal } from '../store';
+  import { loggedIn, modalTransition, showHelpModal } from '../store';
+  import { fly } from 'svelte/transition';
 
   onMount(() => {
     if ($loggedIn === false) {
@@ -18,7 +19,7 @@
 <svelte:window on:keydown={keydownHandler} />
 {#if $showHelpModal}
   <div class="backdrop" on:click|self>
-    <div class="modal help">
+    <div class="modal help" in:fly={$modalTransition}>
       <article class="markdown-article">
         <h2 class="title">마크다운 사용법</h2>
         <section>

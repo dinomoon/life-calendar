@@ -186,7 +186,7 @@ select {
   position: relative;
   width: 60vw;
   height: 80vh;
-  padding: 40px 80px 60px;
+  padding: 40px 4vw 60px;
   background-color: #fff;
   border-radius: 4px;
   overflow-y: auto;
