@@ -78,7 +78,10 @@
 
   // keydownHandler
   function keydownHandler(event) {
-    event.keyCode === 27 && showItemModal.set(false);
+    if (event.keyCode === 27) {
+      showItemModal.set(false);
+      document.body.classList.remove('showModal');
+    }
   }
 
   // dayClickHandler
@@ -346,7 +349,7 @@
 
   function categoryItemSubmitHandler(e) {
     const selectedCategory = e.detail.selectedCategory;
-    const newCategoryItem = e.detail.categoryItemValue;
+    const newCategoryItem = e.detail.categoryItemInputValue;
     let selectedCategoryIdx;
 
     $categories.filter((obj, idx) => {

@@ -1,12 +1,11 @@
 @import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css);
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
 :root {
   --border-color: #dee2e6; /* gray3 */
   --gray-2: #f1f3f5;
   --past-background-color: rgba(0, 0, 0, 0.1);
   --current-item-color: #f5df4d;
-  --vh-past-color: rgba(0, 0, 0, 0.4);
-  --vh-future-color: lightpink;
   --active-color: #fa5252;
   --background-color: #fdf9f1;
   --item-background-color: #fffefc;

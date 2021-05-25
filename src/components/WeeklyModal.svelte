@@ -7,6 +7,7 @@
     lastColorIdx,
     selectedCategories,
     categories,
+userDocId,
   } from "../store";
   import { fly } from 'svelte/transition';
   import { createEventDispatcher } from 'svelte';
@@ -19,8 +20,8 @@
   let showAllTags = false;
   let categoryAdding = false;
   let categoryItemAdding = false;
-  let categoryValue;
-  let categoryItemValue;
+  let categoryInputValue;
+  let categoryItemInputValue;
   const tagColors = ['#ff8787', '#f783ac', '#da77f2', '#9775fa', '#748ffc', '#4dabf7', '#3bc9db', '#38d9a9', '#69db7c', '#a9e34b', '#ffd43b', '#ffa94d'];
   const COLOR_COUNT = tagColors.length;
 
@@ -101,12 +102,16 @@
 
   function tdMouseOver(e) {
     const addBtn = e.currentTarget.children[1];
-    addBtn != null && addBtn.classList.remove('hidden');
+    const removeBtn = e.currentTarget.children[2];
+    addBtn.classList.remove('hidden');
+    removeBtn.classList.remove('hidden');
   }
 
   function tdMouseOut(e) {
     const addBtn = e.currentTarget.children[1];
-    addBtn != null && addBtn.classList.add('hidden');
+    const removeBtn = e.currentTarget.children[2];
+    addBtn.classList.add('hidden');
+    removeBtn.classList.add('hidden');
   }
   
   function categoryAddClickHandler() {
@@ -117,35 +122,77 @@
     categoryItemAdding = true;
   }
 
+  function categoryRemoveClickHandler() {
+    const scLength = $selectedCategories.length;
+    const currentCate = $selectedCategories[scLength - 1].category;
+    const isConfirm = confirm(`${currentCate} 분류를 삭제하시겠습니까? 항목들도 다 같이 삭제됩니다.`);
+    if (isConfirm) {
+      const filteredSC = $selectedCategories.filter(sc => {
+        return sc.category != currentCate;
+      })
+      selectedCategories.set(filteredSC);
+      // newSCObj = { category: initCate, item: initItem, detail: {type: 'count', value: 0} };
+      // selectedCategories.set($selectedCategories);
+      // scLength === 1 ? selectedCategories.set($selectedCategories) : selectedCategories.set($selectedCategories);
+
+      const filteredCategories = $categories.filter(cateObj => {
+        return cateObj.category != currentCate;
+      })
+      categories.set(filteredCategories);
+
+      const copiedCategories = $categories;
+      db.collection('users')
+      .doc($userDocId)
+      .set(
+        {
+          weekly: {
+            categories: copiedCategories,
+          },
+        },
+        { merge: true },
+      );
+
+      console.log($categories.length)
+      if ($categories.length === 0) {
+        const initSC = { category: '텅', item: '텅', detail: {type: 'count', value: 0} };
+        selectedCategories.set(initSC)
+      }
+    }
+  }
+
+  function categoryItemRemoveClickHandler() {
+
+  }
+
   function categorySubmit() {
-    if (categoryValue.trim() === '' || categoryValue == null) {
+    if (categoryInputValue.trim() === '' || categoryInputValue == null) {
       alert('빈 칸은 입력할 수 없습니다.');
     } else {
       dispatch('categorySubmitHandler', {
-        category: categoryValue,
+        category: categoryInputValue,
         items: ['텅'],
       })
 
-      $selectedCategories[$selectedCategories.length - 1].category = categoryValue;
+      $selectedCategories[$selectedCategories.length - 1].category = categoryInputValue;
 
       categoryAdding = false;
-      categoryValue = '';
+      categoryInputValue = '';
     }
   }
 
   function categoryItemSubmit(selectedCategory) {
-    if (categoryItemValue === '' || categoryItemValue == null) {
+    if (categoryItemInputValue === '' || categoryItemInputValue == null) {
       alert('빈 칸은 입력할 수 없습니다.');
     } else {
       dispatch('categoryItemSubmitHandler', {
         selectedCategory,
-        categoryItemValue
+        categoryItemInputValue
       })
 
-      $selectedCategories[$selectedCategories.length - 1].item = categoryItemValue;
+      $selectedCategories[$selectedCategories.length - 1].item = categoryItemInputValue;
 
       categoryItemAdding = false;
-      categoryItemValue = '';
+      categoryItemInputValue = '';
     }
   }
 
@@ -153,7 +200,9 @@
     let newSCObj;
 
     if ($selectedCategories.length === 0) {
-      newSCObj = { category: '운동', item: '푸쉬업', detail: {type: 'count', value: 0} };
+      const initCate = $categories[0].category;
+      const initItem = $categories[0].items[0];
+      newSCObj = { category: initCate, item: initItem, detail: {type: 'count', value: 0} };
     } else {
       const lastSelected = $selectedCategories[$selectedCategories.length - 1];
       const lastCategory = lastSelected.category;
@@ -295,14 +344,12 @@
     {/if}
     <!-- table-container -->
     <div class="table-container">
-      <h2 class="table-title">
-        <i class="far fa-chart-bar" on:click={() => showTableToggle()}></i>
-      </h2>
+      <div class="table-toggle">
+        <!-- <i class="far fa-chart-bar" on:click={() => showTableToggle()}></i> -->
+        <i class="fas fa-table" on:click={() => showTableToggle()}></i>
+      </div>
       {#if showTable}
         <div class="table">
-          <span class="col-add">
-            <i class="far fa-plus-square"></i>
-          </span>
           <span class="row-add" on:click={() => rowAddClickHandler()}>
             <i class="far fa-plus-square"></i>
           </span>
@@ -313,11 +360,13 @@
               <tr>
                 <td on:mouseover={(e) => tdMouseOver(e)} on:mouseout={(e) => tdMouseOut(e)}>
                   <span>분류</span>
-                  <button on:click={() => categoryAddClickHandler()} class="hidden add-btn">+</button>
+                  <button on:click={() => categoryAddClickHandler()} class="hidden add-btn">&#43;</button>
+                  <!-- <button on:click={() => categoryRemoveClickHandler()} class="hidden add-btn">&#45;</button> -->
                 </td>
                 <td on:mouseover={(e) => tdMouseOver(e)} on:mouseout={(e) => tdMouseOut(e)}>
-                  <span>항목명</span>
-                  <button on:click={() => categoryItemAddClickHandler()} class="hidden add-btn">+</button>
+                  <span>항목</span>
+                  <button on:click={() => categoryItemAddClickHandler()} class="hidden add-btn">&#43;</button>
+                  <!-- <button on:click={() => categoryItemRemoveClickHandler()} class="hidden add-btn">&#45;</button> -->
                 </td>
                 <td>
                   <span>추가사항</span>
@@ -334,7 +383,7 @@
                       <form
                         on:submit|preventDefault={() => {categorySubmit()}}
                       >
-                        <input type="text" bind:value={categoryValue}>
+                        <input type="text" bind:value={categoryInputValue}>
                       </form>
                     {:else}
                       <select
@@ -354,7 +403,7 @@
                       <form
                         on:submit|preventDefault={() => {categoryItemSubmit(selectedCateObj.category)}}
                       >
-                        <input type="text" bind:value={categoryItemValue}>
+                        <input type="text" bind:value={categoryItemInputValue}>
                       </form>
                     {:else}
                       <select
@@ -376,7 +425,7 @@
                       class="detail-type"
                     >
                       <option value="count">개수</option>
-                      <option value="time">시간</option>
+                      <option value="time">시간(분)</option>
                     </select>
                     <input
                       type="text"
@@ -410,36 +459,28 @@
     border-bottom: 1px solid var(--gray-2);
   }
 
-  .table-container .table-title {
+  .table-container .table-toggle {
     text-align: right;
   }
 
-  .table-container .table-title i {
+  .table-container .table-toggle i {
     cursor: pointer;
-    color: rgba(0, 0, 0, 0.2);
+    color: rgba(0, 0, 0, 0.1);
+    font-size: 1.4rem;
   }
 
-  .table-container .table-title i:hover {
+  .table-container .table-toggle i:hover {
     color: rgba(0, 0, 0, 0.6);
   }
 
   .table {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    row-gap: 12px;
-    column-gap: 16px;
+    display: flex;
     padding-bottom: 1rem;
   }
 
-  .table .col-add {
-    grid-column: 2;
-    margin-left: 10px;
-  }
-
   .table .row-add {
-    grid-row: 2;
-    margin-top: 10px;
-    height: 30px;
+    margin: 10px 10px 0 0;
+    align-self: flex-start;
   }
   
   .table i {
@@ -460,7 +501,7 @@
   }
 
   .thead .add-btn:hover {
-    background-color: lightpink;
+    background-color: #51cf66;
     color: #fff;
     border-radius: 50%;
   }

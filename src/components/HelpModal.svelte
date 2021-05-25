@@ -60,6 +60,16 @@
             </code>
           </div>
         </section>
+        <section>
+          <h3 class="sub-title">단축키</h3>
+          <p class="desc">굵은 글씨와 기울인 글씨는 단축키를 사용해보세요.</p>
+          <div class="code-wrap">
+            <code>
+              <div>> 굵은 글씨: Ctrl + B</div>
+              <div>> 기울인 글씨: Ctrl + I</div>
+            </code>
+          </div>
+        </section>
       </article>
     </div>
   </div>

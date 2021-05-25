@@ -24,9 +24,12 @@
   let checkedArray = [];
   $categories.forEach(obj => {
     checkedArray = [...checkedArray, {category: obj.category, checked: false}];
-    categoryChart[obj.category] = new Array(5).fill(0);
+    categoryChart = [...categoryChart, {category: obj.category, values: new Array(5).fill(0)}]
   })
+  let fiveLengthArray = new Array(5).fill(0)
 
+
+  let categoryContainers; 
   onMount(() => {
     getStartAndEndWeek();
   })
@@ -119,8 +122,9 @@
 
   // makeCategoryChart
   function makeCategoryChart() {
+    categoryContainers = document.querySelectorAll('.category-container');
     let datasets, text, config, dayDB, chart;
-      $categories.forEach(obj => {
+      $categories.forEach((obj, objIdx) => {
         fromStartToEndWeek.forEach((week, weekIdx) => {
           datasets = [];
           obj.items.forEach((item, idx) => {
@@ -161,16 +165,17 @@
             }
           }
           
-          if (categoryChart[obj.category][weekIdx] != 0) {
-            categoryChart[obj.category][weekIdx].data.datasets = datasets;
-            categoryChart[obj.category][weekIdx].options.plugins.title.text = text;
-            categoryChart[obj.category][weekIdx].update()
+          if (categoryChart[objIdx].values[weekIdx] != 0) {
+            const chart = categoryChart[objIdx].values[weekIdx];
+            chart.data.datasets = datasets;
+            chart.options.plugins.title.text = text;
+            chart.update()
           } else {
-            chart = new Chart(document.getElementById(`${obj.category}chart${week}`), config);
-            categoryChart[obj.category][weekIdx] = chart;
+            let ctx = categoryContainers[objIdx].children[weekIdx + 1].getContext('2d');
+            chart = new Chart(ctx, config);
+            categoryChart[objIdx].values[weekIdx] = chart;
           }
         })
-        console.log(categoryChart)
       })
   }
 
@@ -241,6 +246,7 @@
       </div>
     </header>
     <!-- // modal-header -->
+    <!-- chart-container -->
     <div class="chart-container">
       <!-- checkbox-container -->
       <div class="checkbox-container">
@@ -277,16 +283,19 @@
         <!-- // category checkbox -->
       </div>
       <!-- // checkbox-container -->
-      <canvas id="tagChart" class:hidden={!tagChecked}></canvas>
+      <div class:p-2={tagChecked} class:border-top={tagChecked}>
+        <h2 class:hidden={!tagChecked} style="margin-bottom: 1rem">태그</h2>
+        <canvas id="tagChart" class:hidden={!tagChecked}></canvas>
+      </div>
       <!-- category-container -->
       <div class="categories-container">
         {#each $categories as cateObj, idx}
           <div class="category-container" class:p-2={checkedArray[idx].checked} class:border-top={checkedArray[idx].checked}>
             <h2 class:hidden={!checkedArray[idx].checked}>{cateObj.category}</h2>
-            {#each fromStartToEndWeek as week}
+            {#each fiveLengthArray as week, weekIdx}
               <canvas
                 id="{cateObj.category}chart{week}"
-                class:hidden={!checkedArray[idx].checked}
+                class:hidden={!checkedArray[idx].checked || (fromStartToEndWeek.length === 4 && weekIdx === 4)}
                 class="category"
                 style="width: {CANVAS_WIDTH}; height: {CANVAS_HEIGHT};"
               >
@@ -297,6 +306,7 @@
       </div>
       <!-- // category-container -->
     </div>
+    <!-- // chart-container -->
     <div id="editor" spellcheck="false" />
   </div>
   <!-- // modal -->
@@ -317,6 +327,11 @@
 
   .chart-container {
     border-bottom: 1px solid var(--gray-2);
+  }
+
+  .chart-container h2 {
+    font-size: 20px;
+    font-weight: normal;
   }
 
   .checkbox-container {
