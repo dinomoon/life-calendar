@@ -95,8 +95,10 @@
   }
 
   .circle::before {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
+    right: 4px;
+    top: 4px;
   }
 
   .item .age {
