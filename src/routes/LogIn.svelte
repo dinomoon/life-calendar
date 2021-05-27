@@ -192,6 +192,11 @@
     text-align: left;
   }
 
+  label {
+    display: block;
+    margin-bottom: 6px;
+  }
+
   input {
     padding-left: 1rem;
   }
