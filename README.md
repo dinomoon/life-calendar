@@ -23,12 +23,12 @@
 
 <!-- ABOUT THE PROJECT -->
 
-## About The Project
+## 1. About The Project
 
 유튜브를 보다가 우연히 Life Calendar라는 것을 알게되었습니다.
 하지만 기존의 Life Calendar는 출력을 해서 색칠을 하는 방식이었는 데,
 '만약 주마다 기록을 할 수 있게 만들면 더 좋은 도구가 될 수 있지 않을까?' 라는 생각으로 프로젝트를 시작하게되었습니다.
-만들다보니 기록뿐만 아니라 태그도 추가할 수 있고 기록을 가지고 그래프도 보여질 수 있게끔 되었습니다.
+현재는 기록뿐만 아니라 태그도 추가할 수 있고 그래프도 볼 수 있습니다.
 
 ### Built With
 
@@ -39,7 +39,7 @@
 
 <!-- GETTING STARTED -->
 
-## Getting Started
+## 2. Getting Started
 
 ### Link
 
@@ -47,7 +47,7 @@
 
 <!-- USAGE EXAMPLES -->
 
-## Usage
+## 3. Usage
 
 1. 로그인
 
@@ -66,7 +66,7 @@
 
 <!-- CONTACT -->
 
-## Contact
+## 4. Contact
 
 Email - ansrud45@gmail.com
 
