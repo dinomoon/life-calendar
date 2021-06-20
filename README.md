@@ -22,22 +22,33 @@
 </details>
 
 <!-- ABOUT THE PROJECT -->
+<br>
 
 ## About The Project
 
-유튜브를 보다가 우연히 Life Calendar라는 것을 알게되었습니다.
-하지만 기존의 Life Calendar는 출력을 해서 색칠을 하는 방식이었는 데,
+어느 날 유튜브를 보다가 우연히 Life Calendar라는 것을 알게되었습니다.
+
+![image](https://user-images.githubusercontent.com/42693257/122661310-df4b1600-d1c3-11eb-8e24-293406153799.png)
+
+하지만 기존의 Life Calendar는 위와 사진과 같이 출력을 해서 색칠을 하는 방식이었는 데,
 '만약 주마다 기록을 할 수 있게 만들면 더 좋은 도구가 될 수 있지 않을까?' 라는 생각으로 프로젝트를 시작하게되었습니다.
 현재는 기록뿐만 아니라 태그도 추가할 수 있고 그래프도 볼 수 있습니다.
 
 ### Built With
 
+![image](https://img.shields.io/badge/svelte-v3.38.2-orange)
+![image](https://img.shields.io/badge/CKEditor5-v28.0.0-1D9860)
+![image](https://img.shields.io/badge/Chart.js-v3.3.2-FF708E)
+<img src="https://img.shields.io/badge/Firebase-FFCA2A?style=flat-square&logo=firebase&logoColor=white"/></a>
+
 - [Svelte](https://svelte.dev/)
-- [Firebase](https://firebase.google.com/)
 - [CKEditor5](https://ckeditor.com/)
 - [Chart.js](https://www.chartjs.org/)
+- [Firebase](https://firebase.google.com/)
 
 <!-- GETTING STARTED -->
+
+<br>
 
 ## Getting Started
 
@@ -47,12 +58,25 @@
 
 <!-- USAGE EXAMPLES -->
 
-## Usage
+<br>
 
-✅ 로그인
+## Pages & Usage
+
+✅ 홈
+
+![image](https://user-images.githubusercontent.com/42693257/122661361-73b57880-d1c4-11eb-8bb5-9c96bb328ad8.png)
+![image](https://user-images.githubusercontent.com/42693257/122661372-8e87ed00-d1c4-11eb-9005-6f74669d3887.png)
+![image](https://user-images.githubusercontent.com/42693257/122661380-96e02800-d1c4-11eb-8c19-cd4c5e3b2e81.png)
+![image](https://user-images.githubusercontent.com/42693257/122661381-9b0c4580-d1c4-11eb-9da8-125237b3b946.png)
+
+<br>
+<br>
+
+✅ 로그인 & 회원가입
+
 ![image](https://user-images.githubusercontent.com/42693257/120055835-8cbe8400-c073-11eb-98c0-f1654633710f.png)
 ![image](https://user-images.githubusercontent.com/42693257/120055845-99db7300-c073-11eb-83f0-7aa9fe836042.png)
-sns로 로그인을 하거나 이메일로 회원가입을 한 뒤 이메일로 로그인을 합니다.
+sns로 로그인을 하거나 이메일로 회원가입을 한 뒤 이메일로 로그인을 할 수 있습니다.
 
 <br>
 <br>
@@ -100,6 +124,7 @@ sns로 로그인을 하거나 이메일로 회원가입을 한 뒤 이메일로 
   도움말에는 마크다운 작성법이 적혀있습니다.
 
 <!-- CONTACT -->
+<br>
 
 ## Contact
 
