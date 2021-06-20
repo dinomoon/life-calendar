@@ -141,7 +141,7 @@
 - 테이블에 본인이 만들고 싶은 습관 같은 것들을 입력할 수 있습니다. (운동 분류와 팔굽혀펴기, 턱걸이 항목을 기본값으로 설정했습니다.)
 - 기록한 요일 수에 따라 색깔을 다르게 했습니다. (1일: 가장 연함, 7일: 가장 진함.)
 
-![bandicam 2021-06-20 14-33-29-749](https://user-images.githubusercontent.com/42693257/122663353-b7b07980-d1d4-11eb-8662-1d4dc2baa4c3.gif)
+![bandicam 2021-06-20 15-01-04-928](https://user-images.githubusercontent.com/42693257/122663871-8f2a7e80-d1d8-11eb-9a57-cf583e3046fd.gif)
 
 <br>
 <br>
