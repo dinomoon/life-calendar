@@ -40,11 +40,13 @@
 ![image](https://img.shields.io/badge/CKEditor5-v28.0.0-1D9860)
 ![image](https://img.shields.io/badge/Chart.js-v3.3.2-FF708E)
 <img src="https://img.shields.io/badge/Firebase-FFCA2A?style=flat-square&logo=firebase&logoColor=white"/></a>
+<img src="https://img.shields.io/badge/Netlify-4D9ABF?style=flat-square&logo=Netlify&logoColor=white"/></a>
 
 - [Svelte](https://svelte.dev/)
 - [CKEditor5](https://ckeditor.com/)
 - [Chart.js](https://www.chartjs.org/)
 - [Firebase](https://firebase.google.com/)
+- [Netlify](https://www.netlify.com/)
 
 <!-- GETTING STARTED -->
 
@@ -66,10 +68,10 @@
 
 노션 홈페이지의 디자인을 참고하여 만들었습니다.
 
-![image](https://user-images.githubusercontent.com/42693257/122661361-73b57880-d1c4-11eb-8bb5-9c96bb328ad8.png)
-![image](https://user-images.githubusercontent.com/42693257/122661372-8e87ed00-d1c4-11eb-9005-6f74669d3887.png)
-![image](https://user-images.githubusercontent.com/42693257/122661380-96e02800-d1c4-11eb-8c19-cd4c5e3b2e81.png)
-![image](https://user-images.githubusercontent.com/42693257/122661381-9b0c4580-d1c4-11eb-9da8-125237b3b946.png)
+![image](https://user-images.githubusercontent.com/42693257/122662768-8d5cbd00-d1d0-11eb-8527-4d136b6a0a4e.png)
+![image](https://user-images.githubusercontent.com/42693257/122662781-bbda9800-d1d0-11eb-98ba-2a6625eb18e8.png)
+![image](https://user-images.githubusercontent.com/42693257/122662796-c85ef080-d1d0-11eb-95ad-70fda8585216.png)
+![image](https://user-images.githubusercontent.com/42693257/122662800-d0b72b80-d1d0-11eb-934c-57e0342e1722.png)
 
 <br>
 <br>
@@ -81,10 +83,10 @@
 - 예외 처리가 가능합니다.
 
 ![image](https://user-images.githubusercontent.com/42693257/120055835-8cbe8400-c073-11eb-98c0-f1654633710f.png)
-![image](https://user-images.githubusercontent.com/42693257/122661786-06f0ad00-d1c9-11eb-8d76-16b95830898b.png)
-![image](https://user-images.githubusercontent.com/42693257/122661788-0c4df780-d1c9-11eb-880d-fed787b60521.png)
-![image](https://user-images.githubusercontent.com/42693257/122661790-107a1500-d1c9-11eb-8372-bd3e7702c5eb.png)
-![image](https://user-images.githubusercontent.com/42693257/122661792-13750580-d1c9-11eb-92b4-89561df509d8.png)
+![image](https://user-images.githubusercontent.com/42693257/122662811-ed536380-d1d0-11eb-94be-ceb001bc3c51.png)
+![image](https://user-images.githubusercontent.com/42693257/122662823-f80df880-d1d0-11eb-9e6c-d9b06ab8d05a.png)
+![image](https://user-images.githubusercontent.com/42693257/122662827-00feca00-d1d1-11eb-8ce6-6e3b5cba365f.png)
+![image](https://user-images.githubusercontent.com/42693257/122662830-078d4180-d1d1-11eb-9f0f-a3aa5e2b6bb7.png)
 
 <br>
 <br>
@@ -94,16 +96,18 @@
 - 예외 처리가 가능합니다.
 
 ![image](https://user-images.githubusercontent.com/42693257/120055845-99db7300-c073-11eb-83f0-7aa9fe836042.png)
-![image](https://user-images.githubusercontent.com/42693257/122661803-33a4c480-d1c9-11eb-8881-64116c806913.png)
-![image](https://user-images.githubusercontent.com/42693257/122661805-36071e80-d1c9-11eb-9021-e78582e5f33d.png)
-![image](https://user-images.githubusercontent.com/42693257/122661810-3e5f5980-d1c9-11eb-81a5-bd63d7a635ce.png)
-![image](https://user-images.githubusercontent.com/42693257/122661812-415a4a00-d1c9-11eb-9514-5fc2feae2f50.png)
+![image](https://user-images.githubusercontent.com/42693257/122662840-22f84c80-d1d1-11eb-8c2e-79fc7768ee43.png)
+![image](https://user-images.githubusercontent.com/42693257/122662842-2986c400-d1d1-11eb-9570-d2f4bd8eb517.png)
+![image](https://user-images.githubusercontent.com/42693257/122662844-2f7ca500-d1d1-11eb-8cf7-43ddb08544bd.png)
+![image](https://user-images.githubusercontent.com/42693257/122662850-360b1c80-d1d1-11eb-901f-1062761a8139.png)
+![image](https://user-images.githubusercontent.com/42693257/122662863-51762780-d1d1-11eb-81ed-db9fdbbc1e3a.png)
 
 <br>
 <br>
 
 ✅ 태어난 연도 입력
 
+- 사용자가 로그인을 했는 데 연도 정보가 없을 때 나오는 화면입니다.
 - 본인이 태어난 연도를 입력합니다.
 
 ![image](https://user-images.githubusercontent.com/42693257/120055864-bd062280-c073-11eb-8fa2-cc0bde098c7b.png)
@@ -150,6 +154,9 @@
 
 - 월간, 주간 달력에서 행의 오른쪽에 있는 화살표를 클릭하면 10년 단위로 달력을 접었다 폈다 할 수 있습니다.
 - 도움말에는 마크다운 작성법을 적었습니다.
+
+![Life Calendar - Chrome 2021-06-20 14-13-28](https://user-images.githubusercontent.com/42693257/122662960-001a6800-d1d2-11eb-9db2-ef8a3539f8b3.gif)
+![image](https://user-images.githubusercontent.com/42693257/122662881-6bb00580-d1d1-11eb-98ab-1b1e14dbdfb6.png)
 
 <!-- CONTACT -->
 <br>
