@@ -119,8 +119,7 @@
 
 - 기록하고 싶은 연도를 클릭하여 모달창에 기록할 수 있습니다.
 
-![image](https://user-images.githubusercontent.com/42693257/120055926-12daca80-c074-11eb-8ac6-033d2533e62a.png)
-![image](https://user-images.githubusercontent.com/42693257/120055940-284ff480-c074-11eb-8882-4396962e593c.png)
+![bandicam 2021-06-20 14-40-44-368](https://user-images.githubusercontent.com/42693257/122663468-a9169200-d1d5-11eb-8b2f-69052680d223.gif)
 
 <br>
 <br>
@@ -130,9 +129,7 @@
 - 기록하고 싶은 월을 클릭하여 모달창에 기록할 수 있습니다.
 - 주간 모달창에서 입력한 내용으로 그려진 그래프를 확인할 수 있습니다.
 
-![image](https://user-images.githubusercontent.com/42693257/120055972-559ca280-c074-11eb-89e8-93f6015c223e.png)
-![image](https://user-images.githubusercontent.com/42693257/120055396-b629e080-c070-11eb-914d-8522fbef1abd.png)
-![image](https://user-images.githubusercontent.com/42693257/120055369-90044080-c070-11eb-8dff-e238f1d64d67.png)
+![bandicam 2021-06-20 14-37-44-310](https://user-images.githubusercontent.com/42693257/122663412-39080c00-d1d5-11eb-9e2f-7d344c759992.gif)
 
 <br>
 <br>
@@ -144,8 +141,7 @@
 - 테이블에 본인이 만들고 싶은 습관 같은 것들을 입력할 수 있습니다. (운동 분류와 팔굽혀펴기, 턱걸이 항목을 기본값으로 설정했습니다.)
 - 기록한 요일 수에 따라 색깔을 다르게 했습니다. (1일: 가장 연함, 7일: 가장 진함.)
 
-![image](https://user-images.githubusercontent.com/42693257/120056019-a7452d00-c074-11eb-88fd-6039d3561f6f.png)
-![image](https://user-images.githubusercontent.com/42693257/120055423-e70a1580-c070-11eb-894c-5eca8d7c9e45.png)
+![bandicam 2021-06-20 14-33-29-749](https://user-images.githubusercontent.com/42693257/122663353-b7b07980-d1d4-11eb-8662-1d4dc2baa4c3.gif)
 
 <br>
 <br>
@@ -155,7 +151,7 @@
 - 월간, 주간 달력에서 행의 오른쪽에 있는 화살표를 클릭하면 10년 단위로 달력을 접었다 폈다 할 수 있습니다.
 - 도움말에는 마크다운 작성법을 적었습니다.
 
-![Life Calendar - Chrome 2021-06-20 14-13-28](https://user-images.githubusercontent.com/42693257/122662960-001a6800-d1d2-11eb-9db2-ef8a3539f8b3.gif)
+![bandicam 2021-06-20 14-29-30-113](https://user-images.githubusercontent.com/42693257/122663285-3c4ec800-d1d4-11eb-92a6-37eb473561b2.gif)
 ![image](https://user-images.githubusercontent.com/42693257/122662881-6bb00580-d1d1-11eb-98ab-1b1e14dbdfb6.png)
 
 <!-- CONTACT -->
