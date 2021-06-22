@@ -7,7 +7,7 @@
     lastColorIdx,
     selectedCategories,
     categories,
-userDocId,
+    userDocId,
   } from "../store";
   import { fly } from 'svelte/transition';
   import { createEventDispatcher } from 'svelte';
@@ -102,16 +102,16 @@ userDocId,
 
   function tdMouseOver(e) {
     const addBtn = e.currentTarget.children[1];
-    const removeBtn = e.currentTarget.children[2];
+    // const removeBtn = e.currentTarget.children[2];
     addBtn.classList.remove('hidden');
-    removeBtn.classList.remove('hidden');
+    // removeBtn.classList.remove('hidden');
   }
 
   function tdMouseOut(e) {
     const addBtn = e.currentTarget.children[1];
-    const removeBtn = e.currentTarget.children[2];
+    // const removeBtn = e.currentTarget.children[2];
     addBtn.classList.add('hidden');
-    removeBtn.classList.add('hidden');
+    // removeBtn.classList.add('hidden');
   }
   
   function categoryAddClickHandler() {
@@ -131,9 +131,6 @@ userDocId,
         return sc.category != currentCate;
       })
       selectedCategories.set(filteredSC);
-      // newSCObj = { category: initCate, item: initItem, detail: {type: 'count', value: 0} };
-      // selectedCategories.set($selectedCategories);
-      // scLength === 1 ? selectedCategories.set($selectedCategories) : selectedCategories.set($selectedCategories);
 
       const filteredCategories = $categories.filter(cateObj => {
         return cateObj.category != currentCate;
@@ -158,10 +155,6 @@ userDocId,
         selectedCategories.set(initSC)
       }
     }
-  }
-
-  function categoryItemRemoveClickHandler() {
-
   }
 
   function categorySubmit() {
@@ -453,6 +446,10 @@ userDocId,
 </div>
 
 <style>
+  .modal {
+    overflow-y: scroll;
+  }
+
   .table-container {
     text-align: left;
     padding: 0.6rem 0;
@@ -548,7 +545,6 @@ userDocId,
     justify-content: center;
     align-items: center;
     width: 40px;
-    padding: 10px;
     cursor: pointer;
   }
 

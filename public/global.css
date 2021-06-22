@@ -247,11 +247,29 @@ h2.left,
 
 .prev,
 .next {
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
   font-size: 20px;
-  padding: 10px;
+  width: 40px;
+  height: 40px;
   color: rgba(0, 0, 0, 0.1);
   cursor: pointer;
+}
+
+.prev::before,
+.next::before {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+}
+
+.prev:hover,
+.next:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 #year.prev,

@@ -73,7 +73,6 @@
             default:
               return;
           }
-          console.log(errorMessage);
         });
     }
   };
