@@ -559,4 +559,28 @@
     border-radius: 50%;
     color: #fff;
   }
+
+  .prev,
+  .next {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+  }
+
+  .prev::before,
+  .next::before {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+  }
+
+  .prev:hover,
+  .next:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
 </style>

@@ -422,4 +422,28 @@
     75% {transform: scale(1.05, 0.95);}
     to {transform: scale(1, 1);}
   }
+
+  .prev,
+  .next {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+  }
+
+  .prev::before,
+  .next::before {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+  }
+
+  .prev:hover,
+  .next:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
 </style>
