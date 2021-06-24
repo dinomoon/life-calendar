@@ -247,39 +247,57 @@ h2.left,
 
 .prev,
 .next {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50%;
+  display: inline-block;
   font-size: 20px;
-  width: 40px;
-  height: 40px;
   color: rgba(0, 0, 0, 0.1);
   cursor: pointer;
-}
-
-.prev::before,
-.next::before {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 40px;
-  height: 40px;
-}
-
-.prev:hover,
-.next:hover {
-  background-color: rgba(0, 0, 0, 0.1);
-}
-
-#year.prev,
-#year.next {
-  color: rgba(0, 0, 0, 0.2);
 }
 
 .prev:hover,
 .next:hover {
   color: rgba(0, 0, 0, 0.6) !important;
+}
+
+#year.prev,
+#year.next {
+  padding: 8px 16px;
+  color: rgba(0, 0, 0, 0.2);
+}
+
+#year.prev:hover,
+#year.next:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+#month.prev,
+#month.next,
+#week.prev,
+#week.next {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+
+#month.prev::before,
+#month.next::before,
+#week.prev::before,
+#week.next::before {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+}
+
+#month.prev:hover,
+#month.next:hover,
+#week.prev:hover,
+#week.next:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 /* CKEditor */

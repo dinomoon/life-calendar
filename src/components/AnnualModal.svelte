@@ -16,6 +16,7 @@
   <div class="modal" in:fly={$modalTransition}>
     <header class="modal-header">
       <span
+        id="year"
         class="prev"
         class:hidden={$clickedDay.year === $userInfo.birthday.year}
         on:click={() => clickHandler('year', 'prev')}
@@ -24,6 +25,7 @@
       </span>
       <h2>{$clickedDay.year}년</h2>
       <span
+        id="year"
         class="next"
         class:hidden={$clickedDay.year === $userInfo.birthday.year + 99}
         on:click={() => clickHandler('year', 'next')}

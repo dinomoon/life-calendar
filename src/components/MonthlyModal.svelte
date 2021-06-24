@@ -228,6 +228,7 @@
       </h2>
       <div class="right">
         <i
+          id="month"
           class="prev fas fa-chevron-left"
           on:click={() => clickHandler('month', 'prev')}
           class:hidden={$clickedDay.age === 1 && $clickedDay.month === 1}
@@ -239,6 +240,7 @@
           </span>
         </h2>
         <i
+          id="month"
           class="next fas fa-chevron-right"
           on:click={() => clickHandler('month', 'next')}
           class:hidden={$clickedDay.age === 100 && $clickedDay.month === 12}
