@@ -139,7 +139,6 @@
   }
 
   header {
-    max-width: 1920px;
     position: fixed;
     top: 0;
     left: 0;
